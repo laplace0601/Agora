@@ -1,0 +1,9 @@
+{
+    "python.pyrefly.disabledLanguageServices": {},
+    "php.validate.executablePath": "",
+    "json.schemas": [],
+    "rubyLsp.addSettings": {
+        "rubyLsp::custom": {}
+    },
+    "phpcs.enable": false
+}
