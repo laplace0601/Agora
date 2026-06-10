@@ -5,13 +5,19 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'AuthController::login');
+
+// 1. Landing Page oficial en la raíz del sitio
+$routes->get('/', function() {
+    return view('landing');
+});
+
+// 2. Rutas para mostrar el Formulario de Login (GET)
 $routes->get('login', 'AuthController::login');
-// Ruta para mostrar el formulario (GET)
 $routes->get('auth/login', 'AuthController::login');
 
-// Ruta para procesar el formulario (POST)
+// 3. Ruta para procesar el Formulario de Login (POST)
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
+$routes->post('login/autenticar', 'LoginController::autenticar'); 
 
 // ---------------------------------------------------------------
 // Autenticación y Paneles por Rol
