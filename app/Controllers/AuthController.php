@@ -7,13 +7,22 @@ use App\Models\UsuarioModel;
 class AuthController extends BaseController
 {
     /**
+     * GET / o GET /login
+     *
+     * Carga la vista del formulario de Login.
+     */
+    public function login() 
+    {
+        return view('auth/login'); 
+    }
+
+    /**
      * POST /auth/login
      *
-     * Recibe 'correo' y 'clave' por POST.
-     * Valida credenciales y crea la sesión del usuario.
-     * Retorna JSON con resultado de la operación.
+     * Valida credenciales y procesa el inicio de sesión.
+     * Retorna JSON.
      */
-    public function login()
+    public function processLogin()
     {
         $correo = trim($this->request->getPost('correo') ?? '');
         $clave  = $this->request->getPost('clave') ?? '';

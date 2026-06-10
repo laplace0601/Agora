@@ -5,12 +5,13 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'AuthController::login');
+$routes->get('login', 'AuthController::login');
 
 // ---------------------------------------------------------------
 // Autenticación
 // ---------------------------------------------------------------
-$routes->post('auth/login', 'AuthController::login');
+$routes->post('auth/login', 'AuthController::processLogin');
 $routes->get('auth/logout', 'AuthController::logout');
 
 // ---------------------------------------------------------------

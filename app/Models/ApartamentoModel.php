@@ -54,11 +54,11 @@ class ApartamentoModel extends Model
     public function listarPorCondominio(int $condominioId): array
     {
         return $this->select('apartamentos.*, residentes.nombre_completo, residentes.cedula_identidad, residentes.telefono')
-                    ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
-                    ->where('apartamentos.condominio_id', $condominioId)
-                    ->orderBy('apartamentos.nombre_edificio_torre', 'ASC')
-                    ->orderBy('apartamentos.nro_apartamento', 'ASC')
-                    ->findAll();
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->where('apartamentos.condominio_id', $condominioId)
+            ->orderBy('apartamentos.nombre_edificio_torre', 'ASC')
+            ->orderBy('apartamentos.nro_apartamento', 'ASC')
+            ->findAll();
     }
 
     /**
@@ -67,10 +67,10 @@ class ApartamentoModel extends Model
     public function obtenerDetalle(int $apartamentoId): ?array
     {
         return $this->select('apartamentos.*, condominios.nombre_condominio, condominios.marca_id, residentes.nombre_completo, residentes.cedula_identidad')
-                    ->join('condominios', 'condominios.id = apartamentos.condominio_id')
-                    ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
-                    ->where('apartamentos.id', $apartamentoId)
-                    ->first();
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->where('apartamentos.id', $apartamentoId)
+            ->first();
     }
 
     /**
@@ -80,10 +80,10 @@ class ApartamentoModel extends Model
     public function obtenerPorUsuario(int $usuarioId): array
     {
         return $this->select('apartamentos.*, condominios.nombre_condominio')
-                    ->join('residentes', 'residentes.id = apartamentos.residente_id')
-                    ->join('condominios', 'condominios.id = apartamentos.condominio_id')
-                    ->where('residentes.usuario_id', $usuarioId)
-                    ->findAll();
+            ->join('residentes', 'residentes.id = apartamentos.residente_id')
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->where('residentes.usuario_id', $usuarioId)
+            ->findAll();
     }
 
     /**

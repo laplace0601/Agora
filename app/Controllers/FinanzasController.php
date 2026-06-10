@@ -269,4 +269,22 @@ class FinanzasController extends BaseController
             ],
         ]);
     }
+    public function listarPagosPendientes()
+    {
+        // Restricción: Solo administrador
+        if (session()->get('rol') !== 'admin') {
+            return $this->response->setJSON(['error' => 'Acceso denegado. Permisos insuficientes.'])->setStatusCode(403);
+        }
+
+        $pagoModel = new \App\Models\PagoModel();
+
+        // Consulta optimizada con JOINs para traer los datos del recibo y del apartamento
+        $pagosPendientes = $pagoModel->select('pagos.*, recibos_mensuales.mes, recibos_mensuales.anio, apartamentos.numero as apartamento')
+            ->join('recibos_mensuales', 'recibos_mensuales.id = pagos.recibo_mensual_id')
+            ->join('apartamentos', 'apartamentos.id = recibos_mensuales.apartamento_id')
+            ->where('pagos.estado_validacion', 'Por Validar')
+            ->findAll();
+
+        return $this->response->setJSON($pagosPendientes)->setStatusCode(200);
+    }
 }
