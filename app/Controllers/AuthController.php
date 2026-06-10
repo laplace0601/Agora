@@ -11,73 +11,57 @@ class AuthController extends BaseController
      *
      * Carga la vista del formulario de Login.
      */
-    public function login() 
+    public function login()
     {
-        return view('auth/login'); 
+        return view('auth/login');
     }
-
-    /**
-     * POST /auth/login
-     *
-     * Valida credenciales y procesa el inicio de sesión.
-     * Retorna JSON.
-     */
     public function processLogin()
     {
-        $correo = trim($this->request->getPost('correo') ?? '');
-        $clave  = $this->request->getPost('clave') ?? '';
+        $correo = $this->request->getPost('correo');
+        $clave = $this->request->getPost('clave');
 
-        // Validación de campos vacíos
-        if ($correo === '' || $clave === '') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El correo y la contraseña son obligatorios.',
-            ])->setStatusCode(400);
+        if (empty($correo) || empty($clave)) {
+            return redirect()->back()->with('error', 'El correo y la contraseña son requeridos.');
         }
 
-        $usuarioModel = new UsuarioModel();
-        $usuario      = $usuarioModel->verificarCredenciales($correo, $clave);
+        $modelo = new \App\Models\UsuarioModel();
+        $usuario = $modelo->where('correo', $correo)->first();
 
-        if (! $usuario) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Credenciales incorrectas o cuenta inactiva.',
-            ])->setStatusCode(401);
+        // Verificación Paso 1: El correo existe
+        if (!$usuario) {
+            return redirect()->back()->with('error', 'El correo no está registrado.');
         }
 
-        // Crear sesión nativa de CodeIgniter
-        $session = session();
-        $session->set([
-            'usuario_id' => $usuario['id'],
-            'correo'     => $usuario['correo'],
-            'rol'        => $usuario['rol'],
-            'isLoggedIn' => true,
+        // Verificación Paso 2: La contraseña es correcta
+        if (!password_verify($clave, $usuario['clave'])) {
+            return redirect()->back()->with('error', 'La contraseña es incorrecta.');
+        }
+
+        // Inicio de sesión exitoso
+        $rol = $usuario['rol'] ?? '';
+        session()->set([
+            'usuario_id'   => $usuario['id'] ?? null,
+            'correo'       => $usuario['correo'],
+            'rol'          => $rol,
+            'is_logged_in' => true
         ]);
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Inicio de sesión exitoso.',
-            'data'    => [
-                'usuario_id' => $usuario['id'],
-                'correo'     => $usuario['correo'],
-                'rol'        => $usuario['rol'],
-            ],
-        ]);
+        switch ($rol) {
+            case 'root':
+                return redirect()->to(site_url('super/panel'));
+            case 'admin':
+                return redirect()->to(site_url('admin/comunidad'));
+            case 'residente':
+                return redirect()->to(site_url('residente/dashboard'));
+            default:
+                session()->destroy();
+                return redirect()->back()->with('error', 'El rol asignado no es válido.');
+        }
     }
 
-    /**
-     * GET /auth/logout
-     *
-     * Destruye la sesión activa y retorna JSON de confirmación.
-     */
     public function logout()
     {
-        $session = session();
-        $session->destroy();
-
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Sesión cerrada correctamente.',
-        ]);
+        session()->destroy();
+        return redirect()->to(site_url('auth/login'));
     }
 }

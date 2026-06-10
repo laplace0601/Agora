@@ -7,12 +7,22 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'AuthController::login');
 $routes->get('login', 'AuthController::login');
+// Ruta para mostrar el formulario (GET)
+$routes->get('auth/login', 'AuthController::login');
+
+// Ruta para procesar el formulario (POST)
+$routes->post('auth/procesar-login', 'AuthController::processLogin');
 
 // ---------------------------------------------------------------
-// Autenticación
+// Autenticación y Paneles por Rol
 // ---------------------------------------------------------------
-$routes->post('auth/login', 'AuthController::processLogin');
 $routes->get('auth/logout', 'AuthController::logout');
+
+// Rutas de Paneles
+$routes->get('super/panel', 'SuperController::panel');
+$routes->get('admin/comunidad', 'AdminController::comunidad');
+$routes->get('admin/finanzas', 'AdminController::finanzas');
+$routes->get('residente/dashboard', 'ResidenteController::dashboard');
 
 // ---------------------------------------------------------------
 // CRM — Gestión de Apartamentos (requiere rol admin en sesión)

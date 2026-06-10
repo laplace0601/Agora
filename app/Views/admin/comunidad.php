@@ -32,14 +32,19 @@
 
             <div class="collapse navbar-collapse" id="navbarAdmin">
                 <ul class="navbar-nav mr-auto">
-                    <!-- Nav items de admin si los hay -->
+                    <li class="nav-item active">
+                        <a class="nav-link font-weight-bold" href="<?= site_url('admin/comunidad') ?>">Comunidad <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-outline-info text-white ml-2 mt-1" href="<?= site_url('admin/finanzas') ?>">Ir a Finanzas</a>
+                    </li>
                 </ul>
                 <span class="navbar-text text-light mr-3">
                     Hola, Administrador
                 </span>
-                <button class="btn btn-outline-danger mt-2 mt-lg-0 font-weight-bold" id="btnLogout">
+                <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger mt-2 mt-lg-0 font-weight-bold" id="btnLogout">
                     Cerrar Sesión
-                </button>
+                </a>
             </div>
         </div>
     </nav>
@@ -413,25 +418,7 @@
                 });
             });
 
-            // ==========================================
-            // 5. LOGOUT
-            // ==========================================
-            const btnLogout = document.getElementById('btnLogout');
-            btnLogout.addEventListener('click', function() {
-                btnLogout.disabled = true;
-                btnLogout.innerHTML = 'Saliendo...';
 
-                fetch('/auth/logout', {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                })
-                .then(() => {
-                    window.location.href = '/auth/login';
-                })
-                .catch(error => {
-                    window.location.href = '/auth/login';
-                });
-            });
 
         });
     </script>

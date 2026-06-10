@@ -26,9 +26,9 @@
                 <span class="navbar-text text-light mr-auto">
                     Bienvenido, Residente
                 </span>
-                <button class="btn btn-outline-danger bg-white font-weight-bold mt-2 mt-lg-0" id="btnLogout">
+                <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger bg-white font-weight-bold mt-2 mt-lg-0" id="btnLogout">
                     Cerrar Sesión
-                </button>
+                </a>
             </div>
         </div>
     </nav>
@@ -296,27 +296,6 @@
                     btnProcesarPago.disabled = false;
                     btnProcesarPago.innerHTML = originalBtnText;
                     modalAlert.innerHTML = `<div class="alert alert-danger py-2" role="alert">Error de conexión con el servidor.</div>`;
-                });
-            });
-
-            // 3. LOGOUT
-            const btnLogout = document.getElementById('btnLogout');
-            btnLogout.addEventListener('click', function() {
-                // Feedback visual
-                btnLogout.disabled = true;
-                btnLogout.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
-
-                fetch('/auth/logout', {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                })
-                .then(() => {
-                    // Independientemente de la respuesta, redirigir al login
-                    window.location.href = '/auth/login';
-                })
-                .catch(error => {
-                    console.error('Error en logout:', error);
-                    window.location.href = '/auth/login';
                 });
             });
 
