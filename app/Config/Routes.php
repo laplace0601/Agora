@@ -11,13 +11,13 @@ $routes->get('/', function() {
     return view('landing');
 });
 
-// 2. Rutas para mostrar el Formulario de Login (GET)
-$routes->get('login', 'AuthController::login');
-$routes->get('auth/login', 'AuthController::login');
+// 2. Rutas para mostrar tu Formulario de Login (Cambiadas a tu LoginController)
+$routes->get('login', 'LoginController::index');
+$routes->get('auth/login', 'LoginController::index');
 
-// 3. Ruta para procesar el Formulario de Login (POST)
+// 3. Rutas para procesar el formulario
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
-$routes->post('login/autenticar', 'LoginController::autenticar'); 
+$routes->post('login/autenticar', 'LoginController::autenticar');
 
 // ---------------------------------------------------------------
 // Autenticación y Paneles por Rol

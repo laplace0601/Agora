@@ -141,7 +141,8 @@
 </ul>
                 
                 <div class="d-flex">
-                    <a href="<?= base_url('login') ?>" class="btn btn-agora px-4 rounded-pill shadow-sm">Iniciar Sesión</a>
+                    <!-- DIRECCIÓN MODIFICADA AQUÍ PARA APUNTAR AL PUERTO LOCAL 8080 DIRECTO -->
+                    <a href="http://localhost:8080/index.php/login" class="btn btn-agora px-4 rounded-pill shadow-sm">Iniciar Sesión</a>
                 </div>
             </div>
         </div>

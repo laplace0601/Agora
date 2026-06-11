@@ -8,8 +8,8 @@ class LoginController extends BaseController
 {
     public function index()
     {
-        // Esto carga tu hermosa vista del login (app/Views/login.php)
-        return view('login');
+        // Esto carga la vista del login
+        return view('auth/login');
     }
 
     public function autenticar()
