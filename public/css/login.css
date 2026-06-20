@@ -1,0 +1,27 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F8F9FA; 
+    color: #343A40; 
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+.btn-agora {
+    background-color: #2E6F7A;
+    color: white;
+    border: none;
+    transition: all 0.3s ease; 
+}
+
+.btn-agora:hover {
+    background-color: #1F4E56; 
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 12px rgba(46, 111, 122, 0.3); 
+    color: white;
+}
+
+.btn-agora:active {
+    transform: translateY(-1px); 
+}

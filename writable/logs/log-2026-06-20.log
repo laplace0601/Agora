@@ -1,0 +1,1113 @@
+CRITICAL - 2026-06-20 11:26:14 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "landing.php"
+[Method: GET, Route: /]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('landing.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('landing', [], true)
+ 3 APPPATH\Config\Routes.php(10): view('landing')
+ 4 SYSTEMPATH\CodeIgniter.php(872): CodeIgniter\Router\RouteCollection->{closure}()
+ 5 SYSTEMPATH\CodeIgniter.php(480): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 11:57:19 --> ErrorException: Maximum execution time of 120 seconds exceeded
+[Method: POST, Route: auth/procesar-login]
+in SYSTEMPATH\Debug\Exceptions.php on line 197.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-06-20 11:57:19 --> ErrorException: Maximum execution time of 120 seconds exceeded
+[Method: POST, Route: auth/procesar-login]
+in SYSTEMPATH\Debug\Exceptions.php on line 197.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+DEBUG - 2026-06-20 11:58:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 11:58:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 11:58:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 11:59:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:00:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 12:01:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 18:01:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 18:02:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 18:04:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 18:58:22 --> CodeIgniter\Security\Exceptions\SecurityException: The action you requested is not allowed.
+[Method: POST, Route: auth/procesar-login]
+in SYSTEMPATH\Security\Security.php on line 258.
+ 1 SYSTEMPATH\Security\Security.php(258): CodeIgniter\Security\Exceptions\SecurityException::forDisallowedAction()
+ 2 SYSTEMPATH\Filters\CSRF.php(52): CodeIgniter\Security\Security->verify(Object(CodeIgniter\HTTP\IncomingRequest))
+ 3 SYSTEMPATH\Filters\Filters.php(241): CodeIgniter\Filters\CSRF->before(Object(CodeIgniter\HTTP\IncomingRequest), null)
+ 4 SYSTEMPATH\Filters\Filters.php(221): CodeIgniter\Filters\Filters->runBefore([...])
+ 5 SYSTEMPATH\CodeIgniter.php(465): CodeIgniter\Filters\Filters->run('auth/procesar-login', 'before')
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 19:08:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:08:57 --> CSRF token verified.
+DEBUG - 2026-06-20 19:08:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:08:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:43:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:44:04 --> CSRF token verified.
+DEBUG - 2026-06-20 19:44:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:44:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:44:14 --> CSRF token verified.
+DEBUG - 2026-06-20 19:44:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:44:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:45:07 --> CSRF token verified.
+DEBUG - 2026-06-20 19:45:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:45:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:46:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:47:08 --> CSRF token verified.
+DEBUG - 2026-06-20 19:47:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:47:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 19:54:47 --> Table 'configuracion_marca' already exists
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 100,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 100,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 100,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 4 SYSTEMPATH\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 100,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 5 APPPATH\Database\Migrations\2026-06-20-194930_EsquemaInicialAgora.php(24): CodeIgniter\Database\Forge->createTable('configuracion_marca')
+ 6 SYSTEMPATH\Database\MigrationRunner.php(1014): App\Database\Migrations\EsquemaInicialAgora->up()
+ 7 SYSTEMPATH\Database\MigrationRunner.php(202): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+ 8 SYSTEMPATH\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(null)
+ 9 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+10 SYSTEMPATH\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+11 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run([])
+12 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', [])
+13 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+14 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+15 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+INFO - 2026-06-20 19:56:04 --> CSRF token verified.
+DEBUG - 2026-06-20 19:56:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:56:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 19:56:28 --> CSRF token verified.
+DEBUG - 2026-06-20 19:56:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 19:56:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 19:56:28 --> ErrorException: include(../template/admin_header.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 3.
+ 1 APPPATH\Views\admin\apartamentos.php(3): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_header.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 3)
+ 2 APPPATH\Views\admin\apartamentos.php(3): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:15:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:19 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:15:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:21 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:15:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:22 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:15:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:22 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:23 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:24 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:15:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:15:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:15:43 --> ErrorException: include(../template/admin_footer.php): Failed to open stream: No such file or directory
+[Method: GET, Route: admin/apartamentos]
+in APPPATH\Views\admin\apartamentos.php on line 119.
+ 1 APPPATH\Views\admin\apartamentos.php(119): CodeIgniter\Debug\Exceptions->errorHandler(2, 'include(../template/admin_footer.php): Failed to open stream: No such file or directory', 'C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php', 119)
+ 2 APPPATH\Views\admin\apartamentos.php(119): include()
+ 3 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\Agora\\app\\Views\\admin\\apartamentos.php')
+ 4 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 5 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/apartamentos', [], true)
+ 6 APPPATH\Controllers\AdminController.php(38): view('admin/apartamentos', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->apartamentos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:21:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:21:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:21:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:21:54 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:22:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:22:11 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:22:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:22:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:22:24 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:24:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:24:43 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:56 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:57 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:57 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:58 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:58 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:58 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:25:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:25:58 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:26:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:26:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:26:16 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:26:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:27:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-06-20 20:27:58 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/finanzas.php"
+[Method: GET, Route: admin/finanzas]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('admin/finanzas.php')
+ 2 SYSTEMPATH\Common.php(1250): CodeIgniter\View\View->render('admin/finanzas', [], true)
+ 3 APPPATH\Controllers\AdminController.php(48): view('admin/finanzas')
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzas()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:28:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:28:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:30:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:32:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:33:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:34:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:34:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:35:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:36:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:36:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 20:36:35 --> Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:35 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+[Method: GET, Route: admin/finanzas/pagos]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 6 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 7 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:35 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 310.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:35 --> [Caused by] mysqli_sql_exception: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:36:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:36:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 20:36:46 --> Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:46 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+[Method: GET, Route: admin/finanzas/pagos]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 6 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 7 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:46 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 310.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:36:46 --> [Caused by] mysqli_sql_exception: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:45:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 20:45:21 --> Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:21 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+[Method: GET, Route: admin/finanzas/pagos]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 6 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 7 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:21 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 310.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:21 --> [Caused by] mysqli_sql_exception: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:45:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:45:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 20:45:43 --> Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:43 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+[Method: GET, Route: admin/finanzas/pagos]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 6 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 7 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:43 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 310.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:45:43 --> [Caused by] mysqli_sql_exception: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(87): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:51:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-20 20:51:25 --> Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(89): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:51:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+[Method: GET, Route: admin/finanzas/pagos]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 2 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\AdminController.php(89): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 6 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 7 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:51:25 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 310.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 4 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\AdminController.php(89): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-06-20 20:51:25 --> [Caused by] mysqli_sql_exception: Unknown table 'agora.pagos'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = \'Por Validar\'
+ORDER BY `pagos`.`fecha_registro` DESC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `pagos`.*, `recibos_mensuales`.`mes`, `recibos_mensuales`.`anio`, `recibos_mensuales`.`monto_total`, `apartamentos`.`nro_apartamento`, `residentes`.`nombre_completo`
+FROM `pagos_recibidos`
+JOIN `recibos_mensuales` ON `recibos_mensuales`.`id` = `pagos`.`recibo_mensual_id`
+JOIN `apartamentos` ON `apartamentos`.`id` = `recibos_mensuales`.`apartamento_id`
+LEFT JOIN `residentes` ON `residentes`.`id` = `apartamentos`.`residente_id`
+WHERE `pagos`.`estado_validacion` = :pagos.estado_validacion:
+ORDER BY `pagos`.`fecha_registro` DESC', [...], false)
+ 5 SYSTEMPATH\Model.php(253): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\AdminController.php(89): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\AdminController->finanzasPagos()
+ 9 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\AdminController))
+10 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+DEBUG - 2026-06-20 20:51:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:51:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:51:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:51:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:53:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:54:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:54:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:54:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:54:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:54:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:55:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 20:55:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:07:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:08:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:14:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:14:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:14:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:14:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:16:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:16:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 21:19:17 --> CSRF token verified.
+DEBUG - 2026-06-20 21:19:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 21:19:34 --> CSRF token verified.
+DEBUG - 2026-06-20 21:19:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 21:19:46 --> CSRF token verified.
+DEBUG - 2026-06-20 21:19:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:19:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-20 21:20:55 --> CSRF token verified.
+DEBUG - 2026-06-20 21:20:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:20:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:29:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:29:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:29:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:29:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:31:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:31:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:31:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:31:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:34:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:35:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:37:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:37:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:41:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:41:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:41:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:45:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:45:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-20 21:46:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

@@ -4,6 +4,12 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+/**
+ * CondominioModel
+ *
+ * Tabla: condominios
+ * Representa una torre, edificio o conjunto residencial dentro del sistema.
+ */
 class CondominioModel extends Model
 {
     protected $table            = 'condominios';
@@ -15,6 +21,8 @@ class CondominioModel extends Model
         'nombre_condominio',
         'rif_jurisdiccion',
         'direccion',
+        'propietario',             // Nombre del propietario general
+        'alicuota_base',           // Alícuota base del condominio
         'marca_id',
     ];
 
@@ -24,22 +32,24 @@ class CondominioModel extends Model
         'nombre_condominio' => 'required|max_length[255]',
         'rif_jurisdiccion'  => 'permit_empty|max_length[50]',
         'direccion'         => 'permit_empty|max_length[500]',
-        'marca_id'          => 'required|integer',
+        'propietario'       => 'permit_empty|max_length[255]',
+        'alicuota_base'     => 'permit_empty|decimal',
+        'marca_id'          => 'permit_empty|integer',
     ];
 
     protected $validationMessages = [
         'nombre_condominio' => [
             'required' => 'El nombre del condominio es obligatorio.',
         ],
-        'marca_id' => [
-            'required' => 'Debe asociar el condominio a una marca.',
-            'integer'  => 'El ID de marca debe ser un número entero.',
-        ],
     ];
+
+    // ---------------------------------------------------------------
+    // Métodos de negocio
+    // ---------------------------------------------------------------
 
     /**
      * Lista todos los condominios que pertenecen a una marca específica.
-     * Uso principal: panel del admin para ver solo sus condominios.
+     * Uso: panel del admin para ver solo sus condominios.
      */
     public function listarPorMarca(int $marcaId): array
     {
@@ -50,7 +60,7 @@ class CondominioModel extends Model
 
     /**
      * Obtiene un condominio verificando que pertenezca a la marca indicada.
-     * Evita que un admin acceda a condominios de otra marca.
+     * Previene que un admin acceda a condominios de otra marca.
      */
     public function obtenerDetalleSeguro(int $condominioId, int $marcaId): ?array
     {

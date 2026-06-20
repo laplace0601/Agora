@@ -10,58 +10,87 @@ class AuthController extends BaseController
      * GET / o GET /login
      *
      * Carga la vista del formulario de Login.
+     * Si el usuario ya tiene sesión activa, lo redirige al panel correspondiente.
      */
     public function login()
     {
+        // Evitar que un usuario ya autenticado vea el login (previene loop inverso)
+        if (session()->get('isLoggedIn')) {
+            return $this->_redirigirPorRol(session()->get('rol'));
+        }
+
         return view('auth/login');
     }
+
+    /**
+     * POST /auth/procesar-login
+     *
+     * Procesa las credenciales enviadas por el formulario tradicional (no AJAX).
+     * Responde con redirect() en todos los casos.
+     */
     public function processLogin()
     {
         $correo = $this->request->getPost('correo');
-        $clave = $this->request->getPost('clave');
+        $clave  = $this->request->getPost('clave');
 
         if (empty($correo) || empty($clave)) {
             return redirect()->back()->with('error', 'El correo y la contraseña son requeridos.');
         }
 
-        $modelo = new \App\Models\UsuarioModel();
-        $usuario = $modelo->where('correo', $correo)->first();
+        $modelo  = new UsuarioModel();
+        // Usamos el método del modelo que valida correo + clave + estado 'activo'
+        $usuario = $modelo->verificarCredenciales($correo, $clave);
 
-        // Verificación Paso 1: El correo existe
-        if (!$usuario) {
-            return redirect()->back()->with('error', 'El correo no está registrado.');
+        if (! $usuario) {
+            // No revelamos si es el correo o la contraseña lo incorrecto (seguridad)
+            return redirect()->back()->with('error', 'Credenciales incorrectas o cuenta inactiva.');
         }
 
-        // Verificación Paso 2: La contraseña es correcta
-        if (!password_verify($clave, $usuario['clave'])) {
-            return redirect()->back()->with('error', 'La contraseña es incorrecta.');
-        }
-
-        // Inicio de sesión exitoso
         $rol = $usuario['rol'] ?? '';
+
+        // ---------------------------------------------------------------
+        // Guardar sesión — CLAVE UNIFICADA: 'isLoggedIn' (camelCase)
+        // Todos los filtros y controladores usan esta misma clave.
+        // ---------------------------------------------------------------
         session()->set([
-            'usuario_id'   => $usuario['id'] ?? null,
-            'correo'       => $usuario['correo'],
-            'rol'          => $rol,
-            'is_logged_in' => true
+            'usuario_id'  => $usuario['id'],
+            'correo'      => $usuario['correo'],
+            'rol'         => $rol,
+            'isLoggedIn'  => true,          // ← clave canónica del sistema
         ]);
 
-        switch ($rol) {
-            case 'root':
-                return redirect()->to(site_url('super/panel'));
-            case 'admin':
-                return redirect()->to(site_url('admin/comunidad'));
-            case 'residente':
-                return redirect()->to(site_url('residente/dashboard'));
-            default:
-                session()->destroy();
-                return redirect()->back()->with('error', 'El rol asignado no es válido.');
-        }
+        return $this->_redirigirPorRol($rol);
     }
 
+    /**
+     * GET /auth/logout
+     */
     public function logout()
     {
         session()->destroy();
         return redirect()->to(site_url('auth/login'));
+    }
+
+    // ---------------------------------------------------------------
+    // Helpers privados
+    // ---------------------------------------------------------------
+
+    /**
+     * Devuelve un redirect al panel correspondiente según el rol.
+     */
+    private function _redirigirPorRol(string $rol)
+    {
+        switch ($rol) {
+            case 'root':
+                return redirect()->to(site_url('super/panel'));
+            case 'admin':
+                return redirect()->to(site_url('admin/apartamentos'));
+            case 'residente':
+                return redirect()->to(site_url('residente/dashboard'));
+            default:
+                session()->destroy();
+                return redirect()->to(site_url('auth/login'))
+                                 ->with('error', 'Rol no reconocido. Contacte al administrador.');
+        }
     }
 }

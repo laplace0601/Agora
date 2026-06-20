@@ -1,0 +1,98 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F8F9FA;
+    color: #343A40;
+}
+
+/* Color azul corporativo de Ágora */
+.text-bg-agora {
+    background-color: #2E6F7A !important;
+    color: white !important;
+}
+
+/* Corrección y centrado del contenedor del icono */
+.feature-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: .75rem;
+    display: inline-flex; 
+    align-items: center;    
+    justify-content: center;
+}
+
+/* Enlaces dorados con efecto de transición suave */
+.link-agora {
+    color: #C59B4E;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+.link-agora:hover {
+    color: #1F4E56;
+}
+
+/* Botón premium de inicio de sesión y sus efectos */
+.btn-agora {
+    background-color: #C59B4E !important;
+    color: white !important;
+    font-weight: 600;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+.btn-agora:hover {
+    background-color: #A37F3D !important;
+    color: white !important;
+}
+
+/* Estilos para la sección de bienvenida (Hero) */
+.hero-title {
+    font-size: 3.5rem;
+    line-height: 1.2;
+    color: #1F4E56;
+}
+.btn-outline-agora {
+    border: 2px solid #2E6F7A !important;
+    color: #2E6F7A !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-outline-agora:hover {
+    background-color: #2E6F7A !important;
+    color: white !important;
+}
+
+/* Estilos y efectos de elevación (Hover) para las Tarjetas de Planes */
+.card-plan {
+    border: 1px solid rgba(0,0,0,.125);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-plan:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
+.plan-destacado {
+    border: 2px solid #2E6F7A !important;
+}
+.text-bronze {
+    color: #CD7F32;
+}
+.text-gold {
+    color: #C59B4E;
+}
+
+/* Estilos de enfoque para los campos del formulario de contacto */
+.form-control:focus {
+    border-color: #2E6F7A;
+    box-shadow: 0 0 0 0.25rem rgba(46, 111, 122, 0.25);
+}
+
+/* Iluminación dinámica para el menú de navegación */
+.nav-link-custom {
+    color: rgba(255, 255, 255, 0.6) !important;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-link-custom:hover, .nav-link-custom.active {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}

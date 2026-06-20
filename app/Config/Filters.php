@@ -74,9 +74,11 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf',            // Protección CSRF activada para todos los POST
             // 'invalidchars',
-            'auth' => ['except' => ['/', 'login', 'auth/*']]
+            // NOTA: El filtro 'auth' ya no se aplica globalmente.
+            // Cada grupo de rutas en Routes.php lo aplica individualmente:
+            // $routes->group('admin', ['filter' => 'auth:admin'], ...)
         ],
         'after' => [
             // 'honeypot',

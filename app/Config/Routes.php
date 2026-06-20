@@ -1,46 +1,83 @@
 <?php
 
 use CodeIgniter\Router\RouteCollection;
+// porfa no me toquen esto U-U
 
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'AuthController::login');
-$routes->get('login', 'AuthController::login');
-// Ruta para mostrar el formulario (GET)
-$routes->get('auth/login', 'AuthController::login');
 
-// Ruta para procesar el formulario (POST)
+// ---------------------------------------------------------------
+// Rutas Públicas (sin autenticación)
+// ---------------------------------------------------------------
+
+$routes->get('/', function () {
+    return view('landing/landing'); // carga la landing page principal
+});
+
+// Login — GET muestra el formulario, POST lo procesa
+$routes->get('login',              'AuthController::login');
+$routes->get('auth/login',         'AuthController::login');
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
+$routes->get('auth/logout',        'AuthController::logout');
 
 // ---------------------------------------------------------------
-// Autenticación y Paneles por Rol
+// Panel Super-Admin (rol: root)
 // ---------------------------------------------------------------
-$routes->get('auth/logout', 'AuthController::logout');
-
-// Rutas de Paneles
-$routes->get('super/panel', 'SuperController::panel');
-$routes->get('admin/comunidad', 'AdminController::comunidad');
-$routes->get('admin/finanzas', 'AdminController::finanzas');
-$routes->get('residente/dashboard', 'ResidenteController::dashboard');
+$routes->group('super', ['filter' => 'auth:root'], function ($routes) {
+    $routes->get('panel', 'SuperController::panel');
+});
 
 // ---------------------------------------------------------------
-// CRM — Gestión de Apartamentos (requiere rol admin en sesión)
+// Panel Admin (rol: admin) — Inmuebles y Apartamentos
 // ---------------------------------------------------------------
+$routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
+
+    // Vistas principales
+    $routes->get('apartamentos',          'AdminController::apartamentos');
+    $routes->get('finanzas',              'AdminController::finanzas');
+    $routes->get('finanzas/cobro',        'AdminController::finanzasCobro');
+    $routes->get('finanzas/pagos',        'AdminController::finanzasPagos');
+    $routes->get('cartelera',             'AdminController::cartelera');
+    $routes->get('comunidad',             'AdminController::comunidad');
+
+    // Handlers POST — formularios de las vistas admin
+    $routes->post('apartamentos/registrar-condominio',  'AdminController::registrarCondominio');
+    $routes->post('apartamentos/registrar-apartamento', 'AdminController::registrarApartamento');
+    $routes->post('finanzas/facturar',                  'AdminController::emitirRecibos');
+    $routes->post('finanzas/validar-pago',              'AdminController::validarPago');
+    $routes->post('cartelera/publicar',                 'AdminController::publicarAnuncio');
+    $routes->get('cartelera/eliminar/(:num)',            'AdminController::eliminarAnuncio/$1');
+});
+
+// ---------------------------------------------------------------
+// Panel Residente (rol: residente)
+// ---------------------------------------------------------------
+$routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
+    $routes->get('dashboard',     'ResidenteController::dashboard');
+    $routes->get('pago',          'ResidenteController::reportarPago');
+    $routes->post('pago/enviar',  'ResidenteController::enviarPago');
+    $routes->get('soporte',       'ResidenteController::soporte');
+    $routes->post('soporte/abrir', 'ResidenteController::abrirTicket');
+});
+
+// ---------------------------------------------------------------
+// CRM — API JSON (endpoints consumidos por el frontend vía fetch/AJAX)
+// Protegidos por el filtro auth global definido en Config/Filters.php
+// ---------------------------------------------------------------
+
+// Gestión de Apartamentos
 $routes->post('crm/apartamentos/registrar', 'LicenciaController::registrarApartamento');
 
-// ---------------------------------------------------------------
-// CRM — Finanzas (facturación, pagos, solvencia)
-// ---------------------------------------------------------------
-$routes->post('crm/finanzas/facturar', 'FinanzasController::emitirRecibos');
-$routes->post('crm/finanzas/pagar', 'FinanzasController::registrarPago');
-$routes->post('crm/finanzas/validar-pago', 'FinanzasController::validarPago');
-$routes->get('crm/finanzas/solvencia/(:num)', 'FinanzasController::procesarSolvencia/$1');
+// Finanzas
+$routes->post('crm/finanzas/facturar',         'FinanzasController::emitirRecibos');
+$routes->post('crm/finanzas/pagar',            'FinanzasController::registrarPago');
+$routes->post('crm/finanzas/validar-pago',     'FinanzasController::validarPago');
+$routes->get('crm/finanzas/solvencia/(:num)',  'FinanzasController::procesarSolvencia/$1');
+$routes->get('crm/finanzas/pagos-pendientes',  'FinanzasController::listarPagosPendientes');
 
-// ---------------------------------------------------------------
-// CRM — Comunidad (bitácora, tickets de soporte)
-// ---------------------------------------------------------------
-$routes->post('crm/comunidad/comunicado', 'ComunidadController::crearComunicado');
-$routes->get('crm/comunidad/bitacora', 'ComunidadController::listarComunicados');
-$routes->post('crm/comunidad/ticket', 'ComunidadController::abrirTicket');
-$routes->post('crm/comunidad/ticket/gestionar', 'ComunidadController::responderTicket');
+// Comunidad
+$routes->post('crm/comunidad/comunicado',         'ComunidadController::crearComunicado');
+$routes->get('crm/comunidad/bitacora',            'ComunidadController::listarComunicados');
+$routes->post('crm/comunidad/ticket',             'ComunidadController::abrirTicket');
+$routes->post('crm/comunidad/ticket/gestionar',   'ComunidadController::responderTicket');
