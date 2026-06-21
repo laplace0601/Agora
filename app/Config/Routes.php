@@ -35,13 +35,16 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
 
     // Vistas principales
     $routes->get('apartamentos',          'AdminController::apartamentos');
+    $routes->get('residentes',            'AdminController::residentes');
     $routes->get('finanzas',              'AdminController::finanzas');
     $routes->get('finanzas/cobro',        'AdminController::finanzasCobro');
     $routes->get('finanzas/pagos',        'AdminController::finanzasPagos');
     $routes->get('cartelera',             'AdminController::cartelera');
     $routes->get('comunidad',             'AdminController::comunidad');
-
+    $routes->get('soporte',               'AdminController::soporte');
+    
     // Handlers POST — formularios de las vistas admin
+    $routes->post('soporte/validar',                    'AdminController::validarTicket');
     $routes->post('apartamentos/registrar-condominio',  'AdminController::registrarCondominio');
     $routes->post('apartamentos/registrar-apartamento', 'AdminController::registrarApartamento');
     $routes->post('finanzas/facturar',                  'AdminController::emitirRecibos');
@@ -59,6 +62,7 @@ $routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
     $routes->post('pago/enviar',  'ResidenteController::enviarPago');
     $routes->get('soporte',       'ResidenteController::soporte');
     $routes->post('soporte/abrir', 'ResidenteController::abrirTicket');
+    $routes->get('finanzas',      'ResidenteController::finanzas');
 });
 
 // ---------------------------------------------------------------

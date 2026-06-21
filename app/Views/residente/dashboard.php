@@ -17,27 +17,27 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
 
             <div class="d-flex flex-column gap-4">
 
-                <?php 
+                <?php
                 $comunicados = $comunicados ?? [];
-                if (!empty($comunicados)): 
-                    foreach ($comunicados as $comunicado): 
+                if (!empty($comunicados)):
+                    foreach ($comunicados as $comunicado):
                 ?>
-                    <article class="card-comunicado p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <span class="badge badge-comunidad bg-primary px-3 py-2 rounded-pill fw-semibold small text-white">Anuncio</span>
-                            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <?= date('d/m/Y h:i A', strtotime($comunicado['fecha_publicacion'])) ?></small>
-                        </div>
-                        <h2 class="h5 fw-bold text-dark mb-2"><?= htmlspecialchars($comunicado['titulo']) ?></h2>
-                        <p class="text-secondary small lh-base">
-                            <?= nl2br(htmlspecialchars($comunicado['contenido'])) ?>
-                        </p>
-                        <hr class="text-light-grid my-3">
-                        <span class="text-dark small fw-medium"><i class="bi bi-person me-1"></i> <?= htmlspecialchars($comunicado['correo_autor'] ?? 'Administración') ?></span>
-                    </article>
-                <?php 
-                    endforeach; 
-                else: 
-                ?>
+                        <article class="card-comunicado p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge badge-comunidad bg-primary px-3 py-2 rounded-pill fw-semibold small text-white">Anuncio</span>
+                                <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <?= date('d/m/Y h:i A', strtotime($comunicado['fecha_publicacion'])) ?></small>
+                            </div>
+                            <h2 class="h5 fw-bold text-dark mb-2"><?= htmlspecialchars($comunicado['titulo']) ?></h2>
+                            <p class="text-secondary small lh-base">
+                                <?= nl2br(htmlspecialchars($comunicado['contenido'])) ?>
+                            </p>
+                            <hr class="text-light-grid my-3">
+                            <span class="text-dark small fw-medium"><i class="bi bi-person me-1"></i> <?= htmlspecialchars($comunicado['correo_autor'] ?? 'Administración') ?></span>
+                        </article>
+                    <?php
+                    endforeach;
+                else:
+                    ?>
                     <div class="text-center py-5 bg-white rounded-4 border border-light shadow-sm">
                         <i class="bi bi-inbox text-muted fs-1 d-block mb-2"></i>
                         <p class="text-secondary mb-0">No hay comunicados activos en este momento.</p>
@@ -58,6 +58,11 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
 
                 <a href="<?= site_url('residente/soporte') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-exclamation-triangle me-2 text-danger"></i> Crear Ticket de Soporte</span>
+                    <i class="bi bi-chevron-right small text-muted"></i>
+                </a>
+
+                <a href="<?= site_url('residente/finanzas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-file-earmark-text me-2 text-info"></i> Mis Recibos y Solvencias</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
             </div>

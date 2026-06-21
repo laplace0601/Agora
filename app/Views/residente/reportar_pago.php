@@ -1,6 +1,6 @@
-<?php 
-    $pagina_actual = 'residente_reportar_pago'; // Define el nombre exacto para conectar CSS y JS
-    echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
+<?php
+$pagina_actual = 'residente_reportar_pago'; // Define el nombre exacto para conectar CSS y JS
+echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
 <main class="container my-5" role="main">
@@ -23,26 +23,63 @@
                             <div class="form-floating">
                                 <select class="form-select" id="bancoOrigen" name="banco" required>
                                     <option value="" selected disabled>Selecciona tu banco</option>
-                                    <option value="1">Ágora Digital Bank</option>
+                                    <option value="1">Banco de Venezuela (BDV)</option>
+                                    <option value="2">Banesco Banco Universal</option>
+                                    <option value="3">BBVA Provincial</option>
+                                    <option value="4">Banco Nacional de Crédito (BNC)</option>
+                                    <option value="5">Mercantil Banco Universal</option>
+                                    <option value="6">Bancamiga Banco Universal</option>
+                                    <option value="7">Banco del Tesoro</option>
+                                    <option value="8">Banco Digital de los Trabajadores (BDT)</option>
+                                    <option value="9">Bancaribe Banco Universal</option>
+                                    <option value="10">Banco Exterior</option>
+                                    <option value="11">Banco Fondo Común (BFC)</option>
+                                    <option value="12">Banco Venezolano de Crédito</option>
+                                    <option value="13">Banco Activo</option>
+                                    <option value="14">Banco del Caribe</option>
+                                    <option value="15">Banco Caroní</option>
+                                    <option value="16">Bancrecer</option>
+                                    <option value="17">Banplus</option>
+                                    <option value="18">Banco Plaza</option>
+                                    <option value="19">100% Banco</option>
+                                    <option value="20">Del Sur Banco Universal</option>
+                                    <option value="21">Banco Sofitasa</option>
+                                    <option value="22">Banco de la Gente Emprendedora (Bangente)</option>
+                                    <option value="23">Mi Banco</option>
+                                    <option value="24">N58</option>
                                 </select>
                                 <label for="bancoOrigen">Banco Emisor</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="numReferencia" name="referencia" placeholder="0000" required>
-                                <label for="numReferencia">Número de Referencia</label>
+                                <input type="text" class="form-control" id="numReferencia" name="referencia" placeholder="Número completo de la transacción" required>
+                                <label for="numReferencia">Número de Referencia Completo:</label>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div class="dropzone-agora p-4 text-center" id="dropzoneContainer">
-                                <i class="bi bi-cloud-arrow-up fs-1 text-secondary mb-2 d-block"></i>
-                                <span class="d-block text-dark small fw-medium" id="dropzoneText">Arrastra tu captura aquí o haz clic para buscar</span>
-                                <input type="file" id="fileComprobante" name="comprobante" class="d-none" accept="image/*,application/pdf" required>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="recibo" name="recibo_id" required>
+                                    <option value="" selected disabled>Selecciona el recibo a pagar</option>
+                                    <?php if (!empty($recibos_pendientes)): ?>
+                                        <?php foreach ($recibos_pendientes as $recibo): ?>
+                                            <option value="<?= $recibo['id'] ?>">Recibo #<?= $recibo['id'] ?> - $<?= number_format($recibo['monto_total'], 2) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="" disabled>No hay recibos pendientes</option>
+                                    <?php endif; ?>
+                                </select>
+                                <label for="recibo">Recibo Pendiente</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="monto" name="monto" placeholder="Monto pagado" required>
+                                <label for="monto">Monto Pagado ($)</label>
                             </div>
                         </div>
                         <div class="col-12 mt-4">
-                            <button type="submit" class="btn btn-agora-primary w-100 py-3 rounded-3 fs-5">Enviar Reporte de Pago</button>
+                            <button type="submit" class="btn btn-success w-100 py-3 rounded-3 fs-5">Enviar Reporte de Pago</button>
                         </div>
                     </div>
                 </form>

@@ -53,10 +53,11 @@ class AuthController extends BaseController
         // Todos los filtros y controladores usan esta misma clave.
         // ---------------------------------------------------------------
         session()->set([
-            'usuario_id'  => $usuario['id'],
-            'correo'      => $usuario['correo'],
-            'rol'         => $rol,
-            'isLoggedIn'  => true,          // ← clave canónica del sistema
+            'usuario_id'         => $usuario['id'],
+            'correo'             => $usuario['correo'],
+            'rol'                => $rol,
+            'isLoggedIn'         => true,          // ← clave canónica del sistema
+            'session_start_time' => time(),
         ]);
 
         return $this->_redirigirPorRol($rol);
@@ -82,15 +83,15 @@ class AuthController extends BaseController
     {
         switch ($rol) {
             case 'root':
-                return redirect()->to(site_url('super/panel'));
+                return redirect()->to(site_url('super/apartamentos'));
             case 'admin':
-                return redirect()->to(site_url('admin/apartamentos'));
+                return redirect()->to(site_url('admin/cartelera'));
             case 'residente':
                 return redirect()->to(site_url('residente/dashboard'));
             default:
                 session()->destroy();
                 return redirect()->to(site_url('auth/login'))
-                                 ->with('error', 'Rol no reconocido. Contacte al administrador.');
+                    ->with('error', 'Rol no reconocido. Contacte al administrador.');
         }
     }
 }

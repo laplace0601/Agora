@@ -1,6 +1,6 @@
-<?php 
-    $pagina_actual = 'residente_soporte'; // Mapeo automático a soporte.css y soporte.js
-    echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
+<?php
+$pagina_actual = 'residente_soporte'; // Mapeo automático a soporte.css y soporte.js
+echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
 <main class="container my-5" role="main">
@@ -13,8 +13,11 @@
                     <div class="form-floating mb-3">
                         <select class="form-select" id="categoriaIncidencia" name="categoria" required>
                             <option value="" selected disabled>Selecciona una opción</option>
-                            <option value="1">Ascensores</option>
-                            <option value="2">Infraestructura</option>
+                            <option value="Ascensores">Ascensores</option>
+                            <option value="Infraestructura">Infraestructura</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Seguridad">Seguridad</option>
+                            <option value="Otro">Otro</option>
                         </select>
                         <label for="categoriaIncidencia">Área del Problema</label>
                     </div>
@@ -26,7 +29,9 @@
                         <textarea class="form-control" id="detallesTicket" name="descripcion" placeholder="Detalles" style="height: 120px" required></textarea>
                         <label for="detallesTicket">Descripción Detallada</label>
                     </div>
-                    <button type="submit" class="btn btn-agora-primary w-100 py-2.5 rounded-3">Abrir Ticket</button>
+                    <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3">
+                        Abrir Ticket
+                    </button>
                 </form>
             </div>
         </section>
@@ -44,11 +49,29 @@
                             </tr>
                         </thead>
                         <tbody class="small">
-                            <tr>
-                                <td class="fw-bold ps-3">#0421</td>
-                                <td>Falla en la botonera del Ascensor B</td>
-                                <td><span class="badge rounded-pill bg-warning text-dark px-2.5 py-1.5">Abierto</span></td>
-                            </tr>
+                            <?php if (!empty($mis_tickets)): ?>
+                                <?php foreach ($mis_tickets as $ticket): ?>
+                                    <tr>
+                                        <td class="fw-bold ps-3">#<?= str_pad($ticket['id'], 4, '0', STR_PAD_LEFT) ?></td>
+                                        <td><?= esc($ticket['asunto']) ?></td>
+                                        <td>
+                                            <?php if ($ticket['estado'] === 'Abierto'): ?>
+                                                <span class="badge rounded-pill bg-warning text-dark px-2.5 py-1.5">Abierto</span>
+                                            <?php elseif ($ticket['estado'] === 'En Progreso'): ?>
+                                                <span class="badge rounded-pill bg-info text-dark px-2.5 py-1.5">En Progreso</span>
+                                            <?php elseif ($ticket['estado'] === 'Cerrado'): ?>
+                                                <span class="badge rounded-pill bg-success px-2.5 py-1.5">Cerrado</span>
+                                            <?php else: ?>
+                                                <span class="badge rounded-pill bg-secondary px-2.5 py-1.5"><?= esc($ticket['estado']) ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">No has abierto ningún ticket de soporte.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

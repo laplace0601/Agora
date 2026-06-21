@@ -40,6 +40,37 @@ class AdminController extends BaseController
     }
 
     /**
+     * GET /admin/residentes
+     *
+     * Vista del directorio de residentes para consultar y buscar.
+     */
+    public function residentes()
+    {
+        $residenteModel = new ResidenteModel();
+        
+        $residentes = $residenteModel
+            ->select('residentes.*, usuarios.correo, usuarios.estado')
+            ->join('usuarios', 'usuarios.id = residentes.usuario_id', 'left')
+            ->findAll();
+
+        $apartamentoModel = new ApartamentoModel();
+        $apartamentos = $apartamentoModel->findAll();
+        
+        $aptosPorResidente = [];
+        foreach ($apartamentos as $apto) {
+            if ($apto['residente_id']) {
+                $aptosPorResidente[$apto['residente_id']][] = $apto['nombre_edificio_torre'] . ' - ' . $apto['nro_apartamento'];
+            }
+        }
+
+        foreach ($residentes as &$res) {
+            $res['apartamentos'] = $aptosPorResidente[$res['id']] ?? [];
+        }
+
+        return view('admin/residentes', ['residentes' => $residentes]);
+    }
+
+    /**
      * GET /admin/finanzas
      *
      * Redirige al submódulo de cobro (facturación masiva) como entrada principal.
@@ -118,9 +149,48 @@ class AdminController extends BaseController
         return $this->cartelera();
     }
 
+    /**
+     * GET /admin/soporte
+     *
+     * Vista para ver los tickets de soporte y validarlos.
+     */
+    public function soporte()
+    {
+        $ticketModel = new \App\Models\TicketModel();
+        
+        $tickets = $ticketModel
+            ->select('tickets_soporte.*, residentes.nombre_completo, residentes.telefono, usuarios.correo')
+            ->join('usuarios', 'usuarios.id = tickets_soporte.usuario_id')
+            ->join('residentes', 'residentes.usuario_id = usuarios.id', 'left')
+            ->orderBy('tickets_soporte.fecha_creacion', 'DESC')
+            ->findAll();
+
+        return view('admin/soporte', ['tickets' => $tickets]);
+    }
+
     // ---------------------------------------------------------------
     // Handlers POST — Formularios de las vistas admin
     // ---------------------------------------------------------------
+
+    /**
+     * POST /admin/soporte/validar
+     *
+     * Actualiza el estado de un ticket.
+     */
+    public function validarTicket()
+    {
+        $ticketId = (int) $this->request->getPost('ticket_id');
+        $estado = trim($this->request->getPost('estado') ?? '');
+
+        if ($ticketId <= 0 || !in_array($estado, ['Abierto', 'En Proceso', 'Resuelto'])) {
+            return redirect()->back()->with('error', 'Datos inválidos para actualizar el ticket.');
+        }
+
+        $ticketModel = new \App\Models\TicketModel();
+        $ticketModel->actualizarEstado($ticketId, $estado);
+
+        return redirect()->to(site_url('admin/soporte'))->with('success', 'El estado del ticket ha sido actualizado a: ' . $estado);
+    }
 
     /**
      * POST /admin/apartamentos/registrar-condominio

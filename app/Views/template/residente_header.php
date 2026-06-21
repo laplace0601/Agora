@@ -31,6 +31,12 @@
                         <?php else: ?>
                             Sin Apartamento Asignado
                         <?php endif; ?>
+                        <!-- ↓↓↓ BOTÓN DE CERRAR SESIÓN ↓↓↓ -->
+                        <a href="<?= site_url('auth/logout') ?>"
+                            class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
+                            <i class="bi bi-box-arrow-right me-1"></i> Salir
+                        </a>
+                        <!-- ↑↑↑ BOTÓN DE CERRAR SESIÓN ↑↑↑ -->
                     </span>
                 </div>
             </div>

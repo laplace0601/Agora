@@ -167,4 +167,43 @@ class ResidenteController extends BaseController
         return redirect()->to(site_url('residente/soporte'))
                          ->with('success', 'Ticket de soporte abierto exitosamente. Te contactaremos pronto.');
     }
+
+    /**
+     * GET /residente/finanzas
+     *
+     * Vista de finanzas: recibos vigentes sin pagar y el historial de solvencia (pagados).
+     */
+    public function finanzas()
+    {
+        $usuarioId = session()->get('usuario_id');
+        $apartamentoModel = new ApartamentoModel();
+        $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
+
+        $recibosPendientes = [];
+        $recibosPagados    = [];
+
+        if (! empty($apartamentos)) {
+            $reciboModel = new ReciboModel();
+            
+            // Recibos vigentes sin pagar (Pendientes)
+            $recibosPendientes = $reciboModel
+                ->where('apartamento_id', $apartamentos[0]['id'])
+                ->where('estado_pago', 'Pendiente')
+                ->orderBy('fecha_emision', 'DESC')
+                ->findAll();
+
+            // Historial de recibos pagados (Solvencia)
+            $recibosPagados = $reciboModel
+                ->where('apartamento_id', $apartamentos[0]['id'])
+                ->where('estado_pago', 'Pagado')
+                ->orderBy('fecha_emision', 'DESC')
+                ->findAll();
+        }
+
+        return view('residente/finanzas', [
+            'apartamentos'       => $apartamentos,
+            'recibos_pendientes' => $recibosPendientes,
+            'recibos_pagados'    => $recibosPagados,
+        ]);
+    }
 }

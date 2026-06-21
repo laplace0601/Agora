@@ -14,6 +14,16 @@ class AuthFilter implements FilterInterface
             return redirect()->to(site_url('auth/login'))->with('error', 'Debe iniciar sesión para acceder a esta área.');
         }
 
+        // Validación de inactividad
+        $sessionStartTime = session()->get('session_start_time');
+        if ($sessionStartTime && (time() - $sessionStartTime > 600)) {
+            session()->destroy();
+            return redirect()->to(site_url('auth/login'))->with('error', 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo.');
+        }
+
+        // Renovar el tiempo de inicio de sesión para contar inactividad
+        session()->set('session_start_time', time());
+
         if ($arguments && !empty($arguments)) {
             $rol = session()->get('rol');
             if (!in_array($rol, $arguments)) {
