@@ -23,23 +23,6 @@ class AdminController extends BaseController
     // ---------------------------------------------------------------
 
     /**
-     * GET /admin/apartamentos
-     *
-     * Vista de gestión inmobiliaria: condominios y apartamentos.
-     * Pasa los condominios registrados al select del formulario.
-     */
-    public function apartamentos()
-    {
-        $condominioModel = new CondominioModel();
-
-        $datos = [
-            'condominios' => $condominioModel->findAll(),
-        ];
-
-        return view('admin/apartamentos', $datos);
-    }
-
-    /**
      * GET /admin/residentes
      *
      * Vista del directorio de residentes para consultar y buscar.
@@ -174,91 +157,6 @@ class AdminController extends BaseController
 
     /**
      * POST /admin/soporte/validar
-     *
-     * Actualiza el estado de un ticket.
-     */
-    public function validarTicket()
-    {
-        $ticketId = (int) $this->request->getPost('ticket_id');
-        $estado = trim($this->request->getPost('estado') ?? '');
-
-        if ($ticketId <= 0 || !in_array($estado, ['Abierto', 'En Proceso', 'Resuelto'])) {
-            return redirect()->back()->with('error', 'Datos inválidos para actualizar el ticket.');
-        }
-
-        $ticketModel = new \App\Models\TicketModel();
-        $ticketModel->actualizarEstado($ticketId, $estado);
-
-        return redirect()->to(site_url('admin/soporte'))->with('success', 'El estado del ticket ha sido actualizado a: ' . $estado);
-    }
-
-    /**
-     * POST /admin/apartamentos/registrar-condominio
-     *
-     * Registra un nuevo condominio desde el modal de la vista apartamentos.
-     */
-    public function registrarCondominio()
-    {
-        $condominioModel = new CondominioModel();
-
-        $datos = [
-            'nombre_condominio'  => trim($this->request->getPost('nombre_condo') ?? ''),
-            'direccion'          => trim($this->request->getPost('direccion_condo') ?? ''),
-            'propietario'        => trim($this->request->getPost('propietario_condo') ?? ''),
-            'alicuota_base'      => (float) $this->request->getPost('alicuota_condo'),
-        ];
-
-        if (! $condominioModel->insert($datos)) {
-            return redirect()->back()
-                             ->with('error', 'Error al registrar el condominio: ' . implode(', ', $condominioModel->errors()));
-        }
-
-        return redirect()->to(site_url('admin/apartamentos'))
-                         ->with('success', 'Condominio registrado exitosamente.');
-    }
-
-    /**
-     * POST /admin/apartamentos/registrar-apartamento
-     *
-     * Registra un apartamento desde el modal de la vista apartamentos.
-     */
-    public function registrarApartamento()
-    {
-        $apartamentoModel = new ApartamentoModel();
-        $residenteModel   = new ResidenteModel();
-
-        // 1. Crear el residente (usamos uniqid para la cédula ya que el form solo pide nombre)
-        $nombrePropietario = trim($this->request->getPost('propietario_apto') ?? 'Sin Asignar');
-        $residenteId = null;
-        
-        if ($nombrePropietario !== '') {
-            $residenteId = $residenteModel->insert([
-                'nombre_completo'  => $nombrePropietario,
-                'cedula_identidad' => uniqid('CI-'),
-                'telefono'         => '',
-            ]);
-        }
-
-        // 2. Registrar el apartamento vinculado al residente
-        $datos = [
-            'condominio_id'         => (int) $this->request->getPost('condominio_id'),
-            'residente_id'          => $residenteId ? (int) $residenteId : null,
-            'nombre_edificio_torre' => trim($this->request->getPost('direccion_apto') ?? ''),
-            'nro_apartamento'       => trim($this->request->getPost('numero_apto') ?? ''),
-            'alicuota'              => (float) $this->request->getPost('alicuota_apto'),
-        ];
-
-        if (! $apartamentoModel->insert($datos)) {
-            return redirect()->back()
-                             ->with('error', 'Error al registrar el apartamento: ' . implode(', ', $apartamentoModel->errors()));
-        }
-
-        return redirect()->to(site_url('admin/apartamentos'))
-                         ->with('success', 'Apartamento registrado exitosamente.');
-    }
-
-    /**
-     * POST /admin/cartelera/publicar
      *
      * Publica un nuevo comunicado en la cartelera desde la BD.
      */

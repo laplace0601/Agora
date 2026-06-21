@@ -28,7 +28,7 @@
         <div class="container-fluid px-4">
 
             <!-- Logo / Marca -->
-            <a class="navbar-brand fw-bold fs-4 text-dark" href="<?= site_url('admin/apartamentos') ?>">
+            <a class="navbar-brand fw-bold fs-4 text-dark" href="<?= site_url(session()->get('rol') === 'root' ? 'super/apartamentos' : 'admin/residentes') ?>">
                 <span style="color: #D97706;">Á</span>GORA
                 <span class="badge bg-warning text-dark ms-2 small fw-semibold" style="font-size: 0.6rem;">Admin</span>
             </a>
@@ -41,12 +41,14 @@
 
             <div class="collapse navbar-collapse" id="navbarAdmin">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4 gap-1">
+                    <?php if (session()->get('rol') === 'root'): ?>
                     <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'admin/apartamentos' ? 'active fw-semibold' : '') ?>"
-                            href="<?= site_url('admin/apartamentos') ?>">
+                        <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/apartamentos' ? 'active fw-semibold' : '') ?>"
+                            href="<?= site_url('super/apartamentos') ?>">
                             <i class="bi bi-buildings me-1"></i> Inmuebles
                         </a>
                     </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'admin/residentes' ? 'active fw-semibold' : '') ?>"
                             href="<?= site_url('admin/residentes') ?>">

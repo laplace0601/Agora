@@ -26,6 +26,11 @@ $routes->get('auth/logout',        'AuthController::logout');
 // ---------------------------------------------------------------
 $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->get('panel', 'SuperController::panel');
+    
+    // Inmuebles / Apartamentos (ahora exclusivos de root)
+    $routes->get('apartamentos',          'SuperController::apartamentos');
+    $routes->post('apartamentos/registrar-condominio',  'SuperController::registrarCondominio');
+    $routes->post('apartamentos/registrar-apartamento', 'SuperController::registrarApartamento');
 });
 
 // ---------------------------------------------------------------
@@ -34,7 +39,6 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
 $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
 
     // Vistas principales
-    $routes->get('apartamentos',          'AdminController::apartamentos');
     $routes->get('residentes',            'AdminController::residentes');
     $routes->get('finanzas',              'AdminController::finanzas');
     $routes->get('finanzas/cobro',        'AdminController::finanzasCobro');
@@ -45,8 +49,6 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     
     // Handlers POST — formularios de las vistas admin
     $routes->post('soporte/validar',                    'AdminController::validarTicket');
-    $routes->post('apartamentos/registrar-condominio',  'AdminController::registrarCondominio');
-    $routes->post('apartamentos/registrar-apartamento', 'AdminController::registrarApartamento');
     $routes->post('finanzas/facturar',                  'AdminController::emitirRecibos');
     $routes->post('finanzas/validar-pago',              'AdminController::validarPago');
     $routes->post('cartelera/publicar',                 'AdminController::publicarAnuncio');

@@ -49,7 +49,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                 <h5 class="modal-title fw-bold text-dark" id="McondominiotorreLabel">Nuevo Registro de Condominio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/apartamentos/registrar-condominio') ?>" method="POST">
+            <form action="<?= site_url('super/apartamentos/registrar-condominio') ?>" method="POST">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
@@ -86,7 +86,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                 <h5 class="modal-title fw-bold text-dark" id="MbloqueapartamentoLabel">Nuevo Registro de Apartamento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/apartamentos/registrar-apartamento') ?>" method="POST">
+            <form action="<?= site_url('super/apartamentos/registrar-apartamento') ?>" method="POST">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
