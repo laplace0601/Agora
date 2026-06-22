@@ -15,9 +15,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- CSS específico de la página (ej: admin_apartamentos.css) -->
+    <!-- CSS Global del Panel Admin -->
+    <link rel="stylesheet" href="<?= base_url('css/admin_global.css?v=' . time()) ?>">
+
+    <!-- CSS específico de la página (ej: admin_residentes.css) -->
     <?php if (isset($pagina_actual)): ?>
-        <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css') ?>">
+        <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css?v=' . time()) ?>">
     <?php endif; ?>
 </head>
 

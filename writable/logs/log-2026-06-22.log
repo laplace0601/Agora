@@ -905,3 +905,392 @@ in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
 12 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
 13 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
 14 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+DEBUG - 2026-06-22 20:51:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 20:53:02 --> CSRF token verified.
+DEBUG - 2026-06-22 20:53:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 20:53:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 20:59:54 --> CSRF token verified.
+DEBUG - 2026-06-22 20:59:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 20:59:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 20:59:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:00:08 --> CSRF token verified.
+DEBUG - 2026-06-22 21:00:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:00:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-22 21:04:18 --> Cannot truncate a table referenced in a foreign key constraint (`agora`.`noticias_comunicados`, CONSTRAINT `noticias_comunicados_ibfk_1` FOREIGN KEY (`autor_id`) REFERENCES `agora`.`usuarios` (`id`))
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('TRUNCATE `usuarios`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('TRUNCATE `usuarios`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('TRUNCATE `usuarios`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2773): CodeIgniter\Database\BaseConnection->query('TRUNCATE `usuarios`', null, false)
+ 5 APPPATH\Database\Seeds\UsuariosSeeder.php(21): CodeIgniter\Database\BaseBuilder->truncate()
+ 6 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\UsuariosSeeder->run()
+ 7 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('\\App\\Database\\Seeds\\UsuariosSeeder')
+ 8 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+ 9 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+10 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+11 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+12 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:06:59 --> Table 'configuracion_marca' already exists
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 4 SYSTEMPATH\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 5 APPPATH\Database\Migrations\2026-06-20-194930_EsquemaInicialAgora.php(28): CodeIgniter\Database\Forge->createTable('configuracion_marca')
+ 6 SYSTEMPATH\Database\MigrationRunner.php(1014): App\Database\Migrations\CrearBaseDeDatosInicial->up()
+ 7 SYSTEMPATH\Database\MigrationRunner.php(202): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+ 8 SYSTEMPATH\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(null)
+ 9 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+10 SYSTEMPATH\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+11 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run([...])
+12 SYSTEMPATH\CLI\BaseCommand.php(119): CodeIgniter\CLI\Commands->run('migrate', [...])
+13 SYSTEMPATH\Commands\Database\MigrateRefresh.php(91): CodeIgniter\CLI\BaseCommand->call('migrate', [...])
+14 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\MigrateRefresh->CodeIgniter\Commands\Database\{closure}()
+15 SYSTEMPATH\Commands\Database\MigrateRefresh.php(89): CodeIgniter\Commands\Database\MigrateRefresh->withSignalsBlocked(Object(Closure))
+16 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateRefresh->run([...])
+17 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:refresh', [])
+18 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+19 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+20 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:06:59 --> Duplicate entry '1' for key 'PRIMARY'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (:id:, :nombre_empresa:, :logo_url:, :color_primario:, :correo_contacto:, :nivel_licencia:, :limite_apartamentos:, :codigo_activacion:, :fecha_actualizacion_plan:)', [...], false)
+ 5 APPPATH\Database\Seeds\ConfiguracionMarcaSeeder.php(23): CodeIgniter\Database\BaseBuilder->insert([...])
+ 6 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\ConfiguracionMarcaSeeder->run()
+ 7 APPPATH\Database\Seeds\MainSeeder.php(15): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\ConfiguracionMarcaSeeder')
+ 8 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\MainSeeder->run()
+ 9 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\MainSeeder')
+10 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+11 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+12 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+13 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+14 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:09:27 --> Table 'configuracion_marca' already exists
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 4 SYSTEMPATH\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 5 APPPATH\Database\Migrations\2026-06-20-194930_EsquemaInicialAgora.php(28): CodeIgniter\Database\Forge->createTable('configuracion_marca')
+ 6 SYSTEMPATH\Database\MigrationRunner.php(1014): App\Database\Migrations\CrearBaseDeDatosInicial->up()
+ 7 SYSTEMPATH\Database\MigrationRunner.php(202): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+ 8 SYSTEMPATH\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(null)
+ 9 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+10 SYSTEMPATH\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+11 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run([...])
+12 SYSTEMPATH\CLI\BaseCommand.php(119): CodeIgniter\CLI\Commands->run('migrate', [...])
+13 SYSTEMPATH\Commands\Database\MigrateRefresh.php(91): CodeIgniter\CLI\BaseCommand->call('migrate', [...])
+14 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\MigrateRefresh->CodeIgniter\Commands\Database\{closure}()
+15 SYSTEMPATH\Commands\Database\MigrateRefresh.php(89): CodeIgniter\Commands\Database\MigrateRefresh->withSignalsBlocked(Object(Closure))
+16 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateRefresh->run([...])
+17 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:refresh', [])
+18 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+19 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+20 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:09:27 --> Duplicate entry '1' for key 'PRIMARY'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (:id:, :nombre_empresa:, :logo_url:, :color_primario:, :correo_contacto:, :nivel_licencia:, :limite_apartamentos:, :codigo_activacion:, :fecha_actualizacion_plan:)', [...], false)
+ 5 APPPATH\Database\Seeds\ConfiguracionMarcaSeeder.php(23): CodeIgniter\Database\BaseBuilder->insert([...])
+ 6 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\ConfiguracionMarcaSeeder->run()
+ 7 APPPATH\Database\Seeds\MainSeeder.php(15): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\ConfiguracionMarcaSeeder')
+ 8 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\MainSeeder->run()
+ 9 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\MainSeeder')
+10 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+11 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+12 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+13 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+14 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:11:23 --> Table 'configuracion_marca' already exists
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 4 SYSTEMPATH\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `configuracion_marca` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`nombre_empresa` VARCHAR(100) NOT NULL,
+	`logo_url` VARCHAR(255) NULL,
+	`color_primario` VARCHAR(7) NOT NULL DEFAULT \'#007bff\',
+	`correo_contacto` VARCHAR(100) NULL,
+	`nivel_licencia` VARCHAR(20) NOT NULL DEFAULT \'Bronce\',
+	`limite_apartamentos` INT(11) NOT NULL DEFAULT 40,
+	`codigo_activacion` VARCHAR(255) NULL,
+	`fecha_actualizacion_plan` TIMESTAMP NULL,
+	CONSTRAINT `pk_configuracion_marca` PRIMARY KEY(`id`)
+) DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci')
+ 5 APPPATH\Database\Migrations\2026-06-20-194930_EsquemaInicialAgora.php(28): CodeIgniter\Database\Forge->createTable('configuracion_marca')
+ 6 SYSTEMPATH\Database\MigrationRunner.php(1014): App\Database\Migrations\CrearBaseDeDatosInicial->up()
+ 7 SYSTEMPATH\Database\MigrationRunner.php(202): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+ 8 SYSTEMPATH\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(null)
+ 9 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+10 SYSTEMPATH\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+11 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run([...])
+12 SYSTEMPATH\CLI\BaseCommand.php(119): CodeIgniter\CLI\Commands->run('migrate', [...])
+13 SYSTEMPATH\Commands\Database\MigrateRefresh.php(91): CodeIgniter\CLI\BaseCommand->call('migrate', [...])
+14 SYSTEMPATH\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\MigrateRefresh->CodeIgniter\Commands\Database\{closure}()
+15 SYSTEMPATH\Commands\Database\MigrateRefresh.php(89): CodeIgniter\Commands\Database\MigrateRefresh->withSignalsBlocked(Object(Closure))
+16 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateRefresh->run([...])
+17 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:refresh', [])
+18 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+19 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+20 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+ERROR - 2026-06-22 21:11:23 --> Duplicate entry '1' for key 'PRIMARY'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (:id:, :nombre_empresa:, :logo_url:, :color_primario:, :correo_contacto:, :nivel_licencia:, :limite_apartamentos:, :codigo_activacion:, :fecha_actualizacion_plan:)', [...], false)
+ 5 APPPATH\Database\Seeds\ConfiguracionMarcaSeeder.php(23): CodeIgniter\Database\BaseBuilder->insert([...])
+ 6 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\ConfiguracionMarcaSeeder->run()
+ 7 APPPATH\Database\Seeds\MainSeeder.php(15): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\ConfiguracionMarcaSeeder')
+ 8 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\MainSeeder->run()
+ 9 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\MainSeeder')
+10 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+11 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+12 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+13 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+14 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+DEBUG - 2026-06-22 21:15:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-06-22 21:22:28 --> Error connecting to the database: mysqli_sql_exception: Unknown database 'agora' in C:\xampp\htdocs\Agora\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\xampp\htdocs\Agora\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'agora', 3306, '', 0)
+#1 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(555): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(795): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(1706): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#4 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(1726): CodeIgniter\Database\BaseConnection->listTables()
+#5 C:\xampp\htdocs\Agora\system\Database\MigrationRunner.php(821): CodeIgniter\Database\BaseConnection->tableExists('migrations')
+#6 C:\xampp\htdocs\Agora\system\Database\MigrationRunner.php(173): CodeIgniter\Database\MigrationRunner->ensureTable()
+#7 C:\xampp\htdocs\Agora\system\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\xampp\htdocs\Agora\system\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+#9 C:\xampp\htdocs\Agora\system\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+#10 C:\xampp\htdocs\Agora\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#11 C:\xampp\htdocs\Agora\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#12 C:\xampp\htdocs\Agora\system\Boot.php(442): CodeIgniter\CLI\Console->run()
+#13 C:\xampp\htdocs\Agora\system\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#14 C:\xampp\htdocs\Agora\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#15 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'agora' in C:\xampp\htdocs\Agora\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(555): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(795): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(1706): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#3 C:\xampp\htdocs\Agora\system\Database\BaseConnection.php(1726): CodeIgniter\Database\BaseConnection->listTables()
+#4 C:\xampp\htdocs\Agora\system\Database\MigrationRunner.php(821): CodeIgniter\Database\BaseConnection->tableExists('migrations')
+#5 C:\xampp\htdocs\Agora\system\Database\MigrationRunner.php(173): CodeIgniter\Database\MigrationRunner->ensureTable()
+#6 C:\xampp\htdocs\Agora\system\Commands\Database\Migrate.php(89): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#7 C:\xampp\htdocs\Agora\system\CLI\SignalTrait.php(245): CodeIgniter\Commands\Database\Migrate::CodeIgniter\Commands\Database\{closure}()
+#8 C:\xampp\htdocs\Agora\system\Commands\Database\Migrate.php(88): CodeIgniter\Commands\Database\Migrate->withSignalsBlocked(Object(Closure))
+#9 C:\xampp\htdocs\Agora\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\xampp\htdocs\Agora\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\xampp\htdocs\Agora\system\Boot.php(442): CodeIgniter\CLI\Console->run()
+#12 C:\xampp\htdocs\Agora\system\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\xampp\htdocs\Agora\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-06-22 21:24:07 --> Duplicate entry '1' for key 'PRIMARY'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (1, \'Mi Administradora Base\', NULL, \'#007bff\', \'contacto@agora.com\', \'Bronce\', 40, NULL, NULL)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `configuracion_marca` (`id`, `nombre_empresa`, `logo_url`, `color_primario`, `correo_contacto`, `nivel_licencia`, `limite_apartamentos`, `codigo_activacion`, `fecha_actualizacion_plan`) VALUES (:id:, :nombre_empresa:, :logo_url:, :color_primario:, :correo_contacto:, :nivel_licencia:, :limite_apartamentos:, :codigo_activacion:, :fecha_actualizacion_plan:)', [...], false)
+ 5 APPPATH\Database\Seeds\ConfiguracionMarcaSeeder.php(23): CodeIgniter\Database\BaseBuilder->insert([...])
+ 6 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\ConfiguracionMarcaSeeder->run()
+ 7 APPPATH\Database\Seeds\MainSeeder.php(15): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\ConfiguracionMarcaSeeder')
+ 8 SYSTEMPATH\Database\Seeder.php(155): App\Database\Seeds\MainSeeder->run()
+ 9 SYSTEMPATH\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Seeds\\MainSeeder')
+10 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run([])
+11 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', [...])
+12 SYSTEMPATH\Boot.php(442): CodeIgniter\CLI\Console->run()
+13 SYSTEMPATH\Boot.php(166): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+14 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+INFO - 2026-06-22 21:37:28 --> CSRF token verified.
+DEBUG - 2026-06-22 21:37:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:37:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:37:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:37:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:38:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:38:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:38:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:39:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:39:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:40:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:40:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:45:04 --> CSRF token verified.
+DEBUG - 2026-06-22 21:45:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:45:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:46:15 --> CSRF token verified.
+DEBUG - 2026-06-22 21:46:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:46:36 --> CSRF token verified.
+DEBUG - 2026-06-22 21:46:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:46:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:47:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:47:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:47:30 --> CSRF token verified.
+DEBUG - 2026-06-22 21:47:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:47:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:53:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:53:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 21:53:39 --> CSRF token verified.
+DEBUG - 2026-06-22 21:53:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:53:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:54:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:55:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:56:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:56:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:56:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:56:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:56:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 21:57:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:05:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:05:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-06-22 22:05:30 --> CSRF token verified.
+DEBUG - 2026-06-22 22:05:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:05:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:05:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:14:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-06-22 22:14:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

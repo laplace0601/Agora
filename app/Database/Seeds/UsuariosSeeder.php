@@ -3,51 +3,56 @@
 namespace App\Database\Seeds;
 
 use CodeIgniter\Database\Seeder;
-use App\Models\UsuarioModel;
 
 class UsuariosSeeder extends Seeder
 {
     public function run()
     {
-        $modelo = new UsuarioModel();
+        // ---------------------------------------------------------------
+        // NOTA DE ARQUITECTURA:
+        // Desactivamos la verificación de llaves foráneas para permitir 
+        // el truncate() de una tabla que tiene dependencias.
+        // ---------------------------------------------------------------
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 0');
 
-        // Desactivar validaciones del modelo para la inserción directa del seeder.
-        // Esto evita que reglas como 'is_unique' fallen en un entorno recién migrado.
-        $modelo->skipValidation(true);
+        // Limpiar la tabla
+        $this->db->table('usuarios')->truncate();
 
-        // 1. EL USUARIO ROOT OBLIGATORIO
-        // La clave se pasa en TEXTO PLANO — el callback beforeInsert del modelo
-        // la hashea exactamente UNA sola vez con password_hash (PASSWORD_BCRYPT).
-        // Si se pasa ya hasheada, el callback la hashearía DOS veces y el login fallaría.
-        $modelo->insert([
-            'id'             => 1,
+        // 1. USUARIO ROOT OBLIGATORIO
+        $this->db->table('usuarios')->insert([
             'correo'         => 'admin@agora.com',
             'nombre_usuario' => 'admin',
-            'clave'          => '123456',
+            'clave'          => password_hash('123456', PASSWORD_DEFAULT),
             'rol'            => 'root',
             'estado'         => 'activo',
         ]);
 
         // 2. USUARIOS DE PRUEBA (solo en entorno de desarrollo)
         if (ENVIRONMENT === 'development') {
-            $modelo->insertBatch([
+            $claveHash = password_hash('123456', PASSWORD_DEFAULT);
+
+            $this->db->table('usuarios')->insertBatch([
                 [
-                    'id'             => 2,
                     'correo'         => 'comite_demo@agora.com',
                     'nombre_usuario' => 'comite_demo',
-                    'clave'          => '123456',
+                    'clave'          => $claveHash,
                     'rol'            => 'admin',
                     'estado'         => 'activo',
                 ],
                 [
-                    'id'             => 3,
                     'correo'         => 'residente_demo@agora.com',
                     'nombre_usuario' => 'residente_demo',
-                    'clave'          => '123456',
+                    'clave'          => $claveHash,
                     'rol'            => 'residente',
                     'estado'         => 'activo',
                 ],
             ]);
         }
+
+        // ---------------------------------------------------------------
+        // REACTIVAR LAS LLAVES FORÁNEAS
+        // Muy importante para mantener la integridad de la base de datos.
+        // ---------------------------------------------------------------
+        $this->db->query('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

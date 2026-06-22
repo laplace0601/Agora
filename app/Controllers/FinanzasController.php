@@ -16,75 +16,183 @@ class FinanzasController extends BaseController
      * Fórmula: monto_total = monto_base * alicuota (por apartamento).
      * Solo para rol 'admin'.
      */
-    public function emitirRecibos()
+    /**
+     * POST /crm/finanzas/simular-facturacion
+     *
+     * Genera una pre-visualización de la facturación basada en el monto global
+     * y las alícuotas de cada apartamento. No guarda en base de datos.
+     */
+    public function simularFacturacion()
     {
         $session = session();
-
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los administradores pueden emitir recibos.',
-            ])->setStatusCode(403);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
         }
 
         $condominioId = (int) $this->request->getPost('condominio_id');
-        $montoBase    = (float) $this->request->getPost('monto_base');
+        $montoGlobal  = (float) $this->request->getPost('monto_global_gastos');
+
+        if ($condominioId <= 0 || $montoGlobal <= 0) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Datos inválidos. El monto global debe ser mayor a 0.'])->setStatusCode(400);
+        }
+
+        $apartamentoModel = new ApartamentoModel();
+        $apartamentos = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
+
+        if (empty($apartamentos)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'No hay apartamentos registrados en este condominio.'])->setStatusCode(404);
+        }
+
+        // VALIDACIÓN CRÍTICA: Regla del 100%
+        $sumaAlicuotas = 0;
+        foreach ($apartamentos as $apto) {
+            $sumaAlicuotas += (float) $apto['alicuota'];
+        }
+
+        // Margen de tolerancia [99.9, 100.1] para errores de coma flotante
+        if ($sumaAlicuotas < 99.9 || $sumaAlicuotas > 100.1) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Operación abortada: La suma de las alícuotas del condominio no es 100%. Suma actual: ' . $sumaAlicuotas . '%. Por favor corrija la alícuota de los inmuebles antes de facturar.'
+            ])->setStatusCode(422);
+        }
+
+        $simulacion = [];
+        $totalDistribuido = 0;
+
+        foreach ($apartamentos as $apto) {
+            // Lógica de cálculo: Monto Global * (Alicuota / 100)
+            $montoApartamento = round($montoGlobal * ((float) $apto['alicuota'] / 100), 2);
+            $totalDistribuido += $montoApartamento;
+
+            $simulacion[] = [
+                'apartamento_id'  => $apto['id'],
+                'nro_apartamento' => $apto['nro_apartamento'] ?? $apto['numero'] ?? 'N/A',
+                'alicuota'        => $apto['alicuota'] . '%',
+                'monto_a_pagar'   => $montoApartamento
+            ];
+        }
+
+        // Auditoría financiera en la respuesta
+        return $this->response->setJSON([
+            'status'             => 'success',
+            'monto_global_base'  => $montoGlobal,
+            'suma_alicuotas'     => $sumaAlicuotas . '%',
+            'total_distribuido'  => round($totalDistribuido, 2),
+            'descuadre_centavos' => round($montoGlobal - $totalDistribuido, 2),
+            'detalle'            => $simulacion
+        ]);
+    }
+
+    /**
+     * POST /crm/finanzas/facturar
+     *
+     * Emite recibos mensuales masivos de forma segura usando transacciones.
+     */
+    public function emitirRecibos()
+    {
+        $session = session();
+        if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+        }
+
+        $condominioId = (int) $this->request->getPost('condominio_id');
+        $montoGlobal  = (float) $this->request->getPost('monto_global_gastos'); // Monto Base de Gastos Globales
         $mes          = (int) $this->request->getPost('mes');
         $anio         = (int) $this->request->getPost('anio');
 
-        // Validación de campos obligatorios
-        if ($condominioId <= 0 || $montoBase <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Datos inválidos. Verifique condominio_id, monto_base, mes y año.',
-            ])->setStatusCode(400);
+        if ($condominioId <= 0 || $montoGlobal <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Datos inválidos. Verifique condominio_id, monto, mes y año.'])->setStatusCode(400);
         }
 
-        // Obtener todos los apartamentos del condominio
         $apartamentoModel = new ApartamentoModel();
-        $apartamentos     = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
+        $apartamentos = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
 
         if (empty($apartamentos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'No se encontraron apartamentos para este condominio.',
-            ])->setStatusCode(404);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'No se encontraron apartamentos.'])->setStatusCode(404);
         }
 
-        // Generar recibos masivamente
-        $reciboModel    = new ReciboModel();
-        $insertados     = 0;
-        $yaExistentes   = 0;
+        // VALIDACIÓN CRÍTICA: Regla del 100% de Alícuota
+        $sumaAlicuotas = 0;
+        foreach ($apartamentos as $apto) {
+            $sumaAlicuotas += (float) $apto['alicuota'];
+        }
+
+        if ($sumaAlicuotas < 99.9 || $sumaAlicuotas > 100.1) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Facturación bloqueada por seguridad: La suma de alícuotas del edificio (' . $sumaAlicuotas . '%) no equivale al 100%.'
+            ])->setStatusCode(422);
+        }
+
+        $reciboModel = new ReciboModel();
+        $recibosBatch = [];
+        $yaExistentes = 0;
 
         foreach ($apartamentos as $apto) {
-            // Evitar duplicar recibos del mismo mes/año
+            // Evitar duplicar recibos del mismo mes/año para el mismo apartamento
             if ($reciboModel->existeRecibo((int) $apto['id'], $mes, $anio)) {
                 $yaExistentes++;
                 continue;
             }
 
-            $montoTotal = round($montoBase * (float) $apto['alicuota'], 2);
+            // Cálculo individual
+            $montoApartamento = round($montoGlobal * ((float) $apto['alicuota'] / 100), 2);
 
-            $reciboModel->insert([
+            $recibosBatch[] = [
                 'apartamento_id'  => $apto['id'],
                 'mes'             => $mes,
                 'anio'            => $anio,
-                'monto_base'      => $montoBase,
+                'monto_base'      => $montoApartamento,
                 'monto_intereses' => 0,
-                'monto_total'     => $montoTotal,
+                'monto_total'     => $montoApartamento,
                 'estado_pago'     => 'Pendiente',
-            ]);
+            ];
+        }
 
-            $insertados++;
+        // Si todos los recibos ya habían sido facturados en este periodo
+        if (empty($recibosBatch)) {
+            return $this->response->setJSON([
+                'status'  => 'warning',
+                'message' => "No se generaron recibos. Los {$yaExistentes} apartamentos ya estaban facturados en este mes y año."
+            ]);
+        }
+
+        // ---------------------------------------------------------------
+        // TRANSACCIÓN DE BASE DE DATOS (SEGURIDAD DE INTEGRIDAD)
+        // ---------------------------------------------------------------
+        $db = \Config\Database::connect();
+        $db->transStart(); // Inicia la transacción
+
+        try {
+            // Inserción en bloque masiva, más eficiente que N inserts
+            $reciboModel->insertBatch($recibosBatch);
+        } catch (\Exception $e) {
+            $db->transRollback(); // Revertir todo si falla uno solo
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Fallo crítico en la base de datos al generar facturas. Ningún recibo fue emitido por seguridad.',
+                'error'   => $e->getMessage()
+            ])->setStatusCode(500);
+        }
+
+        $db->transComplete(); // Confirmar la transacción si todo fue bien
+
+        // Segunda capa de seguridad de transacción
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'La transacción falló y ha sido revertida de forma segura por el motor de base de datos.'
+            ])->setStatusCode(500);
         }
 
         return $this->response->setJSON([
             'status'  => 'success',
-            'message' => "Facturación completada: {$insertados} recibos emitidos.",
+            'message' => "Facturación masiva exitosa: " . count($recibosBatch) . " recibos emitidos.",
             'data'    => [
-                'recibos_emitidos'     => $insertados,
-                'recibos_ya_existian'  => $yaExistentes,
-                'total_apartamentos'   => count($apartamentos),
+                'recibos_emitidos'    => count($recibosBatch),
+                'recibos_ya_existian' => $yaExistentes,
+                'total_apartamentos'  => count($apartamentos),
             ],
         ]);
     }

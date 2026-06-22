@@ -11,8 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <!-- CSS Global del Portal Residente -->
+    <link rel="stylesheet" href="<?= base_url('css/residente_global.css?v=' . time()) ?>">
+
+    <!-- CSS específico de la página (ej: residente_dashboard.css) -->
     <?php if (isset($pagina_actual)): ?>
-        <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css') ?>">
+        <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css?v=' . time()) ?>">
     <?php endif; ?>
 </head>
 
