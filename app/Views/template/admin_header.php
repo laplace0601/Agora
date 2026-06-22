@@ -45,12 +45,12 @@
             <div class="collapse navbar-collapse" id="navbarAdmin">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4 gap-1">
                     <?php if (session()->get('rol') === 'root'): ?>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/apartamentos' ? 'active fw-semibold' : '') ?>"
-                            href="<?= site_url('super/apartamentos') ?>">
-                            <i class="bi bi-buildings me-1"></i> Inmuebles
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/apartamentos' ? 'active fw-semibold' : '') ?>"
+                                href="<?= site_url('super/apartamentos') ?>">
+                                <i class="bi bi-buildings me-1"></i> Inmuebles
+                            </a>
+                        </li>
                     <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'admin/residentes' ? 'active fw-semibold' : '') ?>"
@@ -94,9 +94,9 @@
 
                 <!-- Acciones de usuario -->
                 <div class="d-flex align-items-center gap-3 ms-auto">
-                    <span class="text-secondary small">
+                    <span class="text-secondary small fw-bold">
                         <i class="bi bi-person-circle me-1"></i>
-                        <?= session()->get('correo') ?? 'Administrador' ?>
+                        @<?= session()->get('nombre_usuario') ?? 'admin' ?>
                     </span>
                     <a href="<?= site_url('auth/logout') ?>"
                         class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">

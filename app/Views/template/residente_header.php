@@ -30,6 +30,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <div class="d-flex align-items-center gap-3">
                     <span class="text-secondary small fw-medium">
+                        <i class="bi bi-person-circle me-1"></i> @<?= session()->get('nombre_usuario') ?? 'Residente' ?> |
                         <?php if (!empty($apartamentos)): ?>
                             <i class="bi bi-door-open me-1"></i> Apto. <?= htmlspecialchars($apartamentos[0]['nro_apartamento']) ?>
                         <?php else: ?>

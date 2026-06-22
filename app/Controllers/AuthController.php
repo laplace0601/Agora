@@ -54,6 +54,7 @@ class AuthController extends BaseController
         // ---------------------------------------------------------------
         session()->set([
             'usuario_id'         => $usuario['id'],
+            'nombre_usuario'     => $usuario['nombre_usuario'] ?? '',
             'correo'             => $usuario['correo'],
             'rol'                => $rol,
             'isLoggedIn'         => true,          // ← clave canónica del sistema
