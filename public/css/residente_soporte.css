@@ -1,0 +1,10 @@
+/**
+ * @file residente_soporte.css
+ * @description Estilos únicos de la tabla de visualización de incidencias.
+ */
+
+.table th {
+    font-weight: 600;
+    color: #475569;
+    letter-spacing: 0.5px;
+}

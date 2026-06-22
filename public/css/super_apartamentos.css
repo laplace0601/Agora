@@ -1,0 +1,26 @@
+/**
+ * @file super_apartamentos.css
+ * @description Estilos para la vista de gestión inmobiliaria del Súper Root.
+ */
+
+/* ---- Botones de acción principal ---- */
+.btn-agora-admin {
+    background-color: #1F4E56;
+    border-color: #1F4E56;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-agora-admin:hover {
+    background-color: #163a40;
+    box-shadow: 0 4px 14px rgba(31, 78, 86, 0.35);
+}
+
+/* ---- Cards de modal ---- */
+.modal-content {
+    border-radius: 1rem !important;
+}
+
+/* ---- Sección vacía / placeholder ---- */
+section.text-center.py-5 {
+    min-height: 200px;
+    border: 1.5px dashed #dee2e6;
+}

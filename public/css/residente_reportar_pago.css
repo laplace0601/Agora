@@ -1,0 +1,17 @@
+/**
+ * @file residente_reportar_pago.css
+ * @description Ajustes de estilo exclusivos para la zona de arrastre del comprobante.
+ */
+
+.dropzone-agora {
+    border: 2px dashed #CBD5E1;
+    border-radius: 12px;
+    background-color: #F8FAFC;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.dropzone-agora:hover {
+    border-color: var(--color-primario-custom, #1E3A8A);
+    background-color: rgba(30, 58, 138, 0.01);
+}

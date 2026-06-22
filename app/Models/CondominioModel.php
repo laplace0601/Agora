@@ -44,6 +44,26 @@ class CondominioModel extends Model
     ];
 
     // ---------------------------------------------------------------
+    // Eventos / Callbacks del Modelo
+    // ---------------------------------------------------------------
+    
+    protected $beforeInsert = ['asignarMarcaPorDefecto'];
+    protected $beforeUpdate = ['asignarMarcaPorDefecto'];
+
+    /**
+     * Callback para asignar automáticamente el ID de la marca principal (1)
+     * a los condominios si el controlador omite enviarlo.
+     * Mantiene los controladores limpios y respeta el $allowedFields.
+     */
+    protected function asignarMarcaPorDefecto(array $data)
+    {
+        if (isset($data['data']) && empty($data['data']['marca_id'])) {
+            $data['data']['marca_id'] = 1;
+        }
+        return $data;
+    }
+
+    // ---------------------------------------------------------------
     // Métodos de negocio
     // ---------------------------------------------------------------
 

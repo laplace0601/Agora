@@ -30,7 +30,7 @@ class AdminController extends BaseController
     public function residentes()
     {
         $residenteModel = new ResidenteModel();
-        
+
         $residentes = $residenteModel
             ->select('residentes.*, usuarios.correo, usuarios.estado')
             ->join('usuarios', 'usuarios.id = residentes.usuario_id', 'left')
@@ -38,7 +38,7 @@ class AdminController extends BaseController
 
         $apartamentoModel = new ApartamentoModel();
         $apartamentos = $apartamentoModel->findAll();
-        
+
         $aptosPorResidente = [];
         foreach ($apartamentos as $apto) {
             if ($apto['residente_id']) {
@@ -80,7 +80,7 @@ class AdminController extends BaseController
             'mes_actual'   => (int) date('n'),
         ];
 
-        return view('admin/finazas_cobro', $datos);
+        return view('admin/finanzas_cobro', $datos);
     }
 
     /**
@@ -140,7 +140,7 @@ class AdminController extends BaseController
     public function soporte()
     {
         $ticketModel = new \App\Models\TicketModel();
-        
+
         $tickets = $ticketModel
             ->select('tickets_soporte.*, residentes.nombre_completo, residentes.telefono, usuarios.correo')
             ->join('usuarios', 'usuarios.id = tickets_soporte.usuario_id')
@@ -157,6 +157,27 @@ class AdminController extends BaseController
 
     /**
      * POST /admin/soporte/validar
+     *
+     * Actualiza el estado de un ticket de soporte.
+     */
+    public function validarTicket()
+    {
+        $ticketId = (int) $this->request->getPost('ticket_id');
+        $estado = trim($this->request->getPost('estado') ?? '');
+
+        if ($ticketId <= 0 || ! in_array($estado, ['Abierto', 'En Proceso', 'Resuelto'], true)) {
+            return redirect()->back()->with('error', 'Datos inválidos para actualizar el ticket.');
+        }
+
+        $ticketModel = new \App\Models\TicketModel();
+        $ticketModel->actualizarEstado($ticketId, $estado);
+
+        return redirect()->to(site_url('admin/soporte'))
+            ->with('success', "Estado del ticket #{$ticketId} actualizado a '{$estado}'.");
+    }
+
+    /**
+     * POST /admin/cartelera/publicar
      *
      * Publica un nuevo comunicado en la cartelera desde la BD.
      */
@@ -179,7 +200,7 @@ class AdminController extends BaseController
         $comunicadoModel->insert($datos);
 
         return redirect()->to(site_url('admin/cartelera'))
-                         ->with('success', 'Anuncio publicado exitosamente.');
+            ->with('success', 'Anuncio publicado exitosamente.');
     }
 
     /**
@@ -193,7 +214,7 @@ class AdminController extends BaseController
         $comunicadoModel->update($id, ['estado' => 'borrado']);
 
         return redirect()->to(site_url('admin/cartelera'))
-                         ->with('success', 'Anuncio eliminado.');
+            ->with('success', 'Anuncio eliminado.');
     }
 
     /**
@@ -276,11 +297,11 @@ class AdminController extends BaseController
             $reciboModel = new ReciboModel();
             $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado');
             return redirect()->to(site_url('admin/finanzas/pagos'))
-                             ->with('success', "Pago #{$pagoId} aprobado. Recibo marcado como Pagado.");
+                ->with('success', "Pago #{$pagoId} aprobado. Recibo marcado como Pagado.");
         }
 
         $pagoModel->actualizarValidacion($pagoId, 'Rechazado');
         return redirect()->to(site_url('admin/finanzas/pagos'))
-                         ->with('success', "Pago #{$pagoId} rechazado.");
+            ->with('success', "Pago #{$pagoId} rechazado.");
     }
 }

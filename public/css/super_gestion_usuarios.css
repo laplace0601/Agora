@@ -1,0 +1,11 @@
+/**
+ * @file super_gestion_usuarios.css
+ * @description Estilos mínimos para la tabla de gestión de usuarios maestros.
+ */
+.fs-8 {
+    font-size: 0.78rem !important;
+}
+.btn-group .btn:hover {
+    background-color: #F8FAFC !important;
+    filter: brightness(0.95);
+}

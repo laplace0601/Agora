@@ -1,0 +1,16 @@
+/**
+ * @file admin_soporte.css
+ * @description Estilos para el panel de soporte del administrador.
+ */
+.bg-opacity-15 {
+    background-color: rgba(217, 119, 6, 0.15) !important;
+}
+.text-warning-dark {
+    color: #B45309 !important;
+}
+.fs-8 {
+    font-size: 0.78rem !important;
+}
+.card-agora-form {
+    border-radius: 16px;
+}

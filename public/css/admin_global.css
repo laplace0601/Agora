@@ -1,0 +1,80 @@
+/**
+ * @file admin_global.css
+ * @description Estilos base, componentes comunes y variables cromáticas del ecosistema administrativo.
+ */
+
+/* --- CONFIGURACIONES ELEMENTALES E IDENTIDAD DE MARCA --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F8FAFC;
+}
+
+/* El color primario (Sidebar) - Si no hay marca blanca, usa el Azul Petróleo por defecto */
+.sidebar-agora {
+    background: linear-gradient(180deg, var(--color-primario-custom, #1F4E56) 0%, #0D262A 100%) !important;
+}
+
+/* Identidad corporativa de soporte para fondos */
+.text-bg-agora {
+    background: linear-gradient(135deg, var(--color-primario-custom, #2E6F7A) 0%, #1F4E56 100%) !important;
+    color: white !important;
+}
+
+/* El botón principal muta con las variables de marca blanca */
+.btn-agora-admin {
+    background: linear-gradient(135deg, var(--color-primario-custom, #2E6F7A) 0%, var(--color-primario-custom, #1F4E56) 100%) !important;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.btn-agora-admin:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(46, 111, 122, 0.3) !important;
+    filter: brightness(1.1);
+}
+
+/* Botón secundario/esquema */
+.btn-outline-agora-admin {
+    border: 2px solid var(--color-primario-custom, #2E6F7A) !important;
+    color: var(--color-primario-custom, #2E6F7A) !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-outline-agora-admin:hover {
+    background-color: var(--color-primario-custom, #2E6F7A) !important;
+    color: white !important;
+}
+
+/* Enfoques interactivos en campos de texto de todo el panel */
+.form-control:focus, .form-select:focus {
+    border-color: var(--color-primario-custom, #2E6F7A) !important;
+    box-shadow: 0 0 0 0.25rem rgba(46, 111, 122, 0.15) !important;
+}
+
+/* Estilización personalizada del Sidebar activo utilizando el Color de Acento (Dorado por defecto) */
+.nav-pills .nav-link.custom-active {
+    background: linear-gradient(135deg, var(--color-acento-custom, #C59B4E) 0%, var(--color-acento-custom, #A37F3D) 100%) !important;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(197, 155, 78, 0.25);
+}
+
+/* --- ICONOS E INTERFACES DE CABECERAS MODALES COMUNES --- */
+.modal-header-custom {
+    background: linear-gradient(135deg, var(--color-primario-custom, #2E6F7A) 0%, #1F4E56 100%) !important;
+}
+
+.feature-icon-admin {
+    width: 4.5rem;
+    height: 4.5rem;
+    background: linear-gradient(135deg, var(--color-primario-custom, #2E6F7A) 0%, #1F4E56 100%);
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(46, 111, 122, 0.2);
+}
+
+/* Clases utilitarias globales de apoyo */
+.fs-7 { font-size: 0.8rem !important; }
+.fs-8 { font-size: 0.68rem !important; }

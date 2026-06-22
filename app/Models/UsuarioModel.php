@@ -13,6 +13,7 @@ class UsuarioModel extends Model
 
     protected $allowedFields = [
         'correo',
+        'nombre_usuario',
         'clave',
         'rol',
         'estado',
@@ -25,7 +26,7 @@ class UsuarioModel extends Model
         'correo' => 'required|valid_email|max_length[255]|is_unique[usuarios.correo,id,{id}]',
         'clave'  => 'required|min_length[6]',
         'rol'    => 'required|in_list[root,admin,residente]',
-        'estado' => 'permit_empty|in_list[activo,inactivo]',
+        'estado' => 'permit_empty|in_list[activo,inactivo,eliminado]',
     ];
 
     protected $validationMessages = [

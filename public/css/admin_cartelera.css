@@ -1,0 +1,32 @@
+/**
+ * @file admin_cartelera.css
+ * @description Estilos únicos y exclusivos para la grilla de anuncios y comunicados oficiales.
+ */
+
+/* Efecto hover exclusivo para las tarjetas de anuncios */
+.anuncio-card {
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+}
+.anuncio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Indicador lateral de acento dorado en las tarjetas destacadas */
+.border-start.border-agora-accent {
+    border-left: 4px solid var(--color-acento-custom, #C59B4E) !important;
+}
+
+/* Botón interactivo de eliminación (X) */
+.btn-eliminar-anuncio {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #94A3B8;
+    line-height: 0.8;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.btn-eliminar-anuncio:hover {
+    color: #EF4444;
+    transform: scale(1.15);
+}

@@ -18,6 +18,8 @@ class MarcaModel extends Model
         'correo_contacto',
         'nivel_licencia',
         'limite_apartamentos',
+        'codigo_activacion',
+        'fecha_actualizacion_plan',
     ];
 
     protected $useTimestamps = false;

@@ -31,6 +31,18 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->get('apartamentos',          'SuperController::apartamentos');
     $routes->post('apartamentos/registrar-condominio',  'SuperController::registrarCondominio');
     $routes->post('apartamentos/registrar-apartamento', 'SuperController::registrarApartamento');
+
+    // Gestión de usuarios y configuración global
+    $routes->get('crear-usuario', 'SuperController::crearUsuario');
+    $routes->post('guardar-residente', 'SuperController::guardarResidente');
+    $routes->post('guardar-admin', 'SuperController::guardarAdmin');
+    $routes->post('guardar-super', 'SuperController::guardarSuper');
+
+    $routes->get('marca-blanca', 'SuperController::marcaBlanca');
+    $routes->post('marca-blanca/guardar', 'SuperController::guardarMarcaBlanca');
+
+    $routes->get('planes', 'SuperController::planes');
+    $routes->post('planes/cambiar', 'SuperController::cambiarPlan');
 });
 
 // ---------------------------------------------------------------
@@ -74,6 +86,9 @@ $routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
 
 // Gestión de Apartamentos
 $routes->post('crm/apartamentos/registrar', 'LicenciaController::registrarApartamento');
+
+// Gestión de Licencias
+$routes->post('crm/licencia/activar', 'LicenciaController::activarLicencia');
 
 // Finanzas
 $routes->post('crm/finanzas/facturar',         'FinanzasController::emitirRecibos');

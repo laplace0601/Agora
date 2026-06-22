@@ -1,0 +1,28 @@
+/**
+ * @file admin_planes.css
+ * @description Estilización de las tarjetas comparativas de planes de servicio.
+ */
+
+/* Paleta metálica para los títulos de planes */
+.text-bronze { color: #CD7F32; }
+.text-gold { color: var(--color-acento-custom, #C59B4E); }
+.text-agora-teal { color: var(--color-primario-custom, #2E6F7A); }
+
+/* Comportamiento de elevación en las tarjetas de planes */
+.card-plan {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+}
+.card-plan:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(31, 78, 86, 0.08) !important;
+}
+
+/* Resalte visual premium para la tarjeta del Plan Contratado actualmente */
+.plan-activo {
+    border: 2px solid #198754 !important;
+    background-color: rgba(25, 135, 84, 0.01) !important;
+    box-shadow: 0 10px 25px rgba(25, 135, 84, 0.08) !important;
+}
+.border-success-custom { border-color: #198754 !important; }
+.border-light-custom { border-color: rgba(0, 0, 0, 0.06) !important; }

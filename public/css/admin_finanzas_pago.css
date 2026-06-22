@@ -1,0 +1,50 @@
+/**
+ * @file admin_finanzas_pago.css
+ * @description Estilos específicos de la interfaz de validación de comprobantes de pago.
+ */
+
+/* Efecto hover suave exclusivo para las filas de la tabla de auditoría */
+.custom-table-admin tbody tr {
+    transition: background-color 0.2s ease;
+}
+.custom-table-admin tbody tr:hover {
+    background-color: rgba(46, 111, 122, 0.02) !important;
+}
+
+/* Contenedor interactivo de la miniatura del Baucher subido por el residente */
+.espacio-comprobante-agora {
+    width: 90px;
+    height: 55px;
+    background-color: #F1F5F9;
+    border: 1px dashed #CBD5E1;
+    border-radius: 8px;
+    color: #64748B;
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Transición para la mutación de color disparada por el JavaScript */
+.transition-all-custom {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ESTADO: VALIDADO (Premium Glassmorphism Verde) */
+.badge-agora-success {
+    background-color: rgba(25, 135, 84, 0.08) !important;
+    color: #198754 !important;
+    border: 1px solid rgba(25, 135, 84, 0.18) !important;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(25, 135, 84, 0.04);
+}
+
+/* ESTADO: RECHAZADO (Premium Glassmorphism Rojo) */
+.badge-agora-danger {
+    background-color: rgba(220, 53, 69, 0.08) !important;
+    color: #DC3545 !important;
+    border: 1px solid rgba(220, 53, 69, 0.18) !important;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.04);
+}

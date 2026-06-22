@@ -1,0 +1,48 @@
+/**
+ * @file residente_global.css
+ * @description Estilos core y diseño responsivo premium para el Portal del Residente.
+ * @version 1.0.0
+ */
+
+/* --- CONFIGURACIONES BASE E IDENTIDAD --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F8FAFC;
+    color: #334155;
+}
+
+/* Navbar adaptativa acoplada a la Marca Blanca */
+.navbar-agora-residente {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Tarjeta contenedora de formularios con sombreado de la Landing */
+.card-agora-form {
+    border: none;
+    border-radius: 16px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* --- BOTONES PREMIUM CAMALEÓNICOS --- */
+.btn-agora-primary {
+    background: linear-gradient(135deg, var(--color-primario-custom, #1E3A8A) 0%, #0F172A 100%) !important;
+    color: #ffffff !important;
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.btn-agora-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(30, 58, 138, 0.2);
+    filter: brightness(1.1);
+}
+
+/* Enfoques en inputs flotantes sincronizados */
+.form-control:focus, .form-select:focus {
+    border-color: var(--color-primario-custom, #1E3A8A) !important;
+    box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.15) !important;
+}

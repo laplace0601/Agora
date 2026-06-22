@@ -1,0 +1,30 @@
+/**
+ * @file admin_residentes.css
+ * @description Estilos para el directorio de residentes del panel admin.
+ */
+
+/* Tabla con hover suave */
+.table-hover > tbody > tr:hover > td {
+    background-color: rgba(31, 78, 86, 0.03);
+}
+
+/* Avatar circular del residente */
+.bg-secondary.bg-opacity-10.rounded-circle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Input de búsqueda */
+#buscadorResidentes:focus {
+    border-color: #1F4E56;
+    box-shadow: 0 0 0 0.2rem rgba(31, 78, 86, 0.15);
+}
+
+/* Badge de apartamento */
+.badge.bg-light.text-dark.border {
+    font-weight: 500;
+    font-size: 0.75rem;
+}

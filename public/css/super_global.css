@@ -1,0 +1,92 @@
+/**
+ * @file super_global.css
+ * @description Estilos globales y componentes maestros para el panel de Súper Usuario (Ágora).
+ */
+
+:root {
+    --bg-master: #0F172A; /* Azul-Negro corporativo maestro */
+    --text-muted: #64748B;
+    --border-radius-agora: 20px;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F1F5F9 !important;
+}
+
+/* Navbar super */
+.navbar-super {
+    background-color: #0F172A;
+}
+
+/* Botón principal del panel super (color corporativo) */
+.btn-super-primary {
+    background-color: #0F172A !important;
+    border-color: #0F172A !important;
+    color: #fff !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-super-primary:hover,
+.btn-super-primary:focus {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35) !important;
+}
+
+/* Compatibilidad: alias para vistas admin que usan btn-agora-admin en super */
+.btn-agora-admin {
+    background-color: #0F172A;
+    border-color: #0F172A;
+    color: #fff;
+    transition: background-color 0.2s ease;
+}
+.btn-agora-admin:hover {
+    background-color: #1e293b;
+    color: #fff;
+}
+
+.card-agora-form {
+    border-radius: var(--border-radius-agora);
+    background-color: #FFFFFF;
+}
+
+.fs-8 {
+    font-size: 0.78rem !important;
+}
+
+.btn-group .btn:hover {
+    background-color: #F8FAFC !important;
+    filter: brightness(0.95);
+}
+
+/* Comportamiento de las pestañas (Tabs) */
+#roleTabs .nav-link {
+    color: var(--text-muted);
+    background-color: transparent;
+    transition: all 0.25s ease;
+}
+
+#roleTabs .nav-link.active {
+    background-color: var(--bg-master) !important;
+    color: #FFFFFF !important;
+}
+
+/* Módulo de Soporte Recibido (Filas de tickets por prioridad de plan) */
+.fila-ticket {
+    transition: background-color 0.2s ease;
+}
+
+.fila-ticket[data-plan="oro"] {
+    border-left: 5px solid #FFD700 !important; /* Borde Oro VIP */
+    background-color: rgba(255, 215, 0, 0.02);
+}
+
+.fila-ticket[data-plan="plata"] {
+    border-left: 5px solid #C0C0C0 !important; /* Borde Plata */
+    background-color: rgba(192, 192, 192, 0.01);
+}
+
+.fila-ticket[data-plan="bronce"] {
+    border-left: 5px solid #CD7F32 !important; /* Borde Bronce */
+}

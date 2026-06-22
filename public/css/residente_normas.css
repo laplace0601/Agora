@@ -1,0 +1,10 @@
+/* Quita el borde azul feo que Bootstrap le pone al acordeón cuando haces clic */
+.accordion-button:focus {
+    box-shadow: none !important;
+    border-color: rgba(0, 0, 0, 0.125) !important;
+}
+/* Cambia el color de fondo de la pestaña del acordeón cuando está abierta */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(197, 155, 78, 0.05) !important; /* Un toque sutil de tu color de acento */
+    color: var(--color-primario-custom) !important;
+}

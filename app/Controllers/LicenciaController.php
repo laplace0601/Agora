@@ -88,4 +88,57 @@ class LicenciaController extends BaseController
             ],
         ]);
     }
+
+    /**
+     * POST /crm/licencia/activar
+     *
+     * Valida y activa una licencia de la plataforma comparando el código
+     * proporcionado con las llaves seguras del archivo .env
+     */
+    public function activarLicencia()
+    {
+        $codigoActivacion = $this->request->getPost('codigo_activacion');
+
+        $marcaModel = new MarcaModel();
+        // Obtener el único registro de configuración de la instalación
+        $marca = $marcaModel->first();
+
+        if (! $marca) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'error' => 'No se encontró la configuración de marca.',
+            ]);
+        }
+
+        $keyPlata = env('AGORA_KEY_PLATA');
+        $keyOro   = env('AGORA_KEY_ORO');
+
+        $nivelLicencia = null;
+        $limiteApartamentos = null;
+
+        if ($codigoActivacion === $keyPlata) {
+            $nivelLicencia      = 'Plata';
+            $limiteApartamentos = 100;   // Plan intermedio: hasta 100 apartamentos
+        } elseif ($codigoActivacion === $keyOro) {
+            $nivelLicencia      = 'Oro';
+            $limiteApartamentos = 9999;  // Plan ilimitado
+        } else {
+            return $this->response->setStatusCode(400)->setJSON([
+                'error' => 'Llave de activación inválida',
+            ]);
+        }
+
+        $updateData = [
+            'nivel_licencia'           => $nivelLicencia,
+            'limite_apartamentos'      => $limiteApartamentos,
+            'codigo_activacion'        => $codigoActivacion,
+            'fecha_actualizacion_plan' => date('Y-m-d H:i:s'),
+        ];
+
+        $marcaModel->update($marca['id'], $updateData);
+
+        return $this->response->setStatusCode(200)->setJSON([
+            'success' => true,
+            'message' => "Licencia actualizada exitosamente a nivel $nivelLicencia."
+        ]);
+    }
 }

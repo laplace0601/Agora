@@ -1,0 +1,33 @@
+/**
+ * @file residente_finanzas.css
+ * @description Estilos para la vista de finanzas y recibos del residente.
+ */
+
+/* Tarjeta de estado de cuenta con gradiente corporativo */
+.card-agora-form {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #F1F5F9;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Badge de recibo Pendiente */
+.badge.bg-danger {
+    background-color: #EF4444 !important;
+}
+
+/* Badge de recibo Pagado */
+.badge.bg-success {
+    background-color: #10B981 !important;
+}
+
+/* Botón de descarga deshabilitado */
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Tabla con hover suave */
+.table-hover > tbody > tr:hover > td {
+    background-color: rgba(31, 78, 86, 0.04);
+}

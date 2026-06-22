@@ -1,0 +1,21 @@
+/**
+ * @file super_crear_usuario.css
+ * @description Estilo del panel de control maestro.
+ */
+
+/* Ajuste de comportamiento de las pestañas */
+#roleTabs .nav-link {
+    color: #64748B;
+    background-color: transparent;
+    transition: all 0.25s ease;
+}
+
+#roleTabs .nav-link.active {
+    background-color: #0F172A !important; /* Azul-Negro corporativo maestro */
+    color: #FFFFFF !important;
+}
+
+.card-agora-form {
+    border-radius: 20px;
+    background-color: #FFFFFF;
+}

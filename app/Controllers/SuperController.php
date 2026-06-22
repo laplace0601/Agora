@@ -34,9 +34,8 @@ class SuperController extends BaseController
 
         $datos = [
             'nombre_condominio'  => trim($this->request->getPost('nombre_condo') ?? ''),
-            'direccion'          => trim($this->request->getPost('direccion_condo') ?? ''),
-            'propietario'        => trim($this->request->getPost('propietario_condo') ?? ''),
-            'alicuota_base'      => (float) $this->request->getPost('alicuota_condo'),
+            'rif_jurisdiccion'   => trim($this->request->getPost('rif_jurisdiccion') ?? ''),
+            'marca_id'           => 1 // Default provisional requerido por la BD
         ];
 
         if (! $condominioModel->insert($datos)) {
@@ -84,5 +83,55 @@ class SuperController extends BaseController
 
         return redirect()->to(site_url('super/apartamentos'))
                          ->with('success', 'Apartamento registrado exitosamente.');
+    }
+
+    // ---------------------------------------------------------------
+    // Vistas y Handlers de Configuración Root / Super
+    // ---------------------------------------------------------------
+
+    public function crearUsuario()
+    {
+        return view('root/crear_usuario');
+    }
+
+    public function guardarResidente()
+    {
+        // TODO: Lógica real de inserción de usuario y residente
+        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Residente dado de alta exitosamente.');
+    }
+
+    public function guardarAdmin()
+    {
+        // TODO: Lógica real de inserción de usuario y administrador/condominio
+        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Administrador dado de alta exitosamente.');
+    }
+
+    public function guardarSuper()
+    {
+        // TODO: Lógica real de inserción de usuario root
+        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Nuevo Súper Usuario dado de alta exitosamente.');
+    }
+
+    public function marcaBlanca()
+    {
+        return view('root/marca_blanca');
+    }
+
+    public function guardarMarcaBlanca()
+    {
+        // TODO: Guardar logo y colores
+        return redirect()->to(site_url('super/marca-blanca'))->with('success', 'Identidad de marca actualizada.');
+    }
+
+    public function planes()
+    {
+        return view('root/planes');
+    }
+
+    public function cambiarPlan()
+    {
+        // TODO: Solicitar cambio de plan
+        $nuevoPlan = $this->request->getPost('nuevo_plan');
+        return redirect()->to(site_url('super/planes'))->with('success', "Solicitud para el plan $nuevoPlan enviada exitosamente.");
     }
 }

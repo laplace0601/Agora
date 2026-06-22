@@ -1,0 +1,13 @@
+/**
+ * @file admin_finanzas_cobro.css
+ * @description Ajustes específicos para el formulario de generación de cuotas de cobro.
+ */
+
+/* Redondeado e integraciones especiales para los input-groups con iconos */
+.input-group-icon-custom {
+    border-radius: 10px 0 0 10px !important;
+    background-color: #F1F5F9;
+}
+.text-field-custom {
+    border-radius: 0 10px 10px 0 !important;
+}
