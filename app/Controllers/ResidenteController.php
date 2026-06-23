@@ -186,17 +186,20 @@ class ResidenteController extends BaseController
             $reciboModel = new ReciboModel();
             
             // Recibos vigentes sin pagar (Pendientes)
+            // Ordenamos por año y mes DESC (la tabla no tiene columna fecha_emision).
             $recibosPendientes = $reciboModel
                 ->where('apartamento_id', $apartamentos[0]['id'])
                 ->where('estado_pago', 'Pendiente')
-                ->orderBy('fecha_emision', 'DESC')
+                ->orderBy('anio', 'DESC')
+                ->orderBy('mes', 'DESC')
                 ->findAll();
 
             // Historial de recibos pagados (Solvencia)
             $recibosPagados = $reciboModel
                 ->where('apartamento_id', $apartamentos[0]['id'])
                 ->where('estado_pago', 'Pagado')
-                ->orderBy('fecha_emision', 'DESC')
+                ->orderBy('anio', 'DESC')
+                ->orderBy('mes', 'DESC')
                 ->findAll();
         }
 

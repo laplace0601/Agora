@@ -44,4 +44,48 @@ class ResidenteModel extends Model
     {
         return $this->where('usuario_id', $usuarioId)->first();
     }
+
+    /**
+     * Service Layer: Crea un usuario, un residente y le asigna un apartamento en una sola transacción.
+     */
+    public function crearResidenteCompleto(array $datos, &$errores = []): bool
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $usuarioModel = new \App\Models\UsuarioModel();
+        $apartamentoModel = new \App\Models\ApartamentoModel();
+
+        if (!$usuarioModel->insert($datos['usuario'])) {
+            $errores = $usuarioModel->errors();
+            $db->transRollback();
+            return false;
+        }
+        
+        $usuarioId = $usuarioModel->getInsertID();
+        $datos['residente']['usuario_id'] = $usuarioId;
+
+        if (!$this->insert($datos['residente'])) {
+            $errores = $this->errors();
+            $db->transRollback();
+            return false;
+        }
+        
+        $residenteId = $this->getInsertID();
+
+        if (!$apartamentoModel->asignarResidente($datos['apartamento_id'], $residenteId)) {
+            $errores = ['apartamento' => 'Error al asignar el apartamento.'];
+            $db->transRollback();
+            return false;
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            $errores = ['db' => 'Error de base de datos al procesar la transacción.'];
+            return false;
+        }
+
+        return true;
+    }
 }

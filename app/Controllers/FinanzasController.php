@@ -62,8 +62,8 @@ class FinanzasController extends BaseController
         $excluidosCount = 0;
 
         foreach ($apartamentos as $apto) {
-            // Lógica de cálculo: Monto Global * (Alicuota / 100)
-            $montoApartamento = round($montoGlobal * ((float) $apto['alicuota'] / 100), 2);
+            // Lógica de cálculo: Se cobra el monto base exacto por apartamento
+            $montoApartamento = $montoGlobal;
 
             // Regla de Negocio (Opción A): Excluir si no tiene residente asignado
             if (empty($apto['residente_id'])) {
@@ -153,8 +153,8 @@ class FinanzasController extends BaseController
                 continue;
             }
 
-            // Cálculo individual
-            $montoApartamento = round($montoGlobal * ((float) $apto['alicuota'] / 100), 2);
+            // Cálculo individual: Se registra el valor base exacto por apartamento (sin multiplicar por alícuota)
+            $montoApartamento = $montoGlobal;
 
             $recibosBatch[] = [
                 'apartamento_id'  => $apto['id'],

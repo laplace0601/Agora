@@ -44,6 +44,7 @@
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
                         <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
+                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
                         
                         <div class="col-md-6 form-floating">
                             <select class="form-select" name="condominio_id" id="residente-condominio" required>
@@ -86,6 +87,7 @@
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
                         <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
+                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
                         
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_condominio" placeholder="Condominio" required><label class="ms-2">Nombre Comercial del Condominio *</label></div>
                         <div class="col-md-6 form-floating">
@@ -114,6 +116,7 @@
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
                         <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
+                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
                         
                         <div class="col-12 form-floating">
                             <input type="text" class="form-control" name="area_desempeno" placeholder="Ej: Infraestructura / Soporte / Finanzas" required>

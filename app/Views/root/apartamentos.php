@@ -101,7 +101,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                 <table class="table table-hover align-middle mb-0" id="tabla-apartamentos">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col" class="text-secondary">ID</th>
+
                             <th scope="col" class="text-secondary">Condominio</th>
                             <th scope="col" class="text-secondary">Número/Identificador</th>
                             <th scope="col" class="text-secondary">Residente</th>
@@ -113,7 +113,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                         <?php if (!empty($apartamentos)): ?>
                             <?php foreach ($apartamentos as $apto): ?>
                                 <tr>
-                                    <td class="fw-bold text-muted">#<?= $apto['id'] ?></td>
+
                                     <td class="fw-medium"><?= htmlspecialchars($apto['nombre_condominio']) ?></td>
                                     <td><span class="badge bg-secondary rounded-pill"><?= htmlspecialchars($apto['nro_apartamento'] ?? '') ?></span></td>
                                     <td>
@@ -128,7 +128,9 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="6" class="text-center py-4 text-muted">No hay apartamentos registrados.</td></tr>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No hay apartamentos registrados.</td>
+                            </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -198,23 +200,39 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                         <label for="apto-condo">Condominio / Torre *</label>
                     </div>
 
-                    <!-- 2. Número de apartamento -->
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="apto-num" name="numero_apto" required placeholder="Ej: 4-B">
-                        <label for="apto-num">Identificador / Número de Apartamento *</label>
+                    <!-- 2. Campos de Generación Masiva -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-12 col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="apto-prefijo" name="prefijo" placeholder="Ej: Apto ">
+                                <label for="apto-prefijo">Prefijo (Opcional)</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="apto-num-inicial" name="numero_inicial" required min="1" placeholder="Ej: 1">
+                                <label for="apto-num-inicial">Número Inicial *</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="apto-cantidad" name="cantidad" required min="1" placeholder="Ej: 20">
+                                <label for="apto-cantidad">Cantidad a generar *</label>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 3. Metros cuadrados del apartamento -->
                     <div class="form-floating mb-2">
                         <input type="number" class="form-control" id="apto-metros" name="metros_cuadrados_apto"
-                               step="0.01" min="0.01" required placeholder="Ej: 85.50">
-                        <label for="apto-metros">Metros Cuadrados del Apartamento *</label>
+                            step="0.01" min="0.01" required placeholder="Ej: 85.50">
+                        <label for="apto-metros">Metros Cuadrados (por cada apartamento) *</label>
                     </div>
 
-                    <!-- Preview de alícuota calculada -->
+                    <!-- Preview de alícuota calculada por apartamento -->
                     <div id="alicuota-preview" class="alert alert-info border-0 rounded-3 py-2 px-3 small d-none mt-2">
                         <i class="bi bi-calculator me-1"></i>
-                        Alícuota estimada: <strong id="alicuota-valor">—</strong>%
+                        Alícuota estimada (por apto): <strong id="alicuota-valor">—</strong>%
                         <span class="text-muted ms-1">(m² apto / m² condominio × 100)</span>
                     </div>
 
@@ -233,14 +251,14 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
     document.addEventListener('DOMContentLoaded', () => {
 
         // ── Calculadora de alícuota en tiempo real ─────────────────────────
-        const selectCondo  = document.getElementById('apto-condo');
-        const inputMetros  = document.getElementById('apto-metros');
-        const previewDiv   = document.getElementById('alicuota-preview');
-        const valorSpan    = document.getElementById('alicuota-valor');
+        const selectCondo = document.getElementById('apto-condo');
+        const inputMetros = document.getElementById('apto-metros');
+        const previewDiv = document.getElementById('alicuota-preview');
+        const valorSpan = document.getElementById('alicuota-valor');
 
         function actualizarAlicuota() {
             const totalMetros = parseFloat(selectCondo.selectedOptions[0]?.getAttribute('data-metros') ?? 0);
-            const aptoMetros  = parseFloat(inputMetros.value) || 0;
+            const aptoMetros = parseFloat(inputMetros.value) || 0;
 
             if (totalMetros > 0 && aptoMetros > 0) {
                 const alicuota = ((aptoMetros / totalMetros) * 100).toFixed(4);

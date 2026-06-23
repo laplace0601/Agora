@@ -99,7 +99,21 @@ class GestionUsuariosRootController extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado o ya ha sido eliminado.', 'csrf' => csrf_hash()]);
         }
 
-        // ELIMINACIÓN LÓGICA (Soft Delete Manual)
+        // LÓGICA DE ELIMINACIÓN SEGURA: Si es residente, desvincular de apartamentos
+        if ($usuario['rol'] === 'residente') {
+            $residenteModel = new \App\Models\ResidenteModel();
+            $apartamentoModel = new \App\Models\ApartamentoModel();
+            
+            $residente = $residenteModel->obtenerPorUsuario($id);
+            if ($residente) {
+                // Liberar el apartamento asignado a este residente
+                $apartamentoModel->where('residente_id', $residente['id'])
+                                 ->set(['residente_id' => null])
+                                 ->update();
+            }
+        }
+
+        // ELIMINACIÓN LÓGICA (Soft Delete Manual) y prevención de login
         if (!$usuarioModel->update($id, ['estado' => 'eliminado'])) {
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Error del servidor al intentar eliminar el usuario.', 'csrf' => csrf_hash()]);
         }

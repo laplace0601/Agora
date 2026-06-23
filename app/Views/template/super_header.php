@@ -60,22 +60,16 @@
                             <i class="bi bi-patch-check me-1"></i> Planes
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/marca-blanca' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
-                            href="<?= site_url('super/marca-blanca') ?>">
-                            <i class="bi bi-palette me-1"></i> Marca Blanca
-                        </a>
-                    </li>
-                </ul>
 
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <span class="text-light small fw-bold">
-                        <i class="bi bi-person-badge-fill me-1"></i> @<?= session()->get('nombre_usuario') ?? 'root' ?>
-                    </span>
-                    <a href="<?= site_url('auth/logout') ?>" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
-                        Salir <i class="bi bi-box-arrow-right ms-1"></i>
-                    </a>
-                </div>
+
+                    <div class="d-flex align-items-center gap-3 ms-auto">
+                        <span class="text-light small fw-bold">
+                            <i class="bi bi-person-badge-fill me-1"></i> @<?= session()->get('nombre_usuario') ?? 'root' ?>
+                        </span>
+                        <a href="<?= site_url('auth/logout') ?>" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
+                            Salir <i class="bi bi-box-arrow-right ms-1"></i>
+                        </a>
+                    </div>
             </div>
         </div>
     </nav>
