@@ -19,6 +19,7 @@ class ReciboModel extends Model
         'monto_intereses',
         'monto_total',
         'estado_pago',
+        'descripcion',
     ];
 
     protected $useTimestamps = false;
@@ -38,9 +39,9 @@ class ReciboModel extends Model
     public function listarPorApartamento(int $apartamentoId): array
     {
         return $this->where('apartamento_id', $apartamentoId)
-                    ->orderBy('anio', 'DESC')
-                    ->orderBy('mes', 'DESC')
-                    ->findAll();
+            ->orderBy('anio', 'DESC')
+            ->orderBy('mes', 'DESC')
+            ->findAll();
     }
 
     /**
@@ -50,8 +51,8 @@ class ReciboModel extends Model
     public function contarPendientes(int $apartamentoId): int
     {
         return $this->where('apartamento_id', $apartamentoId)
-                    ->where('estado_pago', 'Pendiente')
-                    ->countAllResults();
+            ->where('estado_pago', 'Pendiente')
+            ->countAllResults();
     }
 
     /**
@@ -68,8 +69,8 @@ class ReciboModel extends Model
     public function existeRecibo(int $apartamentoId, int $mes, int $anio): bool
     {
         return $this->where('apartamento_id', $apartamentoId)
-                    ->where('mes', $mes)
-                    ->where('anio', $anio)
-                    ->countAllResults() > 0;
+            ->where('mes', $mes)
+            ->where('anio', $anio)
+            ->countAllResults() > 0;
     }
 }

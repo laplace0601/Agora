@@ -37,8 +37,13 @@
                             <?php if (!empty($recibos_pendientes)): ?>
                                 <?php foreach ($recibos_pendientes as $recibo): ?>
                                     <tr>
-                                        <td class="fw-bold ps-3">#<?= str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) ?></td>
-                                        <td><?= date('d/m/Y', strtotime($recibo['fecha_emision'])) ?></td>
+                                        <td class="fw-bold ps-3">
+                                            #<?= str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) ?>
+                                            <?php if (!empty($recibo['descripcion'])): ?>
+                                                <div class="text-muted fw-normal small mt-1" style="font-size: 0.8em;"><?= htmlspecialchars($recibo['descripcion']) ?></div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= date('d/m/Y', strtotime($recibo['fecha_emision'] ?? $recibo['created_at'] ?? '')) ?></td>
                                         <td class="fw-bold text-danger">$<?= number_format($recibo['monto_total'], 2) ?></td>
                                         <td><span class="badge rounded-pill bg-danger px-2.5 py-1.5">Pendiente</span></td>
                                     </tr>
@@ -76,8 +81,13 @@
                             <?php if (!empty($recibos_pagados)): ?>
                                 <?php foreach ($recibos_pagados as $recibo): ?>
                                     <tr>
-                                        <td class="fw-bold ps-3">#<?= str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) ?></td>
-                                        <td><?= date('d/m/Y', strtotime($recibo['fecha_emision'])) ?></td>
+                                        <td class="fw-bold ps-3">
+                                            #<?= str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) ?>
+                                            <?php if (!empty($recibo['descripcion'])): ?>
+                                                <div class="text-muted fw-normal small mt-1" style="font-size: 0.8em;"><?= htmlspecialchars($recibo['descripcion']) ?></div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= date('d/m/Y', strtotime($recibo['fecha_emision'] ?? $recibo['created_at'] ?? '')) ?></td>
                                         <td class="fw-bold text-success">$<?= number_format($recibo['monto_total'], 2) ?></td>
                                         <td><span class="badge rounded-pill bg-success px-2.5 py-1.5">Pagado</span></td>
                                         <td class="text-center">

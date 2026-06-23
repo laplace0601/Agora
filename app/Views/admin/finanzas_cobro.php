@@ -84,6 +84,11 @@
                             </div>
                         </div>
 
+                        <div class="form-floating mb-4">
+                            <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Ej. Gasto de mantenimiento ordinario - Junio" style="height: 100px"></textarea>
+                            <label for="descripcion">Descripción del Cobro (Opcional)</label>
+                        </div>
+
                         <button type="submit" class="btn btn-agora-admin w-100 py-3 rounded-3 fw-medium fs-5 text-white shadow-sm">
                             <i class="bi bi-wallet2 me-2"></i> Efectuar Facturación Masiva
                         </button>

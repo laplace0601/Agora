@@ -31,6 +31,7 @@ class FinanzasController extends BaseController
 
         $condominioId = (int) $this->request->getPost('condominio_id');
         $montoGlobal  = (float) $this->request->getPost('monto_global_gastos');
+        $descripcion  = trim($this->request->getPost('descripcion') ?? '');
 
         if ($condominioId <= 0 || $montoGlobal <= 0) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Datos inválidos. El monto global debe ser mayor a 0.'])->setStatusCode(400);
@@ -77,7 +78,8 @@ class FinanzasController extends BaseController
                 'apartamento_id'  => $apto['id'],
                 'nro_apartamento' => $apto['nro_apartamento'] ?? $apto['numero'] ?? 'N/A',
                 'alicuota'        => $apto['alicuota'] . '%',
-                'monto_a_pagar'   => $montoApartamento
+                'monto_a_pagar'   => $montoApartamento,
+                'descripcion'     => $descripcion
             ];
         }
 
@@ -112,6 +114,7 @@ class FinanzasController extends BaseController
         $montoGlobal  = (float) $this->request->getPost('monto_global_gastos'); // Monto Base de Gastos Globales
         $mes          = (int) $this->request->getPost('mes');
         $anio         = (int) $this->request->getPost('anio');
+        $descripcion  = trim($this->request->getPost('descripcion') ?? '');
 
         if ($condominioId <= 0 || $montoGlobal <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Datos inválidos. Verifique condominio_id, monto, mes y año.'])->setStatusCode(400);
@@ -164,6 +167,7 @@ class FinanzasController extends BaseController
                 'monto_intereses' => 0,
                 'monto_total'     => $montoApartamento,
                 'estado_pago'     => 'Pendiente',
+                'descripcion'     => $descripcion,
             ];
         }
 
@@ -356,6 +360,8 @@ class FinanzasController extends BaseController
             ])->setStatusCode(403);
         }
 
+        $descripcion = trim($this->request->getPost('descripcion') ?? '');
+
         // Verificar morosidad: contar recibos pendientes
         $reciboModel     = new ReciboModel();
         $pendientes      = $reciboModel->contarPendientes($apartamentoId);
@@ -382,6 +388,7 @@ class FinanzasController extends BaseController
             'hasta_mes'              => (int) date('m'),
             'hasta_anio'             => (int) date('Y'),
             'codigo_verificacion'    => $codigoVerif,
+            'descripcion'            => $descripcion,
         ]);
 
         return $this->response->setJSON([

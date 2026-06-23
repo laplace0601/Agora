@@ -18,6 +18,7 @@ class SolvenciaModel extends Model
         'hasta_mes',
         'hasta_anio',
         'codigo_verificacion',
+        'descripcion',
     ];
 
     protected $useTimestamps = false;
@@ -29,6 +30,7 @@ class SolvenciaModel extends Model
         'hasta_mes'              => 'required|integer|greater_than[0]|less_than[13]',
         'hasta_anio'             => 'required|integer|greater_than[2000]',
         'codigo_verificacion'    => 'required|max_length[64]',
+
     ];
 
     /**
@@ -54,7 +56,7 @@ class SolvenciaModel extends Model
     public function listarPorApartamento(int $apartamentoId): array
     {
         return $this->where('apartamento_id', $apartamentoId)
-                    ->orderBy('fecha_emision', 'DESC')
-                    ->findAll();
+            ->orderBy('fecha_emision', 'DESC')
+            ->findAll();
     }
 }
