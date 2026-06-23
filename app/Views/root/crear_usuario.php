@@ -45,13 +45,29 @@
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
                         
                         <div class="col-md-6 form-floating">
-                            <select class="form-select" name="condominio_id" required>
+                            <select class="form-select" name="condominio_id" id="residente-condominio" required>
                                 <option value="" selected disabled>Selecciona el condominio asignado</option>
-                                <option value="1">Residencias El Ávila</option>
+                                <?php if (!empty($condominios)): ?>
+                                    <?php foreach ($condominios as $condo): ?>
+                                        <option value="<?= $condo['id'] ?>"><?= esc($condo['nombre_condominio']) ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label class="ms-2">Condominio *</label>
                         </div>
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="departamento" placeholder="Ej: Apto 4B - Torre A" required><label class="ms-2">Nro de Departamento / Ubicación *</label></div>
+                        <div class="col-md-6 form-floating">
+                            <select class="form-select" name="apartamento_id" id="residente-apartamento" required disabled>
+                                <option value="" selected disabled>Selecciona primero un condominio</option>
+                                <?php if (!empty($apartamentos)): ?>
+                                    <?php foreach ($apartamentos as $apto): ?>
+                                        <option value="<?= $apto['id'] ?>" data-condominio="<?= $apto['condominio_id'] ?>" style="display: none;">
+                                            Apto. <?= esc($apto['nro_apartamento'] ?? $apto['numero'] ?? 'N/A') ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label class="ms-2">Nro de Departamento / Ubicación *</label>
+                        </div>
                         
                         <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Crear Cuenta de Residente</button></div>
                     </div>
@@ -109,5 +125,42 @@
 
     </div>
 </main>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectCondominio = document.getElementById('residente-condominio');
+    const selectApartamento = document.getElementById('residente-apartamento');
+
+    if (selectCondominio && selectApartamento) {
+        selectCondominio.addEventListener('change', function() {
+            const condoId = this.value;
+            let hasOptions = false;
+
+            // Mostrar solo apartamentos del condominio seleccionado
+            Array.from(selectApartamento.options).forEach(option => {
+                if (option.value === "") return; // Ignorar el placeholder
+                
+                if (option.getAttribute('data-condominio') === condoId) {
+                    option.style.display = '';
+                    hasOptions = true;
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Habilitar o deshabilitar
+            selectApartamento.disabled = !hasOptions;
+            
+            // Resetear valor si no hay o si se cambia
+            selectApartamento.value = "";
+            
+            if (!hasOptions) {
+                selectApartamento.options[0].text = "No hay apartamentos registrados en este condominio";
+            } else {
+                selectApartamento.options[0].text = "Selecciona un apartamento...";
+            }
+        });
+    }
+});
+</script>
 
 <?php echo view('template/super_footer', ['pagina_actual' => 'super_crear_usuario']); ?>

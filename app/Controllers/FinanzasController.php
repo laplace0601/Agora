@@ -59,10 +59,18 @@ class FinanzasController extends BaseController
 
         $simulacion = [];
         $totalDistribuido = 0;
+        $excluidosCount = 0;
 
         foreach ($apartamentos as $apto) {
             // Lógica de cálculo: Monto Global * (Alicuota / 100)
             $montoApartamento = round($montoGlobal * ((float) $apto['alicuota'] / 100), 2);
+
+            // Regla de Negocio (Opción A): Excluir si no tiene residente asignado
+            if (empty($apto['residente_id'])) {
+                $excluidosCount++;
+                continue; // No se incluye en la facturación ni suma al total distribuido
+            }
+
             $totalDistribuido += $montoApartamento;
 
             $simulacion[] = [
@@ -73,6 +81,8 @@ class FinanzasController extends BaseController
             ];
         }
 
+        $notaAuditoria = "Apartamentos sin residente excluidos del cobro: {$excluidosCount}";
+
         // Auditoría financiera en la respuesta
         return $this->response->setJSON([
             'status'             => 'success',
@@ -80,6 +90,8 @@ class FinanzasController extends BaseController
             'suma_alicuotas'     => $sumaAlicuotas . '%',
             'total_distribuido'  => round($totalDistribuido, 2),
             'descuadre_centavos' => round($montoGlobal - $totalDistribuido, 2),
+            'excluidos_count'    => $excluidosCount,
+            'nota_auditoria'     => $notaAuditoria,
             'detalle'            => $simulacion
         ]);
     }
@@ -130,6 +142,11 @@ class FinanzasController extends BaseController
         $yaExistentes = 0;
 
         foreach ($apartamentos as $apto) {
+            // Regla de Negocio (Opción A): Excluir si no tiene residente asignado
+            if (empty($apto['residente_id'])) {
+                continue;
+            }
+
             // Evitar duplicar recibos del mismo mes/año para el mismo apartamento
             if ($reciboModel->existeRecibo((int) $apto['id'], $mes, $anio)) {
                 $yaExistentes++;

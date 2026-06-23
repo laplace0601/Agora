@@ -73,36 +73,37 @@ class GestionUsuariosRootController extends BaseController
         if (!$usuarioModel->update($id, $data)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'error' => 'Error de validación.',
-                'detalles' => $usuarioModel->errors()
+                'detalles' => $usuarioModel->errors(),
+                'csrf' => csrf_hash()
             ]);
         }
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario actualizado exitosamente.']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario actualizado exitosamente.', 'csrf' => csrf_hash()]);
     }
 
     public function delete($id = null)
     {
         if (!$id) {
-            return $this->response->setStatusCode(400)->setJSON(['error' => 'ID de usuario requerido.']);
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'ID de usuario requerido.', 'csrf' => csrf_hash()]);
         }
 
         // PREVENCIÓN DE AUTO-ELIMINACIÓN: Evitar que el Root se bloquee a sí mismo fuera del sistema
         if (session()->get('usuario_id') == $id) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'Acción crítica denegada: No puedes auto-eliminarte.']);
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'Acción crítica denegada: No puedes auto-eliminarte.', 'csrf' => csrf_hash()]);
         }
 
         $usuarioModel = new UsuarioModel();
         $usuario = $usuarioModel->find($id);
 
         if (!$usuario || $usuario['estado'] === 'eliminado') {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado o ya ha sido eliminado.']);
+            return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado o ya ha sido eliminado.', 'csrf' => csrf_hash()]);
         }
 
         // ELIMINACIÓN LÓGICA (Soft Delete Manual)
         if (!$usuarioModel->update($id, ['estado' => 'eliminado'])) {
-            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error del servidor al intentar eliminar el usuario.']);
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error del servidor al intentar eliminar el usuario.', 'csrf' => csrf_hash()]);
         }
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario eliminado lógicamente de la plataforma.']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario eliminado lógicamente de la plataforma.', 'csrf' => csrf_hash()]);
     }
 }

@@ -30,6 +30,7 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     // Inmuebles / Apartamentos (ahora exclusivos de root)
     $routes->get('apartamentos',          'SuperController::apartamentos');
     $routes->post('apartamentos/registrar-condominio',  'SuperController::registrarCondominio');
+    $routes->post('apartamentos/condominios/delete/(:num)', 'SuperController::deleteCondominio/$1');
     $routes->post('apartamentos/registrar-apartamento', 'SuperController::registrarApartamento');
 
     // Gestión de usuarios y configuración global
@@ -43,6 +44,12 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
 
     $routes->get('planes', 'SuperController::planes');
     $routes->post('planes/cambiar', 'SuperController::cambiarPlan');
+
+    // Gestión integral de usuarios (Ver, Editar, Eliminar)
+    $routes->get('gestion_usuarios', 'SuperController::usuarios');
+    $routes->get('api/usuarios', 'GestionUsuariosRootController::index');
+    $routes->post('api/usuarios/update/(:num)', 'GestionUsuariosRootController::update/$1');
+    $routes->post('api/usuarios/delete/(:num)', 'GestionUsuariosRootController::delete/$1');
 });
 
 // ---------------------------------------------------------------

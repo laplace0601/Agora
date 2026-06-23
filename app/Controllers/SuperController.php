@@ -9,6 +9,7 @@ class SuperController extends BaseController
         return view('super/welcome_message');
     }
 
+
     /**
      * GET /super/apartamentos
      *
@@ -17,9 +18,15 @@ class SuperController extends BaseController
     public function apartamentos()
     {
         $condominioModel = new \App\Models\CondominioModel();
+        $apartamentoModel = new \App\Models\ApartamentoModel();
+
+        $apartamentos = $apartamentoModel->select('apartamentos.*, condominios.nombre_condominio')
+                                         ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+                                         ->findAll();
 
         $datos = [
             'condominios' => $condominioModel->findAll(),
+            'apartamentos' => $apartamentos,
         ];
 
         return view('root/apartamentos', $datos);
@@ -32,19 +39,52 @@ class SuperController extends BaseController
     {
         $condominioModel = new \App\Models\CondominioModel();
 
+        $nombre  = trim($this->request->getPost('nombre_condo') ?? '');
+        $rif     = trim($this->request->getPost('rif_jurisdiccion') ?? '');
+        $metros  = $this->request->getPost('total_metros_cuadrados');
+
+        // Validación de seguridad backend: metros no puede ser 0 ni negativo
+        if (empty($nombre)) {
+            return redirect()->back()->with('error', 'El nombre del condominio es obligatorio.');
+        }
+
+        $metrosFloat = (float) $metros;
+        if ($metrosFloat <= 0) {
+            return redirect()->back()->with('error', 'El total de metros cuadrados debe ser mayor a 0.');
+        }
+
         $datos = [
-            'nombre_condominio'  => trim($this->request->getPost('nombre_condo') ?? ''),
-            'rif_jurisdiccion'   => trim($this->request->getPost('rif_jurisdiccion') ?? ''),
-            'marca_id'           => 1 // Default provisional requerido por la BD
+            'nombre_condominio'      => $nombre,
+            'rif_jurisdiccion'       => $rif,
+            'total_metros_cuadrados' => $metrosFloat,
+            'marca_id'               => 1,
         ];
 
         if (! $condominioModel->insert($datos)) {
-            return redirect()->back()
-                             ->with('error', 'Error al registrar el condominio: ' . implode(', ', $condominioModel->errors()));
+            $errores = implode(', ', $condominioModel->errors());
+            return redirect()->back()->with('error', 'Error al registrar: ' . $errores);
         }
 
         return redirect()->to(site_url('super/apartamentos'))
                          ->with('success', 'Condominio registrado exitosamente.');
+    }
+
+    /**
+     * POST /super/apartamentos/condominios/delete/(:num)
+     */
+    public function deleteCondominio($id = null)
+    {
+        if (!$id) {
+            return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'error' => 'ID requerido.']);
+        }
+
+        $condominioModel = new \App\Models\CondominioModel();
+        
+        if ($condominioModel->delete($id)) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Condominio eliminado correctamente.']);
+        }
+
+        return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'error' => 'Error al eliminar el condominio.']);
     }
 
     /**
@@ -53,36 +93,53 @@ class SuperController extends BaseController
     public function registrarApartamento()
     {
         $apartamentoModel = new \App\Models\ApartamentoModel();
-        $residenteModel   = new \App\Models\ResidenteModel();
+        $condominioModel  = new \App\Models\CondominioModel();
 
-        // 1. Crear el residente (usamos uniqid para la cédula ya que el form solo pide nombre)
-        $nombrePropietario = trim($this->request->getPost('propietario_apto') ?? 'Sin Asignar');
-        $residenteId = null;
-        
-        if ($nombrePropietario !== '') {
-            $residenteId = $residenteModel->insert([
-                'nombre_completo'  => $nombrePropietario,
-                'cedula_identidad' => uniqid('CI-'),
-                'telefono'         => '',
-            ]);
+        $condominioId  = (int) $this->request->getPost('condominio_id');
+        $nroApartamento = trim($this->request->getPost('numero_apto') ?? '');
+        $metrosApto    = (float) $this->request->getPost('metros_cuadrados_apto');
+
+        // Validaciones básicas
+        if ($condominioId <= 0) {
+            return redirect()->back()->with('error', 'Debe seleccionar un condominio válido.');
+        }
+        if (empty($nroApartamento)) {
+            return redirect()->back()->with('error', 'El número de apartamento es obligatorio.');
+        }
+        if ($metrosApto <= 0) {
+            return redirect()->back()->with('error', 'Los metros cuadrados del apartamento deben ser mayor a 0.');
         }
 
-        // 2. Registrar el apartamento vinculado al residente
+        // Obtener el condominio para calcular la alícuota proporcional
+        $condominio = $condominioModel->find($condominioId);
+        if (! $condominio) {
+            return redirect()->back()->with('error', 'El condominio seleccionado no existe.');
+        }
+
+        $totalMetros = (float) ($condominio['total_metros_cuadrados'] ?? 0);
+        if ($totalMetros <= 0) {
+            return redirect()->back()->with('error', 'El condominio no tiene metros cuadrados registrados. Edita el condominio primero.');
+        }
+
+        // Alícuota = (m² del apartamento / m² totales del condominio) × 100
+        $alicuota = round(($metrosApto / $totalMetros) * 100, 4);
+
         $datos = [
-            'condominio_id'         => (int) $this->request->getPost('condominio_id'),
-            'residente_id'          => $residenteId ? (int) $residenteId : null,
-            'nombre_edificio_torre' => trim($this->request->getPost('direccion_apto') ?? ''),
-            'nro_apartamento'       => trim($this->request->getPost('numero_apto') ?? ''),
-            'alicuota'              => (float) $this->request->getPost('alicuota_apto'),
+            'condominio_id'         => $condominioId,
+            'residente_id'          => null, // Se asigna cuando se vincula un usuario residente
+            'nombre_edificio_torre' => $condominio['nombre_condominio'], // Nombre del condominio como referencia
+            'nro_apartamento'       => $nroApartamento,
+            'metros_cuadrados'      => $metrosApto,
+            'alicuota'              => $alicuota,
         ];
 
         if (! $apartamentoModel->insert($datos)) {
-            return redirect()->back()
-                             ->with('error', 'Error al registrar el apartamento: ' . implode(', ', $apartamentoModel->errors()));
+            $errores = implode(', ', $apartamentoModel->errors());
+            return redirect()->back()->with('error', 'Error al registrar el apartamento: ' . $errores);
         }
 
         return redirect()->to(site_url('super/apartamentos'))
-                         ->with('success', 'Apartamento registrado exitosamente.');
+                         ->with('success', "Apartamento {$nroApartamento} registrado. Alícuota calculada: {$alicuota}%");
     }
 
     // ---------------------------------------------------------------
@@ -91,7 +148,15 @@ class SuperController extends BaseController
 
     public function crearUsuario()
     {
-        return view('root/crear_usuario');
+        $condominioModel = new \App\Models\CondominioModel();
+        $apartamentoModel = new \App\Models\ApartamentoModel();
+
+        $datos = [
+            'condominios'  => $condominioModel->findAll(),
+            'apartamentos' => $apartamentoModel->findAll(),
+        ];
+
+        return view('root/crear_usuario', $datos);
     }
 
     public function guardarResidente()
@@ -133,5 +198,10 @@ class SuperController extends BaseController
         // TODO: Solicitar cambio de plan
         $nuevoPlan = $this->request->getPost('nuevo_plan');
         return redirect()->to(site_url('super/planes'))->with('success', "Solicitud para el plan $nuevoPlan enviada exitosamente.");
+    }
+
+    public function usuarios()
+    {
+        return view('root/gestion_usuarios');
     }
 }

@@ -16,6 +16,7 @@ class ApartamentoModel extends Model
         'residente_id',
         'nombre_edificio_torre',
         'nro_apartamento',
+        'metros_cuadrados',  // Superficie del apartamento para cálculo de alícuota
         'alicuota',
     ];
 
@@ -23,9 +24,10 @@ class ApartamentoModel extends Model
 
     protected $validationRules = [
         'condominio_id'         => 'required|integer',
-        'nombre_edificio_torre' => 'required|max_length[255]',
+        'nombre_edificio_torre' => 'permit_empty|max_length[255]',
         'nro_apartamento'       => 'required|max_length[20]',
-        'alicuota'              => 'required|decimal',
+        'metros_cuadrados'      => 'permit_empty|decimal',
+        'alicuota'              => 'permit_empty|decimal',
     ];
 
     protected $validationMessages = [

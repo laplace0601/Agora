@@ -64,6 +64,7 @@
                             <i class="bi bi-headset me-1"></i> Soporte
                         </a>
                     </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle rounded-2 px-3 py-2 <?= (str_starts_with(uri_string(), 'admin/finanzas') ? 'active fw-semibold' : '') ?>"
                             href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

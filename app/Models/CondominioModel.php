@@ -21,6 +21,7 @@ class CondominioModel extends Model
         'nombre_condominio',
         'rif_jurisdiccion',
         'direccion',
+        'total_metros_cuadrados',  // Superficie total del condominio (m²) para cálculo de alícuotas
         'propietario',             // Nombre del propietario general
         'alicuota_base',           // Alícuota base del condominio
         'marca_id',
@@ -29,12 +30,13 @@ class CondominioModel extends Model
     protected $useTimestamps = false;
 
     protected $validationRules = [
-        'nombre_condominio' => 'required|max_length[255]',
-        'rif_jurisdiccion'  => 'permit_empty|max_length[50]',
-        'direccion'         => 'permit_empty|max_length[500]',
-        'propietario'       => 'permit_empty|max_length[255]',
-        'alicuota_base'     => 'permit_empty|decimal',
-        'marca_id'          => 'permit_empty|integer',
+        'nombre_condominio'      => 'required|max_length[255]',
+        'rif_jurisdiccion'       => 'permit_empty|max_length[50]',
+        'direccion'              => 'permit_empty|max_length[500]',
+        'total_metros_cuadrados' => 'permit_empty|decimal',
+        'propietario'            => 'permit_empty|max_length[255]',
+        'alicuota_base'          => 'permit_empty|decimal',
+        'marca_id'               => 'permit_empty|integer',
     ];
 
     protected $validationMessages = [
