@@ -93,52 +93,120 @@ class LicenciaController extends BaseController
      * POST /crm/licencia/activar
      *
      * Valida y activa una licencia de la plataforma comparando el código
-     * proporcionado con las llaves seguras del archivo .env
+     * con las llaves definidas en .env, usando un mapa de planes para
+     * eliminar lógica duplicada entre Plata y Oro.
+     *
+     * SEGURIDAD: Los bloques "=== DEBUG ===" pueden comentarse en producción
+     * sin afectar el flujo principal.
      */
     public function activarLicencia()
     {
-        $codigoActivacion = $this->request->getPost('codigo_activacion');
+        $isDev = (ENVIRONMENT === 'development');
 
+        // ── 1. Recibir y sanear el código enviado por POST ─────────────────
+        $codigoActivacion = trim($this->request->getPost('codigo_activacion') ?? '');
+
+        // ── 2. Mapa de planes: clave del .env → datos del plan ─────────────
+        //    Añadir nuevos planes aquí sin tocar otra lógica.
+        //    trim('"\'') elimina comillas residuales por si el .env las incluye.
+        $mapaPlanes = [
+            'Plata' => [
+                'key'    => trim((string) env('AGORA_KEY_PLATA', ''), " \t\n\r\0\x0B\"'"),
+                'limite' => 100,
+            ],
+            'Oro' => [
+                'key'    => trim((string) env('AGORA_KEY_ORO', ''), " \t\n\r\0\x0B\"'"),
+                'limite' => 9999,
+            ],
+        ];
+
+        // === DEBUG START === (comentar este bloque en producción) ============
+        if ($isDev) {
+            // 2a. Verificar que todas las variables de entorno están cargadas
+            foreach ($mapaPlanes as $nombrePlan => $datosPlan) {
+                if ($datosPlan['key'] === '') {
+                    $envVar = 'AGORA_KEY_' . strtoupper($nombrePlan);
+                    log_message('error', "[LicenciaController] {$envVar} no encontrada o vacía en .env");
+                    return $this->response->setStatusCode(500)->setJSON([
+                        'error' => "Error de configuración: Variable {$envVar} no encontrada.",
+                        'csrf'  => csrf_hash(),
+                    ]);
+                }
+            }
+
+            // 2b. Logging unificado de longitudes para detectar caracteres ocultos
+            $logPartes = ["POST len=" . mb_strlen($codigoActivacion)];
+            foreach ($mapaPlanes as $nombre => $datos) {
+                $logPartes[] = "KEY_{$nombre} len=" . mb_strlen($datos['key']);
+            }
+            log_message('debug', '[LicenciaController::activarLicencia] Comparación de longitudes — ' . implode(' | ', $logPartes));
+        }
+        // === DEBUG END =======================================================
+
+        // ── 3. Obtener configuración de marca ─────────────────────────────
         $marcaModel = new MarcaModel();
-        // Obtener el único registro de configuración de la instalación
-        $marca = $marcaModel->first();
+        $marca      = $marcaModel->first();
 
         if (! $marca) {
             return $this->response->setStatusCode(404)->setJSON([
                 'error' => 'No se encontró la configuración de marca.',
+                'csrf'  => csrf_hash(),
             ]);
         }
 
-        $keyPlata = env('AGORA_KEY_PLATA');
-        $keyOro   = env('AGORA_KEY_ORO');
+        // ── 4. Buscar el plan cuya llave coincide (flujo unificado) ────────
+        $planEncontrado = null;
 
-        $nivelLicencia = null;
-        $limiteApartamentos = null;
-
-        if ($codigoActivacion === $keyPlata) {
-            $nivelLicencia      = 'Plata';
-            $limiteApartamentos = 100;   // Plan intermedio: hasta 100 apartamentos
-        } elseif ($codigoActivacion === $keyOro) {
-            $nivelLicencia      = 'Oro';
-            $limiteApartamentos = 9999;  // Plan ilimitado
-        } else {
-            return $this->response->setStatusCode(400)->setJSON([
-                'error' => 'Llave de activación inválida',
-            ]);
+        foreach ($mapaPlanes as $nombrePlan => $datosPlan) {
+            if ($codigoActivacion === $datosPlan['key']) {
+                $planEncontrado = [
+                    'nivel'  => $nombrePlan,
+                    'limite' => $datosPlan['limite'],
+                ];
+                break;
+            }
         }
 
-        $updateData = [
-            'nivel_licencia'           => $nivelLicencia,
-            'limite_apartamentos'      => $limiteApartamentos,
+        // === DEBUG START === (comentar en producción) ========================
+        if ($isDev && $planEncontrado === null) {
+            $debugInfo = ['recibido_len' => mb_strlen($codigoActivacion), 'recibido_hex' => bin2hex($codigoActivacion)];
+            foreach ($mapaPlanes as $nombre => $datos) {
+                $debugInfo["key_{$nombre}_len"] = mb_strlen($datos['key']);
+                $debugInfo["key_{$nombre}_hex"] = bin2hex($datos['key']);
+            }
+            log_message('debug', '[LicenciaController] Llave inválida. Debug HEX: ' . json_encode($debugInfo));
+        }
+        // === DEBUG END =======================================================
+
+        if ($planEncontrado === null) {
+            $response = [
+                'error' => 'Llave de activación inválida.',
+                'csrf'  => csrf_hash(),
+            ];
+            if ($isDev) {
+                $response['debug_info'] = [
+                    'recibido_len' => mb_strlen($codigoActivacion),
+                    'recibido_hex' => bin2hex($codigoActivacion),
+                ];
+            }
+            return $this->response->setStatusCode(400)->setJSON($response);
+        }
+
+        // ── 5. Persistir el cambio de licencia ────────────────────────────
+        $marcaModel->update($marca['id'], [
+            'nivel_licencia'           => $planEncontrado['nivel'],
+            'limite_apartamentos'      => $planEncontrado['limite'],
             'codigo_activacion'        => $codigoActivacion,
             'fecha_actualizacion_plan' => date('Y-m-d H:i:s'),
-        ];
+        ]);
 
-        $marcaModel->update($marca['id'], $updateData);
+        log_message('info', "[LicenciaController] Licencia actualizada a nivel '{$planEncontrado['nivel']}' para marca ID {$marca['id']}.");
 
         return $this->response->setStatusCode(200)->setJSON([
             'success' => true,
-            'message' => "Licencia actualizada exitosamente a nivel $nivelLicencia."
+            'message' => "Licencia actualizada exitosamente a nivel {$planEncontrado['nivel']}.",
+            'csrf'    => csrf_hash(),
         ]);
     }
 }
+
