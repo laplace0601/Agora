@@ -104,6 +104,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                             <th scope="col" class="text-secondary">ID</th>
                             <th scope="col" class="text-secondary">Condominio</th>
                             <th scope="col" class="text-secondary">Número/Identificador</th>
+                            <th scope="col" class="text-secondary">Residente</th>
                             <th scope="col" class="text-secondary">Metros Cuadrados</th>
                             <th scope="col" class="text-secondary">Alícuota</th>
                         </tr>
@@ -115,12 +116,19 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                                     <td class="fw-bold text-muted">#<?= $apto['id'] ?></td>
                                     <td class="fw-medium"><?= htmlspecialchars($apto['nombre_condominio']) ?></td>
                                     <td><span class="badge bg-secondary rounded-pill"><?= htmlspecialchars($apto['nro_apartamento'] ?? '') ?></span></td>
+                                    <td>
+                                        <?php if (!empty($apto['nombre_residente'])): ?>
+                                            <span class="text-dark fw-medium"><i class="bi bi-person-fill text-muted me-1"></i><?= htmlspecialchars($apto['nombre_residente']) ?></span>
+                                        <?php else: ?>
+                                            <span class="text-muted small fs-7"><em>Sin asignar</em></span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?= number_format((float)($apto['metros_cuadrados'] ?? 0), 2) ?> m²</td>
                                     <td><span class="badge bg-info rounded-pill"><?= number_format((float)($apto['alicuota'] ?? 0), 4) ?>%</span></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="5" class="text-center py-4 text-muted">No hay apartamentos registrados.</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No hay apartamentos registrados.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

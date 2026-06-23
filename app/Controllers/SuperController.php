@@ -20,8 +20,9 @@ class SuperController extends BaseController
         $condominioModel = new \App\Models\CondominioModel();
         $apartamentoModel = new \App\Models\ApartamentoModel();
 
-        $apartamentos = $apartamentoModel->select('apartamentos.*, condominios.nombre_condominio')
+        $apartamentos = $apartamentoModel->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo AS nombre_residente')
                                          ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+                                         ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
                                          ->findAll();
 
         $datos = [
