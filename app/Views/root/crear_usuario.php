@@ -38,6 +38,7 @@
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Datos Personales y de Vivienda</h2>
                 <form action="<?= site_url('super/guardar-residente') ?>" method="POST">
+                    <?= csrf_field() ?>
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
@@ -79,6 +80,7 @@
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Datos Generales y Suscripción del Condominio</h2>
                 <form action="<?= site_url('super/guardar-admin') ?>" method="POST">
+                    <?= csrf_field() ?>
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
@@ -106,6 +108,7 @@
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Credenciales del Equipo Ágora Core</h2>
                 <form action="<?= site_url('super/guardar-super') ?>" method="POST">
+                    <?= csrf_field() ?>
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>

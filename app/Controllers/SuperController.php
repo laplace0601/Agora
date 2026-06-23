@@ -162,8 +162,66 @@ class SuperController extends BaseController
 
     public function guardarResidente()
     {
-        // TODO: Lógica real de inserción de usuario y residente
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Residente dado de alta exitosamente.');
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $usuarioModel = new \App\Models\UsuarioModel();
+        $residenteModel = new \App\Models\ResidenteModel();
+        $apartamentoModel = new \App\Models\ApartamentoModel();
+
+        $nombre = trim($this->request->getPost('nombre') ?? '');
+        $cedula = trim($this->request->getPost('cedula') ?? '');
+        $telefono = trim($this->request->getPost('telefono') ?? '');
+        $correo = trim($this->request->getPost('correo') ?? '');
+        $apartamentoId = $this->request->getPost('apartamento_id');
+
+        if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId)) {
+            return redirect()->back()->with('error', 'Faltan campos obligatorios para registrar el residente.');
+        }
+
+        // 1. Crear usuario
+        $datosUsuario = [
+            'correo' => $correo,
+            'nombre_usuario' => strtolower(explode(' ', $nombre)[0] . rand(10, 99)),
+            'clave' => '123456',
+            'rol' => 'residente',
+            'estado' => 'activo',
+        ];
+
+        if (!$usuarioModel->insert($datosUsuario)) {
+            $errores = implode(', ', $usuarioModel->errors());
+            return redirect()->back()->with('error', 'Error al crear usuario: ' . $errores);
+        }
+        $usuarioId = $usuarioModel->getInsertID();
+
+        // 2. Crear residente
+        $datosResidente = [
+            'usuario_id' => $usuarioId,
+            'nombre_completo' => $nombre,
+            'cedula_identidad' => $cedula,
+            'telefono' => $telefono,
+        ];
+
+        if (!$residenteModel->insert($datosResidente)) {
+            $db->transRollback();
+            $errores = implode(', ', $residenteModel->errors());
+            return redirect()->back()->with('error', 'Error al crear residente: ' . $errores);
+        }
+        $residenteId = $residenteModel->getInsertID();
+
+        // 3. Asignar apartamento
+        if (!$apartamentoModel->asignarResidente($apartamentoId, $residenteId)) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Error al asignar el apartamento.');
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Ocurrió un error inesperado al procesar la solicitud.');
+        }
+
+        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Residente dado de alta y asignado al apartamento exitosamente.');
     }
 
     public function guardarAdmin()
