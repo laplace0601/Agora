@@ -20,7 +20,7 @@
         </div>
         <div>
             <span class="badge text-bg-success px-3 py-2 rounded-pill shadow-sm small fw-semibold">
-                <i class="bi bi-check-circle-fill me-1"></i> Suscripción Al Día
+                <i class="bi bi-check-circle-fill me-1"></i> Expande tu Comunidad 
             </span>
         </div>
     </div>

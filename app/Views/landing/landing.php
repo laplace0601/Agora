@@ -228,41 +228,4 @@
     </div>
 </section>
 
-<section class="bg-white py-5" id="contacto">
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <span class="badge text-bg-agora mb-2 px-3 py-2 rounded-pill fw-semibold">Contacto</span>
-            <h2 class="display-6 fw-bold text-dark">¿Tienes dudas o sugerencias?</h2>
-            <p class="lead text-muted">Envíanos un mensaje directo y el equipo de desarrollo te responderá lo antes posible.</p>
-        </div>
-
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="p-4 rounded-4 shadow-sm border bg-light">
-                    <form action="#" method="POST" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label small fw-semibold text-muted">Nombre Completo</label>
-                            <input type="text" class="form-control rounded-pill px-3" id="nombre" placeholder="Ej. Juan Gómez" required>
-                            <div class="invalid-feedback small ps-3">Por favor, ingresa tu nombre completo.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label small fw-semibold text-muted">Correo Electrónico</label>
-                            <input type="email" class="form-control rounded-pill px-3" id="email" placeholder="ejemplo@correo.com" required>
-                            <div class="invalid-feedback small ps-3">Ingresa un correo electrónico válido (ejemplo@correo.com).</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="mensaje" class="form-label small fw-semibold text-muted">Mensaje o Consulta</label>
-                            <textarea class="form-control rounded-3 p-3" id="mensaje" rows="4" placeholder="Escribe aquí tu duda sobre el sistema para el equipo..." required></textarea>
-                            <div class="invalid-feedback small ps-3">El campo de mensaje no puede estar vacío.</div>
-                        </div>
-                        <button type="submit" class="btn btn-agora w-100 rounded-pill py-2 shadow-sm">Enviar Mensaje al Equipo 🚀</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <?= $this->endSection() ?>
-
-<?= $this->include('template/footer') ?>

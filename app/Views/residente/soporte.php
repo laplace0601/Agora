@@ -3,8 +3,18 @@ $pagina_actual = 'residente_soporte'; // Mapeo automático a soporte.css y sopor
 echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
-<main class="container my-5" role="main">
+<main class="container my-5" role="main"> 
+    <!-- Botón Volver al Dashboard fuera de las columnas para que no rompa el diseño -->
+    <div class="mb-4">
+        <a href="<?= site_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center">
+            <i class="bi bi-arrow-left me-2"></i> Volver al Dashboard
+        </a>
+    </div>
+
+    <!-- Contenedor principal de rejilla (Fila global) -->
     <div class="row g-4">
+       
+        <!-- Formulario: Ocupa 4 columnas de 12 en pantallas grandes -->
         <section class="col-12 col-lg-4" aria-labelledby="crear-ticket">
             <div class="card-agora-form p-4">
                 <h2 id="crear-ticket" class="fw-bold h4 text-dark mb-3">Reportar Incidencia</h2>
@@ -36,6 +46,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
             </div>
         </section>
 
+        <!-- Historial: Ocupa 8 columnas de 12 en pantallas grandes -->
         <section class="col-12 col-lg-8" aria-labelledby="historial-tickets">
             <div class="card-agora-form p-4">
                 <h2 id="historial-tickets" class="fw-bold h4 text-dark mb-4">Tus Reportes de Soporte</h2>
@@ -77,6 +88,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                 </div>
             </div>
         </section>
+        
     </div>
 </main>
 

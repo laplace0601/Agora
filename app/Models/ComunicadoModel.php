@@ -57,7 +57,7 @@ class ComunicadoModel extends Model
 
     /**
      * Lista comunicados con el nombre del autor (JOIN a usuarios).
-     * Usado por el endpoint API del ComunidadController.
+     * Usado por el endpoint del ComunidadController.
      */
     public function listarConAutor(): array
     {

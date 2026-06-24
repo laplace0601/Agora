@@ -87,7 +87,7 @@
                   <div class="row">
                     <div class="col-12">
                       <p class="mb-0 mt-5 text-secondary text-center small">
-                        ¿Olvidaste tus datos? <a href="#!" class="link-primary text-decoration-none">Contacta al administrador</a>
+                        ¿Olvidaste tus datos? Llama a XXXX-XXXX 
                       </p>
                     </div>
                   </div>
