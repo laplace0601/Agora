@@ -127,3 +127,14 @@ public/assets/css/min/
 public/assets/js/min/
 public/favicon.ico
 public/robots.txt
+# Ignorar el contenido de writable, pero permitir los .gitkeep
+writable/cache/*
+writable/logs/*
+writable/session/*
+writable/debugbar/*
+writable/uploads/*
+!writable/cache/.gitkeep
+!writable/logs/.gitkeep
+!writable/session/.gitkeep
+!writable/debugbar/.gitkeep
+!writable/uploads/.gitkeep
