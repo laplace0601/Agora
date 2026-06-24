@@ -33,11 +33,11 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->post('apartamentos/condominios/delete/(:num)', 'SuperController::deleteCondominio/$1');
     $routes->post('apartamentos/registrar-apartamento', 'SuperController::registrarApartamento');
 
-    // Gestión de usuarios y configuración global
-    $routes->get('crear-usuario', 'SuperController::crearUsuario');
-    $routes->post('guardar-residente', 'SuperController::guardarResidente');
-    $routes->post('guardar-admin', 'SuperController::guardarAdmin');
-    $routes->post('guardar-super', 'SuperController::guardarSuper');
+    // Gestión de usuarios
+    $routes->get('crear-usuario', 'UsuarioController::crearUsuario');
+    $routes->post('guardar-residente', 'UsuarioController::guardarResidente');
+    $routes->post('guardar-admin', 'UsuarioController::guardarAdmin');
+    $routes->post('guardar-super', 'UsuarioController::guardarSuper');
 
     $routes->get('marca-blanca', 'SuperController::marcaBlanca');
     $routes->post('marca-blanca/guardar', 'SuperController::guardarMarcaBlanca');
@@ -46,7 +46,7 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->post('planes/cambiar', 'SuperController::cambiarPlan');
 
     // Gestión integral de usuarios (Ver, Editar, Eliminar)
-    $routes->get('gestion_usuarios', 'SuperController::usuarios');
+    $routes->get('gestion_usuarios', 'UsuarioController::usuarios');
     $routes->get('api/usuarios', 'GestionUsuariosRootController::index');
     $routes->post('api/usuarios/update/(:num)', 'GestionUsuariosRootController::update/$1');
     $routes->post('api/usuarios/delete/(:num)', 'GestionUsuariosRootController::delete/$1');
@@ -66,12 +66,12 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->get('comunidad',             'AdminController::comunidad');
     $routes->get('soporte',               'AdminController::soporte');
     
-    // Handlers POST — formularios de las vistas admin
-    $routes->post('soporte/validar',                    'AdminController::validarTicket');
-    $routes->post('finanzas/facturar',                  'AdminController::emitirRecibos');
-    $routes->post('finanzas/validar-pago',              'AdminController::validarPago');
-    $routes->post('cartelera/publicar',                 'AdminController::publicarAnuncio');
-    $routes->get('cartelera/eliminar/(:num)',            'AdminController::eliminarAnuncio/$1');
+    // Handlers POST — Delegados a controladores especializados
+    $routes->post('soporte/validar',       'ComunidadController::responderTicket');  // ex AdminController::validarTicket
+    $routes->post('finanzas/facturar',     'FinanzasController::emitirRecibos');     // ex AdminController::emitirRecibos (BUGFIX)
+    $routes->post('finanzas/validar-pago', 'FinanzasController::validarPago');       // ex AdminController::validarPago
+    $routes->post('cartelera/publicar',    'ComunidadController::crearComunicado'); // ex AdminController::publicarAnuncio
+    $routes->get('cartelera/eliminar/(:num)', 'AdminController::eliminarAnuncio/$1');
 });
 
 // ---------------------------------------------------------------

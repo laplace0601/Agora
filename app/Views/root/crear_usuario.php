@@ -83,24 +83,11 @@
                 <form action="<?= site_url('super/guardar-admin') ?>" method="POST">
                     <?= csrf_field() ?>
                     <div class="row g-4">
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
-                        <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
+                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
+                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña *</label></div>
                         
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_condominio" placeholder="Condominio" required><label class="ms-2">Nombre Comercial del Condominio *</label></div>
-                        <div class="col-md-6 form-floating">
-                    <select class="form-select" name="plan_id" id="planSelector" required>
-                        <option value="" selected disabled>Selecciona el Plan de Negocio</option>
-                        <option value="bronce">🥉 Plan Bronce ($15/mes - Hasta 40 Aptos)</option>
-                        <option value="plata">🥈 Plan Plata ($30/mes - Hasta 120 Aptos)</option>
-                        <option value="oro">🥇 Plan Oro ($50/mes - Aptos Ilimitados)</option>
-                    </select>
-                    <label class="ms-2">Plan Comercial Asignado *</label>
-                </div>
-                        
-                        <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Dar de Alta Condominio y Administrador</button></div>
+                        <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Dar de Alta Administrador</button></div>
                     </div>
                 </form>
             </div>
@@ -112,16 +99,9 @@
                 <form action="<?= site_url('super/guardar-super') ?>" method="POST">
                     <?= csrf_field() ?>
                     <div class="row g-4">
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
-                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
-                        <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
+                        <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
-                        
-                        <div class="col-12 form-floating">
-                            <input type="text" class="form-control" name="area_desempeno" placeholder="Ej: Infraestructura / Soporte / Finanzas" required>
-                            <label class="ms-2">Área Operativa de Desempeño *</label>
-                        </div>
+                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña *</label></div>
                         
                         <div class="col-12 mt-4"><button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-semibold shadow-sm"><i class="bi bi-shield-check me-2"></i>Registrar Súper Usuario Maestro</button></div>
                     </div>

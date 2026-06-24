@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\PagoModel;
+
 class SuperController extends BaseController
 {
     public function panel()
@@ -21,9 +23,9 @@ class SuperController extends BaseController
         $apartamentoModel = new \App\Models\ApartamentoModel();
 
         $apartamentos = $apartamentoModel->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo AS nombre_residente')
-                                         ->join('condominios', 'condominios.id = apartamentos.condominio_id')
-                                         ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
-                                         ->findAll();
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->findAll();
 
         $datos = [
             'condominios' => $condominioModel->findAll(),
@@ -79,7 +81,7 @@ class SuperController extends BaseController
         }
 
         session()->setFlashdata('success', 'Condominio registrado exitosamente.');
-        
+
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Condominio registrado exitosamente.',
@@ -97,7 +99,7 @@ class SuperController extends BaseController
         }
 
         $condominioModel = new \App\Models\CondominioModel();
-        
+
         if ($condominioModel->delete($id)) {
             return $this->response->setJSON(['status' => 'success', 'message' => 'Condominio eliminado correctamente.']);
         }
@@ -156,24 +158,24 @@ class SuperController extends BaseController
         $marcaId  = (int) ($condominio['marca_id'] ?? 1);
         $db       = \Config\Database::connect();
         $marcaRow = $db->table('configuracion_marca')
-                       ->select('nivel_licencia, limite_apartamentos')
-                       ->where('id', $marcaId)
-                       ->get()->getRowArray();
+            ->select('nivel_licencia, limite_apartamentos')
+            ->where('id', $marcaId)
+            ->get()->getRowArray();
 
         $limitePlan = (int) ($marcaRow['limite_apartamentos'] ?? 0);
         $nivelPlan  = $marcaRow['nivel_licencia'] ?? 'Desconocido';
 
         $totalGlobal = $db->table('apartamentos')
-                          ->join('condominios', 'condominios.id = apartamentos.condominio_id')
-                          ->where('condominios.marca_id', $marcaId)
-                          ->countAllResults();
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->where('condominios.marca_id', $marcaId)
+            ->countAllResults();
 
         if ($limitePlan > 0 && ($totalGlobal + $cantidad) > $limitePlan) {
             $disponibles = max(0, $limitePlan - $totalGlobal);
             return $jsonError(
                 "Tu plan \u00abNivel: {$nivelPlan}\u00bb permite un m\u00e1ximo de {$limitePlan} apartamentos en total. "
-              . "Ya tienes {$totalGlobal} registrados e intentas crear {$cantidad} m\u00e1s. "
-              . "Puedes agregar como m\u00e1ximo {$disponibles} apartamento(s).",
+                    . "Ya tienes {$totalGlobal} registrados e intentas crear {$cantidad} m\u00e1s. "
+                    . "Puedes agregar como m\u00e1ximo {$disponibles} apartamento(s).",
                 422,
                 'plan_limit'
             );
@@ -188,7 +190,7 @@ class SuperController extends BaseController
         if (($metrosRegistrados + $totalMetrosNuevos) > $totalMetrosCondominio) {
             return $jsonError(
                 'El metraje total excede la capacidad del condominio. '
-              . '(Disponibles: ' . number_format($totalMetrosCondominio - $metrosRegistrados, 2) . ' m\u00b2)'
+                    . '(Disponibles: ' . number_format($totalMetrosCondominio - $metrosRegistrados, 2) . ' m\u00b2)'
             );
         }
 
@@ -212,8 +214,8 @@ class SuperController extends BaseController
 
         // Validación 2: Duplicados
         $duplicados = $apartamentoModel->where('condominio_id', $condominioId)
-                                       ->whereIn('nro_apartamento', $identificadores)
-                                       ->findAll();
+            ->whereIn('nro_apartamento', $identificadores)
+            ->findAll();
 
         if (!empty($duplicados)) {
             $lista = implode(', ', array_column($duplicados, 'nro_apartamento'));
@@ -244,82 +246,6 @@ class SuperController extends BaseController
     // Vistas y Handlers de Configuración Root / Super
     // ---------------------------------------------------------------
 
-    public function crearUsuario()
-    {
-        $condominioModel = new \App\Models\CondominioModel();
-        $apartamentoModel = new \App\Models\ApartamentoModel();
-
-        $datos = [
-            'condominios'  => $condominioModel->findAll(),
-            'apartamentos' => $apartamentoModel->findAll(),
-        ];
-
-        return view('root/crear_usuario', $datos);
-    }
-
-    public function guardarResidente()
-    {
-        $usuarioModel = new \App\Models\UsuarioModel();
-        $residenteModel = new \App\Models\ResidenteModel();
-
-        $nombre = trim($this->request->getPost('nombre') ?? '');
-        $cedula = trim($this->request->getPost('cedula') ?? '');
-        $telefono = trim($this->request->getPost('telefono') ?? '');
-        $correo = trim($this->request->getPost('correo') ?? '');
-        $clave = $this->request->getPost('clave');
-        $apartamentoId = $this->request->getPost('apartamento_id');
-
-        if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId) || empty($clave)) {
-            return redirect()->back()->with('error', 'Faltan campos obligatorios para registrar el residente.');
-        }
-
-        // VALIDACIÓN ESTRICTA DE ROLES (Cruce de Roles Crítico)
-        $usuarioExistente = $usuarioModel->where('correo', $correo)->first();
-        if ($usuarioExistente && in_array($usuarioExistente['rol'], ['admin', 'root'])) {
-            return redirect()->back()->with('error', 'No se puede registrar este correo como residente porque pertenece a un administrador del sistema.');
-        }
-
-        $datosUsuario = [
-            'correo' => $correo,
-            'nombre_usuario' => strtolower(explode(' ', $nombre)[0] . rand(10, 99)),
-            'clave' => $clave, // El UsuarioModel aplicará password_hash() automáticamente antes de insertar
-            'rol' => 'residente',
-            'estado' => 'activo',
-        ];
-
-        $datosResidente = [
-            'nombre_completo' => $nombre,
-            'cedula_identidad' => $cedula,
-            'telefono' => $telefono,
-        ];
-
-        $datosTransaccion = [
-            'usuario' => $datosUsuario,
-            'residente' => $datosResidente,
-            'apartamento_id' => $apartamentoId
-        ];
-
-        $errores = [];
-        if (!$residenteModel->crearResidenteCompleto($datosTransaccion, $errores)) {
-            $msjError = !empty($errores) ? implode(', ', $errores) : 'Error desconocido.';
-            return redirect()->back()->with('error', 'Error al crear residente: ' . $msjError);
-        }
-
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Residente dado de alta y asignado al apartamento exitosamente.');
-    }
-
-    public function guardarAdmin()
-    {
-        // TODO: Lógica real de inserción de usuario y administrador/condominio
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Administrador dado de alta exitosamente.');
-    }
-
-    public function guardarSuper()
-    {
-        // TODO: Lógica real de inserción de usuario root
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Nuevo Súper Usuario dado de alta exitosamente.');
-    }
-
     public function marcaBlanca()
     {
         return view('root/marca_blanca');
@@ -345,10 +271,7 @@ class SuperController extends BaseController
         return redirect()->to(site_url('super/planes'))->with('success', "Solicitud para el plan $nuevoPlan enviada exitosamente.");
     }
 
-    public function usuarios()
-    {
-        return view('root/gestion_usuarios');
-    }
+
 
     /**
      * Limpia un número con formato decimal (europeo/latino) a formato de base de datos.
