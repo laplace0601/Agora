@@ -2,11 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Models\PagoModel;
 use App\Models\CondominioModel;
 use App\Models\ApartamentoModel;
 use App\Models\ComunicadoModel;
-use App\Models\PagoModel;
-use App\Models\ReciboModel;
 use App\Models\ResidenteModel;
 
 /**
@@ -152,61 +151,19 @@ class AdminController extends BaseController
     }
 
     // ---------------------------------------------------------------
-    // Handlers POST — Formularios de las vistas admin
+    // Handlers POST — DELEGADOS a controladores especializados
+    // • POST admin/finanzas/facturar    → FinanzasController::emitirRecibos
+    // • POST admin/finanzas/validar-pago → FinanzasController::validarPago
+    // • POST admin/cartelera/publicar    → ComunidadController::crearComunicado
+    // • POST admin/soporte/validar       → ComunidadController::responderTicket
+    // Ver: app/Config/Routes.php — grupo 'admin'
     // ---------------------------------------------------------------
-
-    /**
-     * POST /admin/soporte/validar
-     *
-     * Actualiza el estado de un ticket de soporte.
-     */
-    public function validarTicket()
-    {
-        $ticketId = (int) $this->request->getPost('ticket_id');
-        $estado = trim($this->request->getPost('estado') ?? '');
-
-        if ($ticketId <= 0 || ! in_array($estado, ['Abierto', 'En Proceso', 'Resuelto'], true)) {
-            return redirect()->back()->with('error', 'Datos inválidos para actualizar el ticket.');
-        }
-
-        $ticketModel = new \App\Models\TicketModel();
-        $ticketModel->actualizarEstado($ticketId, $estado);
-
-        return redirect()->to(site_url('admin/soporte'))
-            ->with('success', "Estado del ticket #{$ticketId} actualizado a '{$estado}'.");
-    }
-
-    /**
-     * POST /admin/cartelera/publicar
-     *
-     * Publica un nuevo comunicado en la cartelera desde la BD.
-     */
-    public function publicarAnuncio()
-    {
-        $comunicadoModel = new ComunicadoModel();
-
-        $datos = [
-            'autor_id'          => session()->get('usuario_id'),
-            'titulo'            => trim($this->request->getPost('titulo') ?? ''),
-            'contenido'         => trim($this->request->getPost('descripcion') ?? ''),
-            'fecha_publicacion' => date('Y-m-d H:i:s'),
-            'estado'            => 'publicado',
-        ];
-
-        if (empty($datos['titulo']) || empty($datos['contenido'])) {
-            return redirect()->back()->with('error', 'El título y la descripción son obligatorios.');
-        }
-
-        $comunicadoModel->insert($datos);
-
-        return redirect()->to(site_url('admin/cartelera'))
-            ->with('success', 'Anuncio publicado exitosamente.');
-    }
 
     /**
      * GET /admin/cartelera/eliminar/(:num)
      *
      * Cambia el estado de un comunicado a 'borrado' (soft delete).
+     * Permanece aquí por ser una acción GET del panel, sin equivalente en CRM.
      */
     public function eliminarAnuncio(int $id)
     {
@@ -215,93 +172,5 @@ class AdminController extends BaseController
 
         return redirect()->to(site_url('admin/cartelera'))
             ->with('success', 'Anuncio eliminado.');
-    }
-
-    /**
-     * POST /admin/finanzas/facturar
-     *
-     * Emite recibos masivos para un condominio (facturación mensual).
-     */
-    public function emitirRecibos()
-    {
-        $condominioId = (int) $this->request->getPost('condominio_id');
-        $montoBase    = (float) $this->request->getPost('monto_base');
-        $mes          = (int) $this->request->getPost('mes');
-        $anio         = (int) $this->request->getPost('año');
-
-        if ($condominioId <= 0 || $montoBase <= 0 || $mes < 1 || $mes > 12 || $anio < 2000) {
-            return redirect()->back()->with('error', 'Complete todos los campos correctamente.');
-        }
-
-        $apartamentoModel = new ApartamentoModel();
-        $apartamentos     = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
-
-        if (empty($apartamentos)) {
-            return redirect()->back()->with('error', 'No hay apartamentos registrados para este condominio.');
-        }
-
-        $reciboModel  = new ReciboModel();
-        $insertados   = 0;
-        $yaExistentes = 0;
-
-        foreach ($apartamentos as $apto) {
-            if ($reciboModel->existeRecibo((int) $apto['id'], $mes, $anio)) {
-                $yaExistentes++;
-                continue;
-            }
-
-            $reciboModel->insert([
-                'apartamento_id'  => $apto['id'],
-                'mes'             => $mes,
-                'anio'            => $anio,
-                'monto_base'      => $montoBase,
-                'monto_intereses' => 0,
-                'monto_total'     => round($montoBase * (float) $apto['alicuota'], 2),
-                'estado_pago'     => 'Pendiente',
-            ]);
-
-            $insertados++;
-        }
-
-        $msg = "Facturación completada: {$insertados} recibos emitidos.";
-        if ($yaExistentes > 0) {
-            $msg .= " ({$yaExistentes} ya existían y fueron omitidos).";
-        }
-
-        return redirect()->to(site_url('admin/finanzas/cobro'))->with('success', $msg);
-    }
-
-    /**
-     * POST /admin/finanzas/validar-pago
-     *
-     * Aprueba o rechaza un comprobante de pago enviado por un residente.
-     */
-    public function validarPago()
-    {
-        $pagoId = (int) $this->request->getPost('pago_id');
-        $accion = trim($this->request->getPost('accion') ?? '');
-
-        if ($pagoId <= 0 || ! in_array($accion, ['aprobar', 'rechazar'], true)) {
-            return redirect()->back()->with('error', 'Acción inválida.');
-        }
-
-        $pagoModel = new PagoModel();
-        $pago      = $pagoModel->obtenerConRecibo($pagoId);
-
-        if (! $pago) {
-            return redirect()->back()->with('error', 'El pago no existe.');
-        }
-
-        if ($accion === 'aprobar') {
-            $pagoModel->actualizarValidacion($pagoId, 'Aprobado');
-            $reciboModel = new ReciboModel();
-            $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado');
-            return redirect()->to(site_url('admin/finanzas/pagos'))
-                ->with('success', "Pago #{$pagoId} aprobado. Recibo marcado como Pagado.");
-        }
-
-        $pagoModel->actualizarValidacion($pagoId, 'Rechazado');
-        return redirect()->to(site_url('admin/finanzas/pagos'))
-            ->with('success', "Pago #{$pagoId} rechazado.");
     }
 }

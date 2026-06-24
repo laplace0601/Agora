@@ -1,0 +1,129 @@
+# ------------------------------
+# CodeIgniter 4 específico
+# ------------------------------
+
+# Archivos de entorno (configuraciones sensibles)
+.env
+.env.*
+!.env.example
+
+# Archivos de caché de CodeIgniter
+writable/cache/
+writable/logs/
+writable/session/
+writable/debugbar/
+writable/uploads/
+!writable/uploads/.gitkeep
+
+# Archivos de vistas compiladas (si usas plantillas)
+writable/views/
+
+# Configuración de base de datos (si está en app/Config/Database.php)
+app/Config/Database.php
+app/Config/Email.php
+app/Config/Encryption.php
+
+# ------------------------------
+# Composer
+# ------------------------------
+vendor/
+composer.lock
+composer.phar
+
+# ------------------------------
+# Node.js (si usas npm para assets)
+# ------------------------------
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# ------------------------------
+# Archivos de sistema operativo
+# ------------------------------
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.swo
+*.log
+*.cache
+
+# ------------------------------
+# Archivos de IDE / editores
+# ------------------------------
+.idea/
+.vscode/
+*.iml
+*.sublime-*
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+.project
+.classpath
+.settings/
+*.session
+*.workspace
+
+# ------------------------------
+# Archivos de cobertura de pruebas
+# ------------------------------
+tests/_output/
+tests/_support/_generated/
+coverage/
+.phpunit.result.cache
+phpunit.xml
+
+# ------------------------------
+# Archivos de depuración / logs adicionales
+# ------------------------------
+*.log
+*.sql
+*.sqlite
+*.sqlite-journal
+error_log
+access_log
+
+# ------------------------------
+# Archivos temporales del sistema
+# ------------------------------
+tmp/
+temp/
+*.tmp
+*.bak
+*.old
+*.orig
+
+# ------------------------------
+# Archivos de compresión / empaquetado
+# ------------------------------
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ------------------------------
+# Archivos de configuración de CI/CD
+# ------------------------------
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+.github/
+
+# ------------------------------
+# Archivos de entorno de desarrollo adicionales
+# ------------------------------
+.env.local
+.env.dev
+.env.test
+.env.production
+
+# ------------------------------
+# Otros archivos específicos del proyecto
+# ------------------------------
+public/assets/build/
+public/assets/css/min/
+public/assets/js/min/
+public/favicon.ico
+public/robots.txt

@@ -92,19 +92,50 @@ class ResidenteController extends BaseController
      */
     public function enviarPago()
     {
+        $session   = session();
+        $usuarioId = $session->get('usuario_id');
+
+        // Guardia de sesión: solo residentes autenticados
+        if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente' || ! $usuarioId) {
+            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión para reportar un pago.');
+        }
+
+        $reciboId    = (int) $this->request->getPost('recibo_id');
+        $montoPagado = (float) $this->request->getPost('monto');
+
+        if ($reciboId <= 0 || $montoPagado <= 0) {
+            return redirect()->back()->with('error', 'El recibo y el monto son obligatorios.');
+        }
+
+        // SEGURIDAD: Verificar que el recibo pertenece al apartamento del residente
+        // Evita que un residente pague recibos de otro apartamento manipulando el POST
+        $apartamentoModel = new ApartamentoModel();
+        $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
+
+        if (empty($apartamentos)) {
+            return redirect()->back()->with('error', 'No tienes un apartamento asignado.');
+        }
+
+        $apartamentoId = (int) $apartamentos[0]['id'];
+
+        $reciboModel = new ReciboModel();
+        $recibo      = $reciboModel->where('id', $reciboId)
+                                   ->where('apartamento_id', $apartamentoId)
+                                   ->first();
+
+        if (! $recibo) {
+            return redirect()->back()->with('error', 'El recibo indicado no existe o no pertenece a tu apartamento.');
+        }
+
         $datos = [
-            'recibo_mensual_id'      => (int)   $this->request->getPost('recibo_id'),
-            'monto_pagado'           => (float)  $this->request->getPost('monto'),
+            'recibo_mensual_id'      => $reciboId,
+            'monto_pagado'           => $montoPagado,
             'metodo_pago'            => trim($this->request->getPost('banco') ?? 'Transferencia'),
             'referencia_transaccion' => trim($this->request->getPost('referencia') ?? ''),
-            'comprobante_url'        => '',        // Pendiente: subida de archivos
+            'comprobante_url'        => '',
             'fecha_registro'         => date('Y-m-d H:i:s'),
             'estado_validacion'      => 'Por Validar',
         ];
-
-        if ($datos['recibo_mensual_id'] <= 0 || $datos['monto_pagado'] <= 0) {
-            return redirect()->back()->with('error', 'El recibo y el monto son obligatorios.');
-        }
 
         $pagoModel = new PagoModel();
 
@@ -144,8 +175,16 @@ class ResidenteController extends BaseController
      */
     public function abrirTicket()
     {
+        $session   = session();
+        $usuarioId = $session->get('usuario_id');
+
+        // Guardia de sesión: solo residentes autenticados
+        if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente' || ! $usuarioId) {
+            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión para abrir un ticket.');
+        }
+
         $datos = [
-            'usuario_id'     => session()->get('usuario_id'),
+            'usuario_id'     => $usuarioId,
             'categoria'      => trim($this->request->getPost('categoria') ?? ''),
             'asunto'         => trim($this->request->getPost('asunto') ?? ''),
             'detalle'        => trim($this->request->getPost('descripcion') ?? ''),

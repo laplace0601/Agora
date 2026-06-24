@@ -154,38 +154,52 @@ class ComunidadController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los administradores pueden gestionar tickets.',
-            ])->setStatusCode(403);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Acceso denegado. Solo los administradores pueden gestionar tickets.',
+                ])->setStatusCode(403);
+            }
+            return redirect()->back()->with('error', 'Acceso denegado. Solo los administradores pueden gestionar tickets.');
         }
 
         $ticketId    = (int) $this->request->getPost('ticket_id');
-        $nuevoEstado = trim($this->request->getPost('nuevo_estado') ?? '');
+        $nuevoEstado = trim($this->request->getPost('nuevo_estado') ?? $this->request->getPost('estado') ?? '');
 
         if ($ticketId <= 0 || ! in_array($nuevoEstado, ['En Proceso', 'Resuelto'], true)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Debe indicar un ticket_id válido y un estado (En Proceso o Resuelto).',
-            ])->setStatusCode(400);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Debe indicar un ticket_id válido y un estado (En Proceso o Resuelto).',
+                ])->setStatusCode(400);
+            }
+            return redirect()->back()->with('error', 'Debe indicar un ticket_id válido y un estado (En Proceso o Resuelto).');
         }
 
         $ticketModel = new TicketModel();
         $ticket      = $ticketModel->find($ticketId);
 
         if (! $ticket) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El ticket indicado no existe.',
-            ])->setStatusCode(404);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'El ticket indicado no existe.',
+                ])->setStatusCode(404);
+            }
+            return redirect()->back()->with('error', 'El ticket indicado no existe.');
         }
 
         // actualizarEstado() registra fecha_resolucion automáticamente si es 'Resuelto'
         $ticketModel->actualizarEstado($ticketId, $nuevoEstado);
+        $mensajeExito = "Ticket #{$ticketId} actualizado a: {$nuevoEstado}.";
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => "Ticket #{$ticketId} actualizado a: {$nuevoEstado}.",
-        ]);
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => $mensajeExito,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $mensajeExito);
     }
 }

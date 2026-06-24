@@ -10,15 +10,9 @@ use App\Models\SolvenciaModel;
 class FinanzasController extends BaseController
 {
     /**
-     * POST /crm/finanzas/facturar
-     *
      * Emite recibos mensuales masivos para todos los apartamentos de un condominio.
      * Fórmula: monto_total = monto_base * alicuota (por apartamento).
-     * Solo para rol 'admin'.
-     */
-    /**
-     * POST /crm/finanzas/simular-facturacion
-     *
+     * Solo para rol 'admin'. 
      * Genera una pre-visualización de la facturación basada en el monto global
      * y las alícuotas de cada apartamento. No guarda en base de datos.
      */
@@ -62,17 +56,24 @@ class FinanzasController extends BaseController
         $totalDistribuido = 0;
         $excluidosCount = 0;
 
-        foreach ($apartamentos as $apto) {
-            // Lógica de cálculo: Se cobra el monto base exacto por apartamento
-            $montoApartamento = $montoGlobal;
+        $apartamentosOcupados = array_filter($apartamentos, function ($apto) {
+            return !empty($apto['residente_id']);
+        });
 
-            // Regla de Negocio (Opción A): Excluir si no tiene residente asignado
-            if (empty($apto['residente_id'])) {
-                $excluidosCount++;
-                continue; // No se incluye en la facturación ni suma al total distribuido
-            }
+        $totalOcupados = count($apartamentosOcupados);
 
-            $totalDistribuido += $montoApartamento;
+        // 2. Validación de seguridad para evitar división por cero
+        if ($totalOcupados > 0) {
+            // Aquí es donde calculas la parte proporcional real
+            $montoIndividual = $montoGlobal / $totalOcupados;
+        } else {
+            $montoIndividual = 0;
+        }
+
+        // 3. Ahora el bucle solo recorre los ocupados y usa el monto ya calculado
+        foreach ($apartamentosOcupados as $apto) {
+            // Ya no hay necesidad de 'continue' aquí, porque ya filtramos la lista arriba
+            $montoApartamento = $montoIndividual;
 
             $simulacion[] = [
                 'apartamento_id'  => $apto['id'],
@@ -127,45 +128,43 @@ class FinanzasController extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'No se encontraron apartamentos.'])->setStatusCode(404);
         }
 
-        // VALIDACIÓN CRÍTICA: Regla del 100% de Alícuota
-        $sumaAlicuotas = 0;
-        foreach ($apartamentos as $apto) {
-            $sumaAlicuotas += (float) $apto['alicuota'];
+        // 1. Filtrar los apartamentos ocupados antes de entrar al bucle
+        $apartamentosOcupados = array_filter($apartamentos, function ($apto) {
+            return !empty($apto['residente_id']) && $apto['residente_id'] != 0;
+        });
+
+        $totalOcupados = count($apartamentosOcupados);
+
+        // 2. Validación y cálculo de la distribución exacta
+        if ($totalOcupados === 0) {
+            return $this->response->setJSON([
+                'status' => 'error', 
+                'message' => 'No hay apartamentos con residentes asignados para facturar.'
+            ])->setStatusCode(400);
         }
 
-        if ($sumaAlicuotas < 99.9 || $sumaAlicuotas > 100.1) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Facturación bloqueada por seguridad: La suma de alícuotas del edificio (' . $sumaAlicuotas . '%) no equivale al 100%.'
-            ])->setStatusCode(422);
-        }
+        $montoIndividual = $montoGlobal / $totalOcupados;
 
         $reciboModel = new ReciboModel();
         $recibosBatch = [];
         $yaExistentes = 0;
 
-        foreach ($apartamentos as $apto) {
-            // Regla de Negocio (Opción A): Excluir si no tiene residente asignado
-            if (empty($apto['residente_id'])) {
-                continue;
-            }
-
+        // 3. Recorrer SÓLO los ocupados y usar el monto exacto
+        foreach ($apartamentosOcupados as $apto) {
             // Evitar duplicar recibos del mismo mes/año para el mismo apartamento
             if ($reciboModel->existeRecibo((int) $apto['id'], $mes, $anio)) {
                 $yaExistentes++;
                 continue;
             }
 
-            // Cálculo individual: Se registra el valor base exacto por apartamento (sin multiplicar por alícuota)
-            $montoApartamento = $montoGlobal;
-
+            // Asignación estricta del monto calculado sin usar alícuotas
             $recibosBatch[] = [
                 'apartamento_id'  => $apto['id'],
                 'mes'             => $mes,
                 'anio'            => $anio,
-                'monto_base'      => $montoApartamento,
+                'monto_base'      => $montoIndividual,
                 'monto_intereses' => 0,
-                'monto_total'     => $montoApartamento,
+                'monto_total'     => $montoIndividual,
                 'estado_pago'     => 'Pendiente',
                 'descripcion'     => $descripcion,
             ];
@@ -284,30 +283,39 @@ class FinanzasController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los administradores pueden validar pagos.',
-            ])->setStatusCode(403);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Acceso denegado. Solo los administradores pueden validar pagos.',
+                ])->setStatusCode(403);
+            }
+            return redirect()->back()->with('error', 'Acceso denegado. Solo los administradores pueden validar pagos.');
         }
 
         $pagoId = (int) $this->request->getPost('pago_id');
         $accion = trim($this->request->getPost('accion') ?? '');
 
         if ($pagoId <= 0 || ! in_array($accion, ['aprobar', 'rechazar'], true)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).',
-            ])->setStatusCode(400);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).',
+                ])->setStatusCode(400);
+            }
+            return redirect()->back()->with('error', 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).');
         }
 
         $pagoModel = new PagoModel();
         $pago      = $pagoModel->obtenerConRecibo($pagoId);
 
         if (! $pago) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El pago indicado no existe.',
-            ])->setStatusCode(404);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'El pago indicado no existe.',
+                ])->setStatusCode(404);
+            }
+            return redirect()->back()->with('error', 'El pago indicado no existe.');
         }
 
         $reciboModel = new ReciboModel();
@@ -319,19 +327,21 @@ class FinanzasController extends BaseController
             // AUTOMATIZACIÓN: actualizar recibo → Pagado
             $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado');
 
+            $mensajeExito = 'Pago aprobado. El recibo mensual ha sido marcado como Pagado automáticamente.';
+        } else {
+            // Acción: rechazar
+            $pagoModel->actualizarValidacion($pagoId, 'Rechazado');
+            $mensajeExito = 'Pago rechazado. El recibo mensual permanece como Pendiente.';
+        }
+
+        if ($this->request->isAJAX()) {
             return $this->response->setJSON([
                 'status'  => 'success',
-                'message' => 'Pago aprobado. El recibo mensual ha sido marcado como Pagado automáticamente.',
+                'message' => $mensajeExito,
             ]);
         }
 
-        // Acción: rechazar
-        $pagoModel->actualizarValidacion($pagoId, 'Rechazado');
-
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Pago rechazado. El recibo mensual permanece como Pendiente.',
-        ]);
+        return redirect()->back()->with('success', $mensajeExito);
     }
 
     /**
