@@ -7,6 +7,23 @@
 ?>
 
 <main class="container my-5" role="main">
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong><?= session()->getFlashdata('success') ?></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="fw-bold h3 text-dark"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Registro Central de Usuarios</h1>
@@ -61,9 +78,19 @@
                             <select class="form-select" name="apartamento_id" id="residente-apartamento" required disabled>
                                 <option value="" selected disabled>Selecciona primero un condominio</option>
                                 <?php if (!empty($apartamentos)): ?>
-                                    <?php foreach ($apartamentos as $apto): ?>
-                                        <option value="<?= $apto['id'] ?>" data-condominio="<?= $apto['condominio_id'] ?>" style="display: none;">
-                                            Apto. <?= esc($apto['nro_apartamento'] ?? $apto['numero'] ?? 'N/A') ?>
+                                    <?php foreach ($apartamentos as $apto): 
+                                        $ocupado = !empty($apto['residente_id']);
+                                    ?>
+                                        <option value="<?= $apto['id'] ?>" 
+                                                data-condominio="<?= $apto['condominio_id'] ?>" 
+                                                <?= $ocupado ? 'disabled' : '' ?>
+                                                style="display: none;">
+                                            Apto. <?= esc($apto['nro_apartamento'] ?? 'N/A') ?>
+                                            <?php if ($ocupado): ?>
+                                                — ⛔ Ocupado (<?= esc($apto['nombre_residente'] ?? 'Asignado') ?>)
+                                            <?php else: ?>
+                                                — ✅ Disponible
+                                            <?php endif; ?>
                                         </option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -127,7 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (option.getAttribute('data-condominio') === condoId) {
                     option.style.display = '';
-                    hasOptions = true;
+                    // Solo contar como disponible si no está disabled
+                    if (!option.disabled) hasOptions = true;
                 } else {
                     option.style.display = 'none';
                 }
@@ -140,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectApartamento.value = "";
             
             if (!hasOptions) {
-                selectApartamento.options[0].text = "No hay apartamentos registrados en este condominio";
+                selectApartamento.options[0].text = "No hay apartamentos disponibles en este condominio";
             } else {
                 selectApartamento.options[0].text = "Selecciona un apartamento...";
             }

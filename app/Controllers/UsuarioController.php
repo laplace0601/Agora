@@ -18,9 +18,16 @@ class UsuarioController extends BaseController
         $condominioModel = new CondominioModel();
         $apartamentoModel = new ApartamentoModel();
 
+        // Traer TODOS los apartamentos con info de ocupación
+        $apartamentos = $apartamentoModel
+            ->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo AS nombre_residente')
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->findAll();
+
         $datos = [
             'condominios'  => $condominioModel->findAll(),
-            'apartamentos' => $apartamentoModel->findAll(),
+            'apartamentos' => $apartamentos,
         ];
 
         return view('root/crear_usuario', $datos);
@@ -49,6 +56,16 @@ class UsuarioController extends BaseController
 
         if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId) || empty($clave)) {
             return redirect()->back()->with('error', 'Faltan campos obligatorios para registrar el residente.');
+        }
+
+        // Verificar que el apartamento NO esté ya asignado a otro residente
+        $apartamentoModel = new ApartamentoModel();
+        $apartamento = $apartamentoModel->find($apartamentoId);
+        if (!$apartamento) {
+            return redirect()->back()->with('error', 'El apartamento seleccionado no existe.');
+        }
+        if (!empty($apartamento['residente_id'])) {
+            return redirect()->back()->with('error', 'El apartamento seleccionado ya tiene un residente asignado. Selecciona otro apartamento disponible.');
         }
 
         // VALIDACIÓN ESTRICTA DE ROLES (Cruce de Roles Crítico)
@@ -83,7 +100,7 @@ class UsuarioController extends BaseController
             return redirect()->back()->with('error', 'Error al crear residente: ' . $msjError);
         }
 
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', 'Residente dado de alta y asignado al apartamento exitosamente.');
+        return redirect()->to(site_url('super/crear-usuario'))->with('success', '¡Se ha creado el usuario con éxito! El residente ha sido dado de alta y asignado al apartamento.');
     }
 
     public function guardarAdmin()
@@ -119,7 +136,7 @@ class UsuarioController extends BaseController
         log_message('info', "[UsuarioController] Admin creado: correo={$correo}, nombre_usuario={$nombreUsuario}");
 
         return redirect()->to(site_url('super/crear-usuario'))
-            ->with('success', "Administrador '{$nombreUsuario}' dado de alta exitosamente.");
+            ->with('success', "¡Se ha creado el usuario con éxito! Administrador '{$nombreUsuario}' dado de alta.");
     }
 
     public function guardarSuper()
@@ -158,6 +175,6 @@ class UsuarioController extends BaseController
         log_message('info', "[UsuarioController] Nuevo root creado: correo={$correo}, nombre_usuario={$nombreUsuario}");
 
         return redirect()->to(site_url('super/crear-usuario'))
-            ->with('success', "Súper Usuario '{$nombreUsuario}' registrado exitosamente.");
+            ->with('success', "¡Se ha creado el usuario con éxito! Súper Usuario '{$nombreUsuario}' registrado.");
     }
 }

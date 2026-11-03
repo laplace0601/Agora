@@ -55,7 +55,7 @@
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'admin/residentes' ? 'active fw-semibold' : '') ?>"
                             href="<?= site_url('admin/residentes') ?>">
-                            <i class="bi bi-people me-1"></i> Residentes
+                            <i class="bi bi-building me-1"></i> Departamentos
                         </a>
                     </li>
                     <li class="nav-item">
@@ -83,12 +83,25 @@
                                     <i class="bi bi-check2-circle me-2 text-secondary"></i> Validar Pagos
                                 </a>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item rounded-2 py-2 <?= (uri_string() === 'admin/finanzas/morosidad' ? 'active' : '') ?>"
+                                    href="<?= site_url('admin/finanzas/morosidad') ?>">
+                                    <i class="bi bi-exclamation-diamond me-2 text-danger"></i> Morosidad
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'admin/cartelera' ? 'active fw-semibold' : '') ?>"
                             href="<?= site_url('admin/cartelera') ?>">
                             <i class="bi bi-megaphone me-1"></i> Cartelera
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-2 px-3 py-2 <?= (str_starts_with(uri_string(), 'admin/areas') ? 'active fw-semibold' : '') ?>"
+                            href="<?= site_url('admin/areas-comunes') ?>">
+                            <i class="bi bi-tree me-1"></i> Áreas Comunes
                         </a>
                     </li>
                 </ul>

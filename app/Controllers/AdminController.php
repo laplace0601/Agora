@@ -7,6 +7,8 @@ use App\Models\CondominioModel;
 use App\Models\ApartamentoModel;
 use App\Models\ComunicadoModel;
 use App\Models\ResidenteModel;
+use App\Models\ReciboModel;
+use App\Models\HabitanteModel;
 
 /**
  * AdminController
@@ -24,40 +26,94 @@ class AdminController extends BaseController
     /**
      * GET /admin/residentes
      *
-     * Vista del directorio de residentes para consultar y buscar.
+     * Vista del Directorio de Departamentos (reemplaza el antiguo directorio de residentes).
+     * Muestra todos los apartamentos con su residente principal y estado de deuda.
      */
     public function residentes()
     {
-        $residenteModel = new ResidenteModel();
+        $apartamentoModel = new ApartamentoModel();
+        $reciboModel      = new ReciboModel();
 
-        $residentes = $residenteModel
-            ->select('residentes.*, usuarios.correo, usuarios.estado')
-            ->join('usuarios', 'usuarios.id = residentes.usuario_id', 'left')
+        // Obtener todos los apartamentos con datos del condominio y residente
+        $apartamentos = $apartamentoModel
+            ->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo, residentes.cedula_identidad, residentes.telefono')
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->orderBy('condominios.nombre_condominio', 'ASC')
+            ->orderBy('apartamentos.nro_apartamento', 'ASC')
             ->findAll();
 
-        $apartamentoModel = new ApartamentoModel();
-        $apartamentos = $apartamentoModel->findAll();
+        // Calcular deuda por apartamento
+        foreach ($apartamentos as &$apto) {
+            $pendientes = $reciboModel
+                ->where('apartamento_id', $apto['id'])
+                ->where('estado_pago', 'Pendiente')
+                ->findAll();
 
-        $aptosPorResidente = [];
-        foreach ($apartamentos as $apto) {
-            if ($apto['residente_id']) {
-                $aptosPorResidente[$apto['residente_id']][] = $apto['nombre_edificio_torre'] . ' - ' . $apto['nro_apartamento'];
+            $deuda = 0;
+            foreach ($pendientes as $r) {
+                $deuda += (float) $r['monto_total'];
             }
+            $apto['deuda_total'] = $deuda;
+            $apto['recibos_pendientes'] = count($pendientes);
         }
 
-        foreach ($residentes as &$res) {
-            $res['apartamentos'] = $aptosPorResidente[$res['id']] ?? [];
+        return view('admin/directorio_departamentos', ['apartamentos' => $apartamentos]);
+    }
+
+    /**
+     * GET /admin/apartamento/(:num)/detalle
+     *
+     * API JSON: Retorna detalle de un apartamento con habitantes y estado de cuenta.
+     */
+    public function detalleApartamento(int $apartamentoId)
+    {
+        $apartamentoModel = new ApartamentoModel();
+        $habitanteModel   = new HabitanteModel();
+        $reciboModel      = new ReciboModel();
+
+        $apartamento = $apartamentoModel
+            ->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo, residentes.cedula_identidad, residentes.telefono')
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->where('apartamentos.id', $apartamentoId)
+            ->first();
+
+        if (!$apartamento) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Apartamento no encontrado.'])->setStatusCode(404);
         }
 
-        return view('admin/residentes', ['residentes' => $residentes]);
+        // Habitantes (censo) — Admin ve TODOS los estados (aprobados, pendientes, rechazados)
+        $habitantes = $habitanteModel->listarTodosPorApartamento($apartamentoId);
+
+        // Recibos pendientes (deudas)
+        $recibosPendientes = $reciboModel
+            ->where('apartamento_id', $apartamentoId)
+            ->where('estado_pago', 'Pendiente')
+            ->orderBy('anio', 'DESC')
+            ->orderBy('mes', 'DESC')
+            ->findAll();
+
+        $deudaTotal = 0;
+        foreach ($recibosPendientes as $r) {
+            $deudaTotal += (float) $r['monto_total'];
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data'   => [
+                'apartamento'       => $apartamento,
+                'habitantes'        => $habitantes,
+                'recibos_pendientes' => $recibosPendientes,
+                'deuda_total'       => $deudaTotal,
+            ],
+        ]);
     }
 
     /**
      * GET /admin/finanzas
      *
      * Redirige al submódulo de cobro (facturación masiva) como entrada principal.
-     * La vista admin/finanzas.php no existe como página independiente;
-     * los submódulos son: /admin/finanzas/cobro y /admin/finanzas/pagos
      */
     public function finanzas()
     {
@@ -102,6 +158,56 @@ class AdminController extends BaseController
             ->findAll();
 
         return view('admin/finanzas_pago', ['pagos' => $pagos]);
+    }
+
+    /**
+     * GET /admin/finanzas/morosidad
+     *
+     * Panel de control de morosidad: recibos pendientes organizados por mes/año.
+     */
+    public function morosidad()
+    {
+        $reciboModel      = new ReciboModel();
+        $apartamentoModel = new ApartamentoModel();
+
+        // Filtros opcionales por mes y año
+        $filtroMes  = $this->request->getGet('mes')  ? (int) $this->request->getGet('mes')  : null;
+        $filtroAnio = $this->request->getGet('anio') ? (int) $this->request->getGet('anio') : (int) date('Y');
+
+        // Consulta base: recibos pendientes con datos de apartamento y residente
+        $builder = $reciboModel
+            ->select('recibos_mensuales.*, apartamentos.nro_apartamento, apartamentos.nombre_edificio_torre, residentes.nombre_completo, residentes.telefono')
+            ->join('apartamentos', 'apartamentos.id = recibos_mensuales.apartamento_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->where('recibos_mensuales.estado_pago', 'Pendiente');
+
+        if ($filtroAnio) {
+            $builder->where('recibos_mensuales.anio', $filtroAnio);
+        }
+        if ($filtroMes) {
+            $builder->where('recibos_mensuales.mes', $filtroMes);
+        }
+
+        $morosos = $builder
+            ->orderBy('recibos_mensuales.anio', 'DESC')
+            ->orderBy('recibos_mensuales.mes', 'DESC')
+            ->orderBy('apartamentos.nro_apartamento', 'ASC')
+            ->findAll();
+
+        // Totales
+        $totalDeuda = 0;
+        foreach ($morosos as $m) {
+            $totalDeuda += (float) $m['monto_total'];
+        }
+
+        return view('admin/morosidad', [
+            'morosos'     => $morosos,
+            'total_deuda' => $totalDeuda,
+            'filtro_mes'  => $filtroMes,
+            'filtro_anio' => $filtroAnio,
+            'anio_actual' => (int) date('Y'),
+            'mes_actual'  => (int) date('n'),
+        ]);
     }
 
     /**

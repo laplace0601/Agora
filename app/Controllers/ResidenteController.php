@@ -248,4 +248,23 @@ class ResidenteController extends BaseController
             'recibos_pagados'    => $recibosPagados,
         ]);
     }
+
+    /**
+     * GET /residente/habitantes
+     *
+     * Vista del censo de habitantes del apartamento del residente.
+     * Los residentes pueden ver sus habitantes aprobados y solicitudes pendientes,
+     * y enviar nuevas solicitudes que requieren aprobación del admin.
+     */
+    public function habitantes()
+    {
+        $usuarioId = session()->get('usuario_id');
+
+        $apartamentoModel = new ApartamentoModel();
+        $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
+
+        return view('residente/habitantes', [
+            'apartamentos' => $apartamentos,
+        ]);
+    }
 }

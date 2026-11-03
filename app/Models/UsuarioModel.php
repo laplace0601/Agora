@@ -22,9 +22,14 @@ class UsuarioModel extends Model
 
     protected $useTimestamps = false;
 
+    // ---------------------------------------------------------------
+    // Reglas de validación — 'clave' NO es required para permitir
+    // updates sin cambio de contraseña. La obligatoriedad en insert
+    // se maneja en el callback beforeInsert y en los controladores.
+    // ---------------------------------------------------------------
     protected $validationRules = [
         'correo' => 'required|valid_email|max_length[255]|is_unique[usuarios.correo,id,{id}]',
-        'clave'  => 'required|min_length[6]',
+        'clave'  => 'permit_empty|min_length[6]',
         'rol'    => 'required|in_list[root,admin,residente]',
         'estado' => 'permit_empty|in_list[activo,inactivo,eliminado]',
     ];
@@ -36,7 +41,6 @@ class UsuarioModel extends Model
             'is_unique'   => 'Este correo ya está registrado en el sistema.',
         ],
         'clave' => [
-            'required'   => 'La contraseña es obligatoria.',
             'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
         ],
         'rol' => [
@@ -54,11 +58,14 @@ class UsuarioModel extends Model
 
     protected function hashearClave(array $data): array
     {
-        if (isset($data['data']['clave'])) {
+        if (isset($data['data']['clave']) && ! empty($data['data']['clave'])) {
             $data['data']['clave'] = password_hash(
                 $data['data']['clave'],
                 PASSWORD_BCRYPT
             );
+        } else {
+            // Si la clave viene vacía en un update, no la tocamos
+            unset($data['data']['clave']);
         }
 
         return $data;

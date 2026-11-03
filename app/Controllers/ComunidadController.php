@@ -8,9 +8,10 @@ use App\Models\ComunicadoModel;
 class ComunidadController extends BaseController
 {
     /**
-     * POST /crm/comunidad/comunicado
+     * POST /crm/comunidad/comunicado  o  POST /admin/cartelera/publicar
      *
      * El admin publica una noticia o comunicado en la bitácora/cartelera digital.
+     * Soporta adjuntar una imagen (jpg, png, webp, máx 2MB).
      * Solo para rol 'admin'.
      */
     public function crearComunicado()
@@ -18,20 +19,64 @@ class ComunidadController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los administradores pueden publicar comunicados.',
-            ])->setStatusCode(403);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Acceso denegado. Solo los administradores pueden publicar comunicados.',
+                ])->setStatusCode(403);
+            }
+            return redirect()->back()->with('error', 'Acceso denegado.');
         }
 
         $titulo    = trim($this->request->getPost('titulo') ?? '');
-        $contenido = trim($this->request->getPost('contenido') ?? '');
+        $contenido = trim($this->request->getPost('contenido') ?? $this->request->getPost('descripcion') ?? '');
 
         if ($titulo === '' || $contenido === '') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El título y el contenido son obligatorios.',
-            ])->setStatusCode(400);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'El título y el contenido son obligatorios.',
+                ])->setStatusCode(400);
+            }
+            return redirect()->back()->with('error', 'El título y el contenido son obligatorios.');
+        }
+
+        // ---------------------------------------------------------------
+        // Procesamiento de imagen adjunta (ETAPA 1)
+        // ---------------------------------------------------------------
+        $imagenUrl = null;
+        $imagen    = $this->request->getFile('imagen');
+
+        if ($imagen && $imagen->isValid() && ! $imagen->hasMoved()) {
+            // Validar tipo y tamaño (máx 2MB)
+            $reglas = [
+                'imagen' => [
+                    'rules'  => 'uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]|mime_in[imagen,image/jpeg,image/png,image/webp]',
+                    'errors' => [
+                        'max_size' => 'La imagen no debe superar los 2 MB.',
+                        'is_image' => 'El archivo debe ser una imagen válida.',
+                        'mime_in'  => 'Solo se permiten imágenes JPG, PNG o WebP.',
+                    ],
+                ],
+            ];
+
+            if (! $this->validate($reglas)) {
+                $erroresImg = implode(' ', $this->validator->getErrors());
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'status'  => 'error',
+                        'message' => $erroresImg,
+                    ])->setStatusCode(400);
+                }
+                return redirect()->back()->with('error', $erroresImg);
+            }
+
+            // Mover el archivo a public/uploads/bitacora/
+            $nuevoNombre = $imagen->getRandomName();
+            $imagen->move(FCPATH . 'uploads/bitacora', $nuevoNombre);
+
+            // Guardar la ruta relativa para la BD
+            $imagenUrl = 'uploads/bitacora/' . $nuevoNombre;
         }
 
         $comunicadoModel = new ComunicadoModel();
@@ -40,24 +85,33 @@ class ComunidadController extends BaseController
             'autor_id'          => $session->get('usuario_id'),
             'titulo'            => $titulo,
             'contenido'         => $contenido,
+            'imagen_url'        => $imagenUrl,
             'fecha_publicacion' => date('Y-m-d H:i:s'),
         ];
 
         if (! $comunicadoModel->insert($datos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Error al publicar el comunicado.',
-                'errors'  => $comunicadoModel->errors(),
-            ])->setStatusCode(422);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Error al publicar el comunicado.',
+                    'errors'  => $comunicadoModel->errors(),
+                ])->setStatusCode(422);
+            }
+            return redirect()->back()->with('error', 'Error al publicar el comunicado.');
         }
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Comunicado publicado exitosamente.',
-            'data'    => [
-                'comunicado_id' => $comunicadoModel->getInsertID(),
-            ],
-        ]);
+        // Respuesta dual: soporta tanto AJAX como formulario estándar
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Comunicado publicado exitosamente.',
+                'data'    => [
+                    'comunicado_id' => $comunicadoModel->getInsertID(),
+                ],
+            ]);
+        }
+
+        return redirect()->to(site_url('admin/cartelera'))->with('success', 'Comunicado publicado exitosamente.');
     }
 
     /**

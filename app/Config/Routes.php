@@ -72,6 +72,37 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->post('finanzas/validar-pago', 'FinanzasController::validarPago');       // ex AdminController::validarPago
     $routes->post('cartelera/publicar',    'ComunidadController::crearComunicado'); // ex AdminController::publicarAnuncio
     $routes->get('cartelera/eliminar/(:num)', 'AdminController::eliminarAnuncio/$1');
+
+    // Morosidad / Estado de cuentas
+    $routes->get('finanzas/morosidad',             'AdminController::morosidad');
+
+    // Detalle de apartamento (AJAX / JSON)
+    $routes->get('apartamento/(:num)/detalle',     'AdminController::detalleApartamento/$1');
+
+    // ---------------------------------------------------------------
+    // ETAPA 2: Censo de Habitantes
+    // ---------------------------------------------------------------
+    $routes->get('apartamento/(:num)/habitantes',  'HabitantesController::listar/$1');
+    $routes->post('habitantes/guardar',            'HabitantesController::guardar');
+    $routes->post('habitantes/eliminar',           'HabitantesController::eliminar');
+    $routes->get('habitantes/obtener/(:num)',      'HabitantesController::obtener/$1');
+
+    // Aprobación / Rechazo de solicitudes de habitantes
+    $routes->post('habitantes/aprobar',            'HabitantesController::aprobar');
+    $routes->post('habitantes/rechazar',           'HabitantesController::rechazar');
+    $routes->get('habitantes/pendientes',          'HabitantesController::pendientes');
+
+    // ---------------------------------------------------------------
+    // ETAPA 3: Áreas Comunes y Reservas
+    // ---------------------------------------------------------------
+    $routes->get('areas-comunes',                    'AreasReservasController::areasComunes');
+    $routes->post('areas-comunes/guardar',           'AreasReservasController::guardarArea');
+    $routes->get('areas-comunes/eliminar/(:num)',    'AreasReservasController::eliminarArea/$1');
+
+    $routes->get('reservas',                         'AreasReservasController::listarReservas');
+    $routes->get('reservas/nueva',                   'AreasReservasController::formularioReserva');
+    $routes->post('reservas/crear',                  'AreasReservasController::crearReserva');
+    $routes->post('reservas/cancelar',               'AreasReservasController::cancelarReserva');
 });
 
 // ---------------------------------------------------------------
@@ -84,7 +115,21 @@ $routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
     $routes->get('soporte',       'ResidenteController::soporte');
     $routes->post('soporte/abrir', 'ResidenteController::abrirTicket');
     $routes->get('finanzas',      'ResidenteController::finanzas');
+
+    // ETAPA 3: Reservas para residentes
+    $routes->get('reservas',           'AreasReservasController::formularioReserva');
+    $routes->post('reservas/crear',    'AreasReservasController::crearReserva');
+
+    // Censo de habitantes (residente solicita, admin aprueba)
+    $routes->get('habitantes',              'ResidenteController::habitantes');
+    $routes->get('habitantes/listar',       'HabitantesController::listarMisHabitantes');
+    $routes->post('habitantes/solicitar',   'HabitantesController::solicitar');
 });
+
+// ---------------------------------------------------------------
+// API pública (requiere sesión genérica)
+// ---------------------------------------------------------------
+$routes->get('api/reservas/disponibilidad', 'AreasReservasController::disponibilidad');
 
 // ---------------------------------------------------------------
 // CRM — API JSON (endpoints consumidos por el frontend vía fetch/AJAX)

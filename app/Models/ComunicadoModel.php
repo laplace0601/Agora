@@ -21,6 +21,7 @@ class ComunicadoModel extends Model
         'autor_id',
         'titulo',
         'contenido',
+        'imagen_url',              // Ruta relativa a la imagen adjunta (nullable)
         'fecha_publicacion',
         'estado',                  // 'publicado' | 'borrado'
     ];

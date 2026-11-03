@@ -28,6 +28,26 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
                                 <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> <?= date('d/m/Y h:i A', strtotime($comunicado['fecha_publicacion'])) ?></small>
                             </div>
                             <h2 class="h5 fw-bold text-dark mb-2"><?= htmlspecialchars($comunicado['titulo']) ?></h2>
+
+                            <!-- Imagen adjunta responsiva con lightbox -->
+                            <?php if (!empty($comunicado['imagen_url'])): ?>
+                                <div class="mb-3">
+                                    <div class="ratio ratio-16x9 bg-light rounded-3 overflow-hidden">
+                                        <img src="<?= base_url($comunicado['imagen_url']) ?>" 
+                                             alt="Imagen adjunta" 
+                                             class="img-fluid w-100 img-comunicado-zoom" 
+                                             style="object-fit: cover; cursor: pointer;"
+                                             role="button"
+                                             tabindex="0"
+                                             title="Clic para ampliar"
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#modalImagenZoom"
+                                             data-img-src="<?= base_url($comunicado['imagen_url']) ?>"
+                                             data-img-alt="<?= htmlspecialchars($comunicado['titulo']) ?>">
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
                             <p class="text-secondary small lh-base">
                                 <?= nl2br(htmlspecialchars($comunicado['contenido'])) ?>
                             </p>
@@ -65,6 +85,18 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
                     <span><i class="bi bi-file-earmark-text me-2 text-info"></i> Mis Recibos y Solvencias</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
+
+                <!-- Censo de habitantes -->
+                <a href="<?= site_url('residente/habitantes') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-people-fill me-2 text-primary"></i> Mi Censo de Habitantes</span>
+                    <i class="bi bi-chevron-right small text-muted"></i>
+                </a>
+
+                <!-- ETAPA 3: Acceso rápido a reservas -->
+                <a href="<?= site_url('residente/reservas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-calendar-check me-2 text-success"></i> Reservar Área Común</span>
+                    <i class="bi bi-chevron-right small text-muted"></i>
+                </a>
             </div>
 
             <div class="card-estado-cuenta mt-4 p-4 text-white">
@@ -80,5 +112,63 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
 
     </div>
 </main>
+
+<!-- ============================================================= -->
+<!-- Modal: Lightbox / Zoom de Imagen (Residente)                  -->
+<!-- ============================================================= -->
+<div class="modal fade" id="modalImagenZoom" tabindex="-1" aria-labelledby="modalImagenZoomLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title text-white fw-bold" id="modalImagenZoomLabel">Imagen</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center p-2">
+                <img id="zoomImgSrc" src="" alt="" 
+                     class="img-fluid rounded-4 shadow-lg" 
+                     style="max-height: 80vh; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script: Lightbox para imágenes de comunicados -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modalZoom = document.getElementById('modalImagenZoom');
+    if (modalZoom) {
+        modalZoom.addEventListener('show.bs.modal', function(event) {
+            const trigger = event.relatedTarget;
+            const imgSrc = trigger.getAttribute('data-img-src');
+            const imgAlt = trigger.getAttribute('data-img-alt') || 'Imagen ampliada';
+            
+            document.getElementById('zoomImgSrc').src = imgSrc;
+            document.getElementById('zoomImgSrc').alt = imgAlt;
+            document.getElementById('modalImagenZoomLabel').textContent = imgAlt;
+        });
+
+        modalZoom.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('zoomImgSrc').src = '';
+        });
+    }
+});
+</script>
+
+<!-- Estilo adicional para el lightbox -->
+<style>
+    #modalImagenZoom .modal-dialog {
+        max-width: 90vw;
+    }
+    #modalImagenZoom .modal-content {
+        background: rgba(0, 0, 0, 0.92) !important;
+    }
+    .img-comunicado-zoom:hover {
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+    }
+    .img-comunicado-zoom {
+        transition: opacity 0.2s ease;
+    }
+</style>
 
 <?php echo view('template/residente_footer', ['pagina_actual' => $pagina_actual]); ?>

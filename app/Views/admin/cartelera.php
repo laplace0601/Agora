@@ -49,6 +49,24 @@
                        class="btn-eliminar" 
                        title="Eliminar anuncio"
                        onclick="return confirm('¿Eliminar este anuncio?');">&times;</a>
+
+                    <!-- Imagen adjunta con lightbox -->
+                    <?php if (!empty($anuncio['imagen_url'])): ?>
+                        <div class="ratio ratio-16x9 bg-light">
+                            <img src="<?= base_url($anuncio['imagen_url']) ?>" 
+                                 alt="Imagen del anuncio" 
+                                 class="card-img-top img-anuncio-zoom" 
+                                 style="object-fit: cover; cursor: pointer;"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Clic para ampliar"
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#modalImagenZoom"
+                                 data-img-src="<?= base_url($anuncio['imagen_url']) ?>"
+                                 data-img-alt="<?= htmlspecialchars($anuncio['titulo']) ?>">
+                        </div>
+                    <?php endif; ?>
+
                     <div class="card-body pt-4 pe-4">
                         <h2 class="h5 fw-bold text-dark pe-3 mb-2"><?= htmlspecialchars($anuncio['titulo']) ?></h2>
                         <p class="text-secondary small lh-base"><?= nl2br(htmlspecialchars($anuncio['contenido'])) ?></p>
@@ -68,7 +86,26 @@
     </section>
 </main>
 
-<!-- Modal: Nuevo Anuncio -->
+<!-- ============================================================= -->
+<!-- Modal: Lightbox / Zoom de Imagen                              -->
+<!-- ============================================================= -->
+<div class="modal fade" id="modalImagenZoom" tabindex="-1" aria-labelledby="modalImagenZoomLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title text-white fw-bold" id="modalImagenZoomLabel">Imagen</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center p-2">
+                <img id="zoomImgSrc" src="" alt="" 
+                     class="img-fluid rounded-4 shadow-lg" 
+                     style="max-height: 80vh; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Nuevo Anuncio (ETAPA 1: con enctype multipart y campo de imagen) -->
 <div class="modal fade" id="modalNuevoAnuncio" tabindex="-1" aria-labelledby="modalNuevoAnuncioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow">
@@ -76,16 +113,30 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalNuevoAnuncioLabel">Publicar Nuevo Anuncio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/cartelera/publicar') ?>" method="POST">
+            <form action="<?= site_url('admin/cartelera/publicar') ?>" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="titulo" name="titulo" required placeholder="Título">
                         <label for="titulo">Título del Anuncio *</label>
                     </div>
-                    <div class="form-floating mb-2">
+                    <div class="form-floating mb-3">
                         <textarea class="form-control" id="descripcion" name="descripcion" style="height: 120px" required placeholder="Descripción"></textarea>
                         <label for="descripcion">Descripción detallada *</label>
+                    </div>
+
+                    <!-- Campo de imagen adjunta -->
+                    <div class="mb-2">
+                        <label for="imagen" class="form-label small text-secondary">
+                            <i class="bi bi-image me-1"></i> Imagen adjunta (opcional — JPG, PNG o WebP, máx 2 MB)
+                        </label>
+                        <input type="file" class="form-control" id="imagen" name="imagen" 
+                               accept="image/jpeg,image/png,image/webp">
+                        <!-- Preview de la imagen seleccionada -->
+                        <div id="imagenPreview" class="mt-2 d-none">
+                            <img id="imagenPreviewImg" src="" alt="Vista previa" 
+                                 class="img-fluid rounded-3 border" style="max-height: 150px;">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
@@ -131,5 +182,66 @@
         </div>
     </div>
 </div>
+
+<!-- Scripts: Vista previa de imagen + Lightbox -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Vista previa de imagen al crear anuncio ---
+    const inputImagen = document.getElementById('imagen');
+    const preview = document.getElementById('imagenPreview');
+    const previewImg = document.getElementById('imagenPreviewImg');
+
+    if (inputImagen) {
+        inputImagen.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    preview.classList.remove('d-none');
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        });
+    }
+
+    // --- Lightbox: Al hacer clic en una imagen del feed, cargarla en el modal ---
+    const modalZoom = document.getElementById('modalImagenZoom');
+    if (modalZoom) {
+        modalZoom.addEventListener('show.bs.modal', function(event) {
+            const trigger = event.relatedTarget;
+            const imgSrc = trigger.getAttribute('data-img-src');
+            const imgAlt = trigger.getAttribute('data-img-alt') || 'Imagen ampliada';
+            
+            document.getElementById('zoomImgSrc').src = imgSrc;
+            document.getElementById('zoomImgSrc').alt = imgAlt;
+            document.getElementById('modalImagenZoomLabel').textContent = imgAlt;
+        });
+
+        // Limpiar imagen al cerrar el modal para evitar flash del anterior
+        modalZoom.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('zoomImgSrc').src = '';
+        });
+    }
+});
+</script>
+
+<!-- Estilo adicional para el fondo oscuro del lightbox -->
+<style>
+    #modalImagenZoom .modal-dialog {
+        max-width: 90vw;
+    }
+    #modalImagenZoom .modal-content {
+        background: rgba(0, 0, 0, 0.92) !important;
+    }
+    .img-anuncio-zoom:hover {
+        opacity: 0.85;
+        transition: opacity 0.2s ease;
+    }
+    .img-anuncio-zoom {
+        transition: opacity 0.2s ease;
+    }
+</style>
 
 <?php echo view('template/admin_footer', ['pagina_actual' => $pagina_actual]); ?>
