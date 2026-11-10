@@ -25,14 +25,12 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
 
     <div class="mb-5 border-bottom pb-4">
         <h1 class="fw-bold h3 text-dark mb-1">Personalización de Marca</h1>
-        <p class="text-secondary small mb-0">Adapta la interfaz del sistema con la identidad visual, logotipos y paleta de colores de tu condominio.</p>
+        <p class="text-secondary small mb-0">Adapta la interfaz del sistema con la identidad visual, logotipos y datos de pago de tu condominio.</p>
     </div>
 
-    <div class="row g-4">
-        <!-- ================================================================ -->
-        <!-- COLUMNA IZQUIERDA: Formulario de configuración                   -->
-        <!-- ================================================================ -->
-        <div class="col-12 col-lg-6">
+    <!-- Contenedor general ampliado al 100% (col-12) sin la vista previa lateral -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border border-light">
                 <div class="card-body">
                     <h2 class="h5 fw-bold text-dark mb-4"><i class="bi bi-sliders me-2 text-agora-teal"></i>Ajustes de Identidad</h2>
@@ -44,7 +42,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                         <div class="form-floating mb-4">
                             <input type="text" class="form-control" id="custom-title" name="nombre_empresa" placeholder="Ágora Residencias" required value="<?= esc($marca['nombre_empresa'] ?? '') ?>">
                             <label for="custom-title">Nombre Comercial del Condominio *</label>
-                            <div class="form-text small text-muted">Este nombre reemplazará al texto genérico en las facturas y correos.</div>
+                            <div class="form-text small text-muted">Este nombre reemplazará al texto genérico en las cabeceras, recibos y correos.</div>
                         </div>
 
                         <!-- Logo Actual (preview) -->
@@ -92,11 +90,6 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                         </div>
 
                         <hr class="my-4">
-
-                        <!-- ============================================= -->
-                        <!-- SELECTORES DE COLOR                           -->
-                        <!-- ============================================= -->
-
 
                         <!-- Correo de Contacto -->
                         <div class="mb-4">
@@ -157,105 +150,8 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                 </div>
             </div>
         </div>
-
-        <!-- ================================================================ -->
-        <!-- COLUMNA DERECHA: Vista previa en vivo                            -->
-        <!-- ================================================================ -->
-        <div class="col-12 col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white border border-light h-100">
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h5 fw-bold text-dark mb-2"><i class="bi bi-eye me-2 text-agora-teal"></i>Vista Previa en Vivo</h2>
-                    <p class="text-secondary small mb-4">Observa cómo interactúan los colores elegidos simulando el menú lateral del sistema.</p>
-
-                    <div class="mockup-sidebar-container rounded-4 shadow-sm overflow-hidden flex-grow-1 p-4 d-flex align-items-center justify-content-center bg-light">
-                        <div id="preview-sidebar" class="mockup-sidebar p-3 text-white rounded-3 shadow d-flex flex-column" style="width: 260px; height: 320px; background: <?= esc($marca['color_primario'] ?? '#007bff') ?>; transition: background 0.3s ease;">
-                            <div class="text-center fw-bold py-2 border-bottom border-white border-opacity-10 fs-6">
-                                <span id="preview-logo-text"><?= esc(strtoupper($marca['nombre_empresa'] ?? 'MI CONDOMINIO')) ?></span>
-                            </div>
-                            <div class="d-flex flex-column gap-2 mt-4 flex-grow-1">
-                                <div id="preview-active-link" class="d-flex align-items-center py-2 px-3 rounded-2 small fw-semibold text-white shadow-sm" style="background: #C59B4E; transition: background 0.3s ease;">
-                                    <i class="bi bi-speedometer2 me-2"></i> Dashboard Activo
-                                </div>
-                                <div class="d-flex align-items-center py-2 px-3 rounded-2 small text-white text-opacity-50">
-                                    <i class="bi bi-building me-2"></i> Apartamentos
-                                </div>
-                                <div class="d-flex align-items-center py-2 px-3 rounded-2 small text-white text-opacity-50">
-                                    <i class="bi bi-cash-coin me-2"></i> Finanzas
-                                </div>
-                            </div>
-                            <div class="fs-8 text-center text-white text-opacity-25 mt-auto">Vista previa a escala</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
     </div>
 </main>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ---------------------------------------------------------------
-        // Referencias a elementos del DOM
-        // ---------------------------------------------------------------
-        const colorPrimary = document.getElementById('color-primary');
-        const colorPrimaryText = document.getElementById('color-primary-text');
-        const colorAccent = document.getElementById('color-accent');
-        const colorAccentText = document.getElementById('color-accent-text');
-        const previewSidebar = document.getElementById('preview-sidebar');
-        const previewActiveLink = document.getElementById('preview-active-link');
-        const previewLogoText = document.getElementById('preview-logo-text');
-        const customTitle = document.getElementById('custom-title');
-
-        // ---------------------------------------------------------------
-        // Color Primario: sincronizar picker ↔ texto ↔ preview
-        // ---------------------------------------------------------------
-        if (colorPrimary && colorPrimaryText) {
-            // Picker → texto + preview
-            colorPrimary.addEventListener('input', function() {
-                colorPrimaryText.value = this.value.toUpperCase();
-                if (previewSidebar) previewSidebar.style.background = this.value;
-            });
-
-            // Texto manual → picker + preview (permite escribir hex)
-            colorPrimaryText.removeAttribute('readonly');
-            colorPrimaryText.addEventListener('input', function() {
-                let val = this.value.trim();
-                if (!val.startsWith('#')) val = '#' + val;
-                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-                    colorPrimary.value = val;
-                    if (previewSidebar) previewSidebar.style.background = val;
-                }
-            });
-
-            // Al perder el foco, normalizar el valor del texto
-            colorPrimaryText.addEventListener('blur', function() {
-                this.value = colorPrimary.value.toUpperCase();
-            });
-        }
-
-        // ---------------------------------------------------------------
-        // Color de Acento: sincronizar picker ↔ texto ↔ preview
-        // ---------------------------------------------------------------
-        if (colorAccent && colorAccentText) {
-            colorAccent.addEventListener('input', function() {
-                colorAccentText.value = this.value.toUpperCase();
-                if (previewActiveLink) previewActiveLink.style.background = this.value;
-            });
-        }
-
-        // ---------------------------------------------------------------
-        // Nombre comercial → preview del sidebar
-        // ---------------------------------------------------------------
-        if (customTitle) {
-            customTitle.addEventListener('input', function() {
-                if (previewLogoText) {
-                    previewLogoText.textContent = this.value.toUpperCase() || 'MI CONDOMINIO';
-                }
-            });
-        }
-    });
-</script>
 
 <?php
 echo view('template/super_footer', ['pagina_actual' => 'admin_marca_blanca']);
