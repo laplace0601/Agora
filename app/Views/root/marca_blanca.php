@@ -96,26 +96,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                         <!-- ============================================= -->
                         <!-- SELECTORES DE COLOR                           -->
                         <!-- ============================================= -->
-                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-palette me-2 text-agora-teal"></i>Paleta de Colores</h6>
 
-                        <div class="row g-3 mb-4">
-                            <div class="col-12 col-sm-6">
-                                <label for="color-primary" class="form-label text-secondary small fw-bold text-uppercase">Color Primario</label>
-                                <div class="input-group">
-                                    <input type="color" class="form-control form-control-color border-end-0" id="color-primary" name="color_primario" value="<?= esc($marca['color_primario'] ?? '#007bff') ?>" title="Elige el color primario" style="min-height: 42px;">
-                                    <input type="text" class="form-control border-start-0 font-monospace small" id="color-primary-text" value="<?= esc(strtoupper($marca['color_primario'] ?? '#007BFF')) ?>" maxlength="7" style="text-transform: uppercase;">
-                                </div>
-                                <div class="form-text small text-muted">Aplica a la marca y acentos del navbar.</div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label for="color-accent" class="form-label text-secondary small fw-bold text-uppercase">Color de Acento (Vista previa)</label>
-                                <div class="input-group">
-                                    <input type="color" class="form-control form-control-color border-end-0" id="color-accent" value="#C59B4E" title="Elige el color de acento" style="min-height: 42px;">
-                                    <input type="text" class="form-control border-start-0 font-monospace small" id="color-accent-text" value="#C59B4E" maxlength="7" readonly style="text-transform: uppercase;">
-                                </div>
-                                <div class="form-text small text-muted">Solo para vista previa (no se guarda).</div>
-                            </div>
-                        </div>
 
                         <!-- Correo de Contacto -->
                         <div class="mb-4">
@@ -213,67 +194,67 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // ---------------------------------------------------------------
-    // Referencias a elementos del DOM
-    // ---------------------------------------------------------------
-    const colorPrimary     = document.getElementById('color-primary');
-    const colorPrimaryText = document.getElementById('color-primary-text');
-    const colorAccent      = document.getElementById('color-accent');
-    const colorAccentText  = document.getElementById('color-accent-text');
-    const previewSidebar   = document.getElementById('preview-sidebar');
-    const previewActiveLink = document.getElementById('preview-active-link');
-    const previewLogoText  = document.getElementById('preview-logo-text');
-    const customTitle      = document.getElementById('custom-title');
+    document.addEventListener('DOMContentLoaded', function() {
+        // ---------------------------------------------------------------
+        // Referencias a elementos del DOM
+        // ---------------------------------------------------------------
+        const colorPrimary = document.getElementById('color-primary');
+        const colorPrimaryText = document.getElementById('color-primary-text');
+        const colorAccent = document.getElementById('color-accent');
+        const colorAccentText = document.getElementById('color-accent-text');
+        const previewSidebar = document.getElementById('preview-sidebar');
+        const previewActiveLink = document.getElementById('preview-active-link');
+        const previewLogoText = document.getElementById('preview-logo-text');
+        const customTitle = document.getElementById('custom-title');
 
-    // ---------------------------------------------------------------
-    // Color Primario: sincronizar picker ↔ texto ↔ preview
-    // ---------------------------------------------------------------
-    if (colorPrimary && colorPrimaryText) {
-        // Picker → texto + preview
-        colorPrimary.addEventListener('input', function () {
-            colorPrimaryText.value = this.value.toUpperCase();
-            if (previewSidebar) previewSidebar.style.background = this.value;
-        });
+        // ---------------------------------------------------------------
+        // Color Primario: sincronizar picker ↔ texto ↔ preview
+        // ---------------------------------------------------------------
+        if (colorPrimary && colorPrimaryText) {
+            // Picker → texto + preview
+            colorPrimary.addEventListener('input', function() {
+                colorPrimaryText.value = this.value.toUpperCase();
+                if (previewSidebar) previewSidebar.style.background = this.value;
+            });
 
-        // Texto manual → picker + preview (permite escribir hex)
-        colorPrimaryText.removeAttribute('readonly');
-        colorPrimaryText.addEventListener('input', function () {
-            let val = this.value.trim();
-            if (!val.startsWith('#')) val = '#' + val;
-            if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-                colorPrimary.value = val;
-                if (previewSidebar) previewSidebar.style.background = val;
-            }
-        });
+            // Texto manual → picker + preview (permite escribir hex)
+            colorPrimaryText.removeAttribute('readonly');
+            colorPrimaryText.addEventListener('input', function() {
+                let val = this.value.trim();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    colorPrimary.value = val;
+                    if (previewSidebar) previewSidebar.style.background = val;
+                }
+            });
 
-        // Al perder el foco, normalizar el valor del texto
-        colorPrimaryText.addEventListener('blur', function () {
-            this.value = colorPrimary.value.toUpperCase();
-        });
-    }
+            // Al perder el foco, normalizar el valor del texto
+            colorPrimaryText.addEventListener('blur', function() {
+                this.value = colorPrimary.value.toUpperCase();
+            });
+        }
 
-    // ---------------------------------------------------------------
-    // Color de Acento: sincronizar picker ↔ texto ↔ preview
-    // ---------------------------------------------------------------
-    if (colorAccent && colorAccentText) {
-        colorAccent.addEventListener('input', function () {
-            colorAccentText.value = this.value.toUpperCase();
-            if (previewActiveLink) previewActiveLink.style.background = this.value;
-        });
-    }
+        // ---------------------------------------------------------------
+        // Color de Acento: sincronizar picker ↔ texto ↔ preview
+        // ---------------------------------------------------------------
+        if (colorAccent && colorAccentText) {
+            colorAccent.addEventListener('input', function() {
+                colorAccentText.value = this.value.toUpperCase();
+                if (previewActiveLink) previewActiveLink.style.background = this.value;
+            });
+        }
 
-    // ---------------------------------------------------------------
-    // Nombre comercial → preview del sidebar
-    // ---------------------------------------------------------------
-    if (customTitle) {
-        customTitle.addEventListener('input', function () {
-            if (previewLogoText) {
-                previewLogoText.textContent = this.value.toUpperCase() || 'MI CONDOMINIO';
-            }
-        });
-    }
-});
+        // ---------------------------------------------------------------
+        // Nombre comercial → preview del sidebar
+        // ---------------------------------------------------------------
+        if (customTitle) {
+            customTitle.addEventListener('input', function() {
+                if (previewLogoText) {
+                    previewLogoText.textContent = this.value.toUpperCase() || 'MI CONDOMINIO';
+                }
+            });
+        }
+    });
 </script>
 
 <?php
