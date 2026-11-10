@@ -14,12 +14,17 @@ class MarcaModel extends Model
     protected $allowedFields = [
         'nombre_empresa',
         'logo_url',
+        'login_bg_url',
         'color_primario',
         'correo_contacto',
+        'telefono_contacto',
         'nivel_licencia',
         'limite_apartamentos',
         'codigo_activacion',
         'fecha_actualizacion_plan',
+        'cedula_pago',
+        'telefono_pago',
+        'banco_pago',
     ];
 
     protected $useTimestamps = false;
@@ -28,8 +33,12 @@ class MarcaModel extends Model
     protected $validationRules = [
         'nombre_empresa'      => 'required|max_length[255]',
         'correo_contacto'     => 'required|valid_email|max_length[255]',
+        'telefono_contacto'   => 'permit_empty|max_length[50]',
         'nivel_licencia'      => 'permit_empty|max_length[50]',
         'limite_apartamentos' => 'permit_empty|integer',
+        'cedula_pago'         => 'permit_empty|max_length[20]',
+        'telefono_pago'       => 'permit_empty|max_length[30]',
+        'banco_pago'          => 'permit_empty|max_length[100]',
     ];
 
     protected $validationMessages = [

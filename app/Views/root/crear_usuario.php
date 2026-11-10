@@ -122,7 +122,7 @@
 
         <div class="tab-pane fade" id="panel-super" role="tabpanel">
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
-                <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Credenciales del Equipo Ágora Core</h2>
+                <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Credenciales del Equipo <?= esc(nombreEmpresa()) ?></h2>
                 <form action="<?= site_url('super/guardar-super') ?>" method="POST">
                     <?= csrf_field() ?>
                     <div class="row g-4">

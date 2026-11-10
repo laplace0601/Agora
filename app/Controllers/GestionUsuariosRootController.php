@@ -5,6 +5,12 @@ namespace App\Controllers;
 use App\Models\UsuarioModel;
 use CodeIgniter\API\ResponseTrait;
 
+/**
+ * GestionUsuariosRootController
+ *
+ * API JSON para gestión integral de usuarios desde el panel Root.
+ * Protegido doblemente: filtro de ruta + guardia de constructor.
+ */
 class GestionUsuariosRootController extends BaseController
 {
     use ResponseTrait;
@@ -38,6 +44,14 @@ class GestionUsuariosRootController extends BaseController
         return $this->response->setJSON(['status' => 'success', 'data' => $usuarios]);
     }
 
+    /**
+     * POST /super/api/usuarios/update/(:num)
+     *
+     * Actualiza datos de un usuario. Maneja el cambio de contraseña de forma segura:
+     * - Validación manual del correo (unicidad excluyendo al usuario actual)
+     * - Hash de contraseña via PASSWORD_BCRYPT
+     * - No falla si la contraseña no se cambia (campo vacío)
+     */
     public function update($id = null)
     {
         if (!$id) {
@@ -56,29 +70,92 @@ class GestionUsuariosRootController extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado.']);
         }
 
-        $data = [
-            'correo' => $this->request->getPost('correo'),
-            'rol'    => $this->request->getPost('rol'),
-            'estado' => $this->request->getPost('estado'),
-        ];
-
-        // Solo actualizar clave si el campo nueva_clave no está vacío
+        // --- Recoger datos del POST ---
+        $correo = trim($this->request->getPost('correo') ?? '');
+        $rol    = $this->request->getPost('rol');
+        $estado = $this->request->getPost('estado');
         $nuevaClave = $this->request->getPost('nueva_clave');
-        if (!empty($nuevaClave)) {
-            // Se inyecta en 'clave' para que el callback 'hashearClave' del UsuarioModel 
-            // lo intercepte y aplique password_hash automáticamente.
-            $data['clave'] = $nuevaClave; 
-        }
 
-        if (!$usuarioModel->update($id, $data)) {
+        // --- Validación manual para evitar conflictos con reglas del modelo ---
+
+        // Validar correo obligatorio y formato
+        if (empty($correo) || ! filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             return $this->response->setStatusCode(422)->setJSON([
-                'error' => 'Error de validación.',
-                'detalles' => $usuarioModel->errors(),
-                'csrf' => csrf_hash()
+                'error'  => 'Debe ingresar un correo electrónico válido.',
+                'csrf'   => csrf_hash(),
             ]);
         }
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario actualizado exitosamente.', 'csrf' => csrf_hash()]);
+        // Validar unicidad del correo (excluyendo al usuario actual)
+        if ($correo !== $usuario['correo']) {
+            $existente = $usuarioModel->where('correo', $correo)
+                                      ->where('id !=', $id)
+                                      ->first();
+            if ($existente) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'error'  => "El correo '{$correo}' ya está registrado en otro usuario.",
+                    'csrf'   => csrf_hash(),
+                ]);
+            }
+        }
+
+        // Validar rol
+        if (! in_array($rol, ['root', 'admin', 'residente'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'error'  => 'El rol seleccionado no es válido.',
+                'csrf'   => csrf_hash(),
+            ]);
+        }
+
+        // Validar estado
+        if (! in_array($estado, ['activo', 'inactivo'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'error'  => 'El estado seleccionado no es válido.',
+                'csrf'   => csrf_hash(),
+            ]);
+        }
+
+        // Validar contraseña si se proporcionó
+        if (!empty($nuevaClave) && strlen($nuevaClave) < 6) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'error'  => 'La contraseña debe tener al menos 6 caracteres.',
+                'csrf'   => csrf_hash(),
+            ]);
+        }
+
+        // --- Construir datos de actualización ---
+        $data = [
+            'correo' => $correo,
+            'rol'    => $rol,
+            'estado' => $estado,
+        ];
+
+        // Solo incluir la clave si se proporcionó una nueva.
+        // Se envía en texto plano para que el callback 'beforeUpdate' del UsuarioModel
+        // realice el hashing de manera centralizada y segura (evita doble hashing).
+        if (!empty($nuevaClave)) {
+            $data['clave'] = $nuevaClave;
+        }
+
+        // Saltar validación del modelo (ya validamos manualmente arriba)
+        $usuarioModel->skipValidation(true);
+        
+        if (!$usuarioModel->protect(false)->update($id, $data)) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'error' => 'Error interno al actualizar el usuario.',
+                'csrf'  => csrf_hash(),
+            ]);
+        }
+
+        $usuarioModel->protect(true);
+
+        log_message('info', "[GestionUsuariosRoot] Usuario #{$id} actualizado por root #" . session()->get('usuario_id'));
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Usuario actualizado exitosamente.',
+            'csrf'    => csrf_hash(),
+        ]);
     }
 
     public function delete($id = null)
@@ -114,9 +191,12 @@ class GestionUsuariosRootController extends BaseController
         }
 
         // ELIMINACIÓN LÓGICA (Soft Delete Manual) y prevención de login
+        $usuarioModel->skipValidation(true);
         if (!$usuarioModel->update($id, ['estado' => 'eliminado'])) {
             return $this->response->setStatusCode(500)->setJSON(['error' => 'Error del servidor al intentar eliminar el usuario.', 'csrf' => csrf_hash()]);
         }
+
+        log_message('info', "[GestionUsuariosRoot] Usuario #{$id} eliminado lógicamente por root #" . session()->get('usuario_id'));
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario eliminado lógicamente de la plataforma.', 'csrf' => csrf_hash()]);
     }

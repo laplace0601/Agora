@@ -248,13 +248,91 @@ class SuperController extends BaseController
 
     public function marcaBlanca()
     {
-        return view('root/marca_blanca');
+        $marcaModel = new \App\Models\MarcaModel();
+        $marca = $marcaModel->find(1);
+        return view('root/marca_blanca', ['marca' => $marca]);
     }
 
     public function guardarMarcaBlanca()
     {
-        // TODO: Guardar logo y colores
-        return redirect()->to(site_url('super/marca-blanca'))->with('success', 'Identidad de marca actualizada.');
+        $marcaModel = new \App\Models\MarcaModel();
+
+        $data = [
+            'nombre_empresa'    => $this->request->getPost('nombre_empresa'),
+            'color_primario'    => $this->request->getPost('color_primario'),
+            'correo_contacto'   => $this->request->getPost('correo_contacto'),
+            'telefono_contacto' => $this->request->getPost('telefono_contacto'),
+            'cedula_pago'       => $this->request->getPost('cedula_pago'),
+            'telefono_pago'     => $this->request->getPost('telefono_pago'),
+            'banco_pago'        => $this->request->getPost('banco_pago'),
+        ];
+
+        // Manejo de subida de logo
+        $logo = $this->request->getFile('logo_condominio');
+        if ($logo && $logo->isValid() && !$logo->hasMoved()) {
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+            $allowedMimes = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/svg'];
+            $ext = strtolower($logo->getClientExtension());
+            $mime = strtolower($logo->getMimeType());
+
+            if (!in_array($ext, $allowedTypes) || !in_array($mime, $allowedMimes)) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', 'Formato de imagen no permitido o archivo inválido. Use: jpg, jpeg, png, webp o svg.');
+            }
+
+            if ($logo->getSizeByUnit('mb') > 2) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', 'El logo no debe superar los 2 MB.');
+            }
+
+            $uploadPath = FCPATH . 'uploads/branding/';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0775, true);
+            }
+
+            $newName = $logo->getRandomName();
+            $logo->move($uploadPath, $newName);
+            $data['logo_url'] = 'uploads/branding/' . $newName;
+        }
+
+        // Manejo de subida de imagen de fondo del login
+        $loginBg = $this->request->getFile('login_bg');
+        if ($loginBg && $loginBg->isValid() && !$loginBg->hasMoved()) {
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'webp'];
+            $allowedMimes = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp'];
+            $ext = strtolower($loginBg->getClientExtension());
+            $mime = strtolower($loginBg->getMimeType());
+
+            if (!in_array($ext, $allowedTypes) || !in_array($mime, $allowedMimes)) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', 'Formato de fondo de login no permitido. Use: jpg, jpeg, png o webp.');
+            }
+
+            if ($loginBg->getSizeByUnit('mb') > 5) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', 'La imagen de fondo del login no debe superar los 5 MB.');
+            }
+
+            $uploadPath = FCPATH . 'uploads/branding/';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0775, true);
+            }
+
+            $newName = 'login_bg_' . $loginBg->getRandomName();
+            $loginBg->move($uploadPath, $newName);
+            $data['login_bg_url'] = 'uploads/branding/' . $newName;
+        }
+
+        try {
+            $marcaModel->skipValidation(true)->update(1, $data);
+            log_message('info', '[Auditoría] Usuario ID ' . (session()->get('usuario_id') ?? session()->get('id_usuario')) . ' actualizó la configuración de marca blanca.');
+            return redirect()->to(site_url('super/marca-blanca'))
+                ->with('success', 'Identidad de marca actualizada correctamente.');
+        } catch (\Exception $e) {
+            log_message('error', '[MarcaBlanca] Error al guardar: ' . $e->getMessage());
+            return redirect()->to(site_url('super/marca-blanca'))
+                ->with('error', 'Ocurrió un error al guardar la configuración de marca.');
+        }
     }
 
 

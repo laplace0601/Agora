@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ágora — Panel Administrativo</title>
+    <title><?= nombreEmpresa() ?> — Panel Administrativo</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,6 +22,13 @@
     <?php if (isset($pagina_actual)): ?>
         <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css?v=' . time()) ?>">
     <?php endif; ?>
+
+    <!-- Variables CSS dinámicas desde Marca Blanca -->
+    <style>
+        :root {
+            --agora-primary: <?= colorPrimario() ?>;
+        }
+    </style>
 </head>
 
 <body>
@@ -31,8 +38,13 @@
         <div class="container-fluid px-4">
 
             <!-- Logo / Marca -->
-            <a class="navbar-brand fw-bold fs-4 text-dark" href="<?= site_url(session()->get('rol') === 'root' ? 'super/apartamentos' : 'admin/residentes') ?>">
-                <span style="color: #D97706;">Á</span>GORA
+            <a class="navbar-brand fw-bold fs-4 text-dark d-flex align-items-center" href="<?= site_url(session()->get('rol') === 'root' ? 'super/apartamentos' : 'admin/residentes') ?>">
+                <?php if (logoEmpresa()): ?>
+                    <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="height: 32px;" class="me-2 rounded">
+                    <span><?= esc(nombreEmpresa()) ?></span>
+                <?php else: ?>
+                    <span style="color: <?= colorPrimario() ?>;"><?= mb_substr(nombreEmpresa(), 0, 1) ?></span><?= mb_substr(nombreEmpresa(), 1) ?>
+                <?php endif; ?>
                 <span class="badge bg-warning text-dark ms-2 small fw-semibold" style="font-size: 0.6rem;">Admin</span>
             </a>
 

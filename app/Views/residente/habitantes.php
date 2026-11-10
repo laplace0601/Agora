@@ -64,6 +64,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formSolicitarHabitante">
+                <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="alert alert-info border-0 small py-2">
                         <i class="bi bi-info-circle me-1"></i>

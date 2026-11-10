@@ -58,13 +58,17 @@ class UsuarioModel extends Model
 
     protected function hashearClave(array $data): array
     {
-        if (isset($data['data']['clave']) && ! empty($data['data']['clave'])) {
-            $data['data']['clave'] = password_hash(
-                $data['data']['clave'],
-                PASSWORD_BCRYPT
-            );
+        if (isset($data['data']['clave']) && $data['data']['clave'] !== '') {
+            // Prevenir doble hashing: si la clave ya es un hash válido (ej. bcrypt), no volver a hashear
+            $info = password_get_info($data['data']['clave']);
+            if (empty($info['algo'])) {
+                $data['data']['clave'] = password_hash(
+                    $data['data']['clave'],
+                    PASSWORD_BCRYPT
+                );
+            }
         } else {
-            // Si la clave viene vacía en un update, no la tocamos
+            // Si la clave viene vacía o no fue enviada en un update, no sobreescribir la contraseña existente
             unset($data['data']['clave']);
         }
 

@@ -10,8 +10,9 @@
           <div class="row g-0">
 
             <div class="col-12 col-md-6">
+              <?php $bgLogin = loginBgEmpresa(); ?>
               <img class="img-fluid rounded-start w-100 h-100 object-fit-cover"
-                src="<?= base_url('images/edificio.jpg') ?>"
+                src="<?= $bgLogin ?? base_url('images/edificio.jpg') ?>"
                 alt="Condominio Residencial"
                 style="min-height: 520px; object-position: center;"
                 loading="lazy">
@@ -25,9 +26,13 @@
                     <div class="col-12">
                       <div class="mb-4 text-center">
                         <a href="<?= base_url('/') ?>">
-                          <img src="<?= base_url('images/agora.jpg') ?>" alt="Agora Logo" style="max-width: 200px; width: 100%; height: auto; border-radius: 8px;">
+                          <?php if (logoEmpresa()): ?>
+                            <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="max-width: 200px; width: 100%; height: auto; border-radius: 8px;">
+                          <?php else: ?>
+                            <img src="<?= base_url('images/agora.jpg') ?>" alt="Agora Logo" style="max-width: 200px; width: 100%; height: auto; border-radius: 8px;">
+                          <?php endif; ?>
                         </a>
-                        <h2 class="h5 text-center fw-bold text-dark mt-3">Sistema de Gestión de Condominios</h2>
+                        <h2 class="h5 text-center fw-bold text-dark mt-3"><?= esc(nombreEmpresa()) ?> — Sistema de Gestión</h2>
                         <p class="text-center text-muted small">Ingresa tus credenciales para acceder</p>
                       </div>
                     </div>
@@ -72,7 +77,7 @@
 
                       <div class="col-12">
                         <div class="d-grid">
-                          <button class="btn btn-agora btn-lg fw-bold" type="submit">Ingresar</button>
+                          <button class="btn btn-agora btn-lg fw-bold" type="submit" style="background-color: <?= colorPrimario() ?>;">Ingresar</button>
                         </div>
                       </div>
                     </div>
@@ -87,7 +92,7 @@
                   <div class="row">
                     <div class="col-12">
                       <p class="mb-0 mt-5 text-secondary text-center small">
-                        ¿Olvidaste tus datos? Llama a XXXX-XXXX 
+                        ¿Olvidaste tus datos? Llama a <?= esc(telefonoContacto()) ?>
                       </p>
                     </div>
                   </div>

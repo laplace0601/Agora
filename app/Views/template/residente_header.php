@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ágora - Portal Residencial</title>
+    <title><?= nombreEmpresa() ?> - Portal Residencial</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,14 +18,26 @@
     <?php if (isset($pagina_actual)): ?>
         <link rel="stylesheet" href="<?= base_url('css/' . $pagina_actual . '.css?v=' . time()) ?>">
     <?php endif; ?>
+
+    <!-- Variables CSS dinámicas desde Marca Blanca -->
+    <style>
+        :root {
+            --agora-primary: <?= colorPrimario() ?>;
+        }
+    </style>
 </head>
 
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-agora py-3" role="navigation">
         <div class="container">
-            <a class="navbar-brand brand-agora" href="<?= site_url('residente/dashboard') ?>">
-                <span style="color: #D97706;">Á</span>GORA
+            <a class="navbar-brand brand-agora d-flex align-items-center gap-2" href="<?= site_url('residente/dashboard') ?>">
+                <?php if (logoEmpresa()): ?>
+                    <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="height: 32px;">
+                    <span><?= esc(nombreEmpresa()) ?></span>
+                <?php else: ?>
+                    <span style="color: <?= colorPrimario() ?>;"><?= mb_substr(nombreEmpresa(), 0, 1) ?></span><?= mb_substr(nombreEmpresa(), 1) ?>
+                <?php endif; ?>
             </a>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <div class="d-flex align-items-center gap-3">

@@ -145,6 +145,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formAgregarHabitante">
+                <?= csrf_field() ?>
                 <input type="hidden" id="agregar_apto_id" name="apartamento_id">
                 <div class="modal-body px-4">
                     <div class="row g-3">
@@ -481,7 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const formData = new FormData();
             formData.append('id', id);
-            const resp = await fetch('<?= site_url('admin/habitantes/aprobar') ?>', { method: 'POST', body: formData });
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            const resp = await fetch('<?= site_url('admin/habitantes/aprobar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const result = await resp.json();
             if (result.status === 'success') {
                 // Recargar la vista actual
@@ -503,7 +505,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const formData = new FormData();
             formData.append('id', id);
-            const resp = await fetch('<?= site_url('admin/habitantes/rechazar') ?>', { method: 'POST', body: formData });
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            const resp = await fetch('<?= site_url('admin/habitantes/rechazar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const result = await resp.json();
             if (result.status === 'success') {
                 if (currentAptoId) await cargarDetalleApto(currentAptoId);
@@ -523,7 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const formData = new FormData();
             formData.append('id', id);
-            const resp = await fetch('<?= site_url('admin/habitantes/eliminar') ?>', { method: 'POST', body: formData });
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+            const resp = await fetch('<?= site_url('admin/habitantes/eliminar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const result = await resp.json();
             if (result.status === 'success') {
                 if (currentAptoId) await cargarDetalleApto(currentAptoId);

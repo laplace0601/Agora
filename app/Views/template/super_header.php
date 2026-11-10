@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SúperAdmin - Ágora Core Platform</title>
+    <title>SúperAdmin - <?= esc(nombreEmpresa()) ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,12 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="<?= site_url('super/apartamentos') ?>">
                 <span class="bg-primary text-white px-2 py-1 rounded fs-6"><i class="bi bi-shield-fill-check"></i></span>
-                <span>AGORA <span class="text-primary small fw-normal">CORE</span></span>
+                <?php if (logoEmpresa()): ?>
+                    <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="height: 28px;">
+                    <span class="text-light small fw-normal"><?= esc(nombreEmpresa()) ?></span>
+                <?php else: ?>
+                    <span><?= strtoupper(nombreEmpresa()) ?></span>
+                <?php endif; ?>
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSuper" aria-label="Toggle navigation">
@@ -58,6 +63,12 @@
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/planes' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
                             href="<?= site_url('super/planes') ?>">
                             <i class="bi bi-patch-check me-1"></i> Planes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/marca-blanca' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
+                            href="<?= site_url('super/marca-blanca') ?>">
+                            <i class="bi bi-palette me-1"></i> Marca Blanca
                         </a>
                     </li>
 
