@@ -2,6 +2,35 @@
 
 <?= $this->section('content') ?>
 
+<style>
+  /* Personalización verde para el inicio de sesión */
+  .btn-agora-login {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #ffffff !important;
+    transition: all 0.25s ease-in-out;
+  }
+  .btn-agora-login:hover {
+    background-color: #157347 !important;
+    border-color: #146c43 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.35);
+    transform: translateY(-1px);
+  }
+  .btn-agora-login:active {
+    background-color: #146c43 !important;
+    transform: translateY(0);
+  }
+  .form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.2);
+  }
+  .form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+  }
+</style>
+
 <section class="p-3 p-md-4 p-xl-5 vh-100 d-flex align-items-center">
   <div class="container">
     <div class="row justify-content-center">
@@ -77,7 +106,7 @@
 
                       <div class="col-12">
                         <div class="d-grid">
-                          <button class="btn btn-agora btn-lg fw-bold" type="submit" style="background-color: <?= colorPrimario() ?>;">Ingresar</button>
+                          <button class="btn btn-agora-login btn-lg fw-bold text-white shadow-sm" type="submit">Ingresar</button>
                         </div>
                       </div>
                     </div>

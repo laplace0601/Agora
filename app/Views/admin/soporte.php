@@ -1,6 +1,6 @@
-<?php 
-    $pagina_actual = 'admin_soporte'; 
-    echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
+<?php
+$pagina_actual = 'admin_soporte';
+echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
 <main class="container my-5" role="main">
@@ -31,7 +31,7 @@
                         <div class="col-12">
                             <div class="card-agora-form p-4">
                                 <div class="row align-items-center">
-                                    
+
                                     <!-- Info Ticket -->
                                     <div class="col-12 col-md-5 mb-3 mb-md-0">
                                         <div class="d-flex align-items-start">
@@ -68,10 +68,10 @@
                                             <a href="mailto:<?= esc($ticket['correo']) ?>" class="text-decoration-none small"><?= esc($ticket['correo']) ?></a>
                                         </div>
                                         <?php if (!empty($ticket['telefono'])): ?>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-telephone-fill text-muted me-2"></i>
-                                            <a href="tel:<?= esc($ticket['telefono']) ?>" class="text-decoration-none small text-secondary"><?= esc($ticket['telefono']) ?></a>
-                                        </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-telephone-fill text-muted me-2"></i>
+                                                <a href="tel:<?= esc($ticket['telefono']) ?>" class="text-decoration-none small text-secondary"><?= esc($ticket['telefono']) ?></a>
+                                            </div>
                                         <?php endif; ?>
                                     </div>
 
@@ -80,7 +80,7 @@
                                         <form action="<?= site_url('admin/soporte/validar') ?>" method="POST" class="d-inline-flex flex-column align-items-md-end w-100">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="ticket_id" value="<?= $ticket['id'] ?>">
-                                            
+
                                             <label class="small fw-semibold text-muted mb-2 text-start text-md-end w-100">Actualizar Estado:</label>
                                             <div class="input-group input-group-sm mb-2 w-100" style="max-width: 200px;">
                                                 <select class="form-select" name="estado">
@@ -88,7 +88,7 @@
                                                     <option value="En Proceso" <?= $ticket['estado'] === 'En Proceso' ? 'selected' : '' ?>>En Proceso</option>
                                                     <option value="Resuelto" <?= $ticket['estado'] === 'Resuelto' ? 'selected' : '' ?>>Resuelto</option>
                                                 </select>
-                                                <button type="submit" class="btn btn-primary px-3">Guardar</button>
+                                                <button type="submit" class="btn text-white px-3" style="background-color: #28a745;">Guardar</button>
                                             </div>
                                             <?php if ($ticket['estado'] === 'Resuelto' && !empty($ticket['fecha_resolucion'])): ?>
                                                 <small class="text-success"><i class="bi bi-check2-all me-1"></i> Resuelto el <?= date('d/m/Y', strtotime($ticket['fecha_resolucion'])) ?></small>

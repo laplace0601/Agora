@@ -29,7 +29,7 @@ class UsuarioModel extends Model
     // ---------------------------------------------------------------
     protected $validationRules = [
         'correo' => 'required|valid_email|max_length[255]|is_unique[usuarios.correo,id,{id}]',
-        'clave'  => 'permit_empty|min_length[6]',
+        'clave'  => 'permit_empty|min_length[8]',
         'rol'    => 'required|in_list[root,admin,residente]',
         'estado' => 'permit_empty|in_list[activo,inactivo,eliminado]',
     ];
@@ -41,7 +41,7 @@ class UsuarioModel extends Model
             'is_unique'   => 'Este correo ya está registrado en el sistema.',
         ],
         'clave' => [
-            'min_length' => 'La contraseña debe tener al menos 6 caracteres.',
+            'min_length' => 'La contraseña debe tener al menos 8 caracteres.',
         ],
         'rol' => [
             'required' => 'Debe asignar un rol al usuario.',

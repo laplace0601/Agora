@@ -51,11 +51,20 @@ class UsuarioController extends BaseController
         $cedula = trim($this->request->getPost('cedula') ?? '');
         $telefono = trim($this->request->getPost('telefono') ?? '');
         $correo = trim($this->request->getPost('correo') ?? '');
-        $clave = $this->request->getPost('clave');
+        $clave = (string) $this->request->getPost('clave');
+        $claveConfirm = (string) $this->request->getPost('clave_confirm');
         $apartamentoId = $this->request->getPost('apartamento_id');
 
-        if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId) || empty($clave)) {
+        if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId) || empty($clave) || empty($claveConfirm)) {
             return redirect()->back()->with('error', 'Faltan campos obligatorios para registrar el residente.');
+        }
+
+        if (strlen($clave) < 8) {
+            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+        }
+
+        if ($clave !== $claveConfirm) {
+            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Verificar que el apartamento NO esté ya asignado a otro residente
@@ -109,11 +118,20 @@ class UsuarioController extends BaseController
 
         $correo        = trim($this->request->getPost('correo') ?? '');
         $nombreUsuario = trim($this->request->getPost('nombre_usuario') ?? '');
-        $clave         = $this->request->getPost('clave');
+        $clave         = (string) $this->request->getPost('clave');
+        $claveConfirm  = (string) $this->request->getPost('clave_confirm');
 
         // Validación de campos obligatorios
-        if (empty($correo) || empty($nombreUsuario) || empty($clave)) {
-            return redirect()->back()->with('error', 'El correo, nombre de usuario y contraseña son obligatorios.');
+        if (empty($correo) || empty($nombreUsuario) || empty($clave) || empty($claveConfirm)) {
+            return redirect()->back()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
+        }
+
+        if (strlen($clave) < 8) {
+            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+        }
+
+        if ($clave !== $claveConfirm) {
+            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Prevención de correos duplicados
@@ -149,10 +167,19 @@ class UsuarioController extends BaseController
 
         $correo        = trim($this->request->getPost('correo') ?? '');
         $nombreUsuario = trim($this->request->getPost('nombre_usuario') ?? '');
-        $clave         = $this->request->getPost('clave');
+        $clave         = (string) $this->request->getPost('clave');
+        $claveConfirm  = (string) $this->request->getPost('clave_confirm');
 
-        if (empty($correo) || empty($nombreUsuario) || empty($clave)) {
-            return redirect()->back()->with('error', 'El correo, nombre de usuario y contraseña son obligatorios.');
+        if (empty($correo) || empty($nombreUsuario) || empty($clave) || empty($claveConfirm)) {
+            return redirect()->back()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
+        }
+
+        if (strlen($clave) < 8) {
+            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+        }
+
+        if ($clave !== $claveConfirm) {
+            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Prevención de correos duplicados

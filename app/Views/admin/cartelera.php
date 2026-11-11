@@ -27,7 +27,7 @@
             <p class="text-secondary small mb-0">Gestiona los comunicados activos que visualizan los residentes.</p>
         </div>
         <div class="d-flex gap-2">
-            <button type="button" class="btn btn-primary text-white rounded-pill px-4 py-2 small shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoAnuncio">
+            <button type="button" class="btn btn-success text-white rounded-pill px-4 py-2 small shadow-sm" style="background-color: #198754; border-color: #198754;" data-bs-toggle="modal" data-bs-target="#modalNuevoAnuncio">
                 <i class="bi bi-plus-lg me-1"></i> Añadir Anuncio
             </button>
             <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 small" data-bs-toggle="modal" data-bs-target="#modalHistorial">
@@ -140,7 +140,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-primary text-white w-100 py-2.5 rounded-3 fw-medium">
+                    <button type="submit" class="btn btn-success text-white w-100 py-2.5 rounded-3 fw-medium" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-send me-1"></i> Publicar en Cartelera
                     </button>
                 </div>

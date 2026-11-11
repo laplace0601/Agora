@@ -16,10 +16,10 @@
     <!-- Variables CSS dinámicas desde Marca Blanca -->
     <style>
         :root {
-            --agora-primary: <?= colorPrimario() ?>;
+            --agora-primary: #198754;
         }
-        .btn-agora { background-color: var(--agora-primary); }
-        .btn-agora:hover { background-color: var(--agora-primary); filter: brightness(0.85); }
+        .btn-agora { background-color: #198754; border-color: #198754; color: #fff; }
+        .btn-agora:hover { background-color: #157347; border-color: #146c43; color: #fff; }
     </style>
 </head>
 <body class="bg-light">

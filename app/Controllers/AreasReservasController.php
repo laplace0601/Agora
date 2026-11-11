@@ -42,7 +42,10 @@ class AreasReservasController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+            }
+            return redirect()->to(site_url('auth/login'))->with('error', 'Acceso denegado.');
         }
 
         $areaModel = new AreaComunModel();
@@ -57,17 +60,81 @@ class AreasReservasController extends BaseController
 
         if ($id) {
             if (! $areaModel->update($id, $datos)) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Error al actualizar.', 'errors' => $areaModel->errors()])->setStatusCode(422);
+                $errores = implode(', ', $areaModel->errors());
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al actualizar.', 'errors' => $areaModel->errors()])->setStatusCode(422);
+                }
+                return redirect()->to(site_url('admin/areas-comunes'))->with('error', 'Error al actualizar: ' . $errores);
             }
             session()->setFlashdata('success', 'Área común actualizada correctamente.');
         } else {
             if (! $areaModel->insert($datos)) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Error al crear.', 'errors' => $areaModel->errors()])->setStatusCode(422);
+                $errores = implode(', ', $areaModel->errors());
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al crear.', 'errors' => $areaModel->errors()])->setStatusCode(422);
+                }
+                return redirect()->to(site_url('admin/areas-comunes'))->with('error', 'Error al crear: ' . $errores);
             }
             session()->setFlashdata('success', 'Área común registrada correctamente.');
         }
 
         return redirect()->to(site_url('admin/areas-comunes'));
+    }
+
+    /**
+     * POST /admin/areas-comunes/cambiar-estado
+     *
+     * Cambia el estado de un área entre: Activo, Mantenimiento, Inactivo.
+     */
+    public function cambiarEstado()
+    {
+        $session = session();
+        if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+            }
+            return redirect()->to(site_url('auth/login'))->with('error', 'Acceso denegado.');
+        }
+
+        $id     = (int) $this->request->getPost('id');
+        $estado = trim($this->request->getPost('estado') ?? '');
+
+        if (! in_array($estado, ['Activo', 'Mantenimiento', 'Inactivo'], true)) {
+            $msg = 'Estado no válido. Debe ser: Activo, Mantenimiento o Inactivo.';
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(422);
+            }
+            return redirect()->to(site_url('admin/areas-comunes'))->with('error', $msg);
+        }
+
+        $areaModel = new AreaComunModel();
+        $area = $areaModel->find($id);
+        if (! $area) {
+            $msg = 'El área común seleccionada no existe.';
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(404);
+            }
+            return redirect()->to(site_url('admin/areas-comunes'))->with('error', $msg);
+        }
+
+        $areaModel->update($id, ['estado' => $estado]);
+
+        $mensajes = [
+            'Activo'        => "Área \"{$area['nombre']}\" activada con éxito. Ya está disponible para reservas.",
+            'Mantenimiento' => "Área \"{$area['nombre']}\" colocada en estado de Mantenimiento.",
+            'Inactivo'      => "Área \"{$area['nombre']}\" desactivada.",
+        ];
+        $msgFinal = $mensajes[$estado] ?? "Estado actualizado a {$estado}.";
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => $msgFinal,
+                'csrf'    => csrf_hash(),
+            ]);
+        }
+
+        return redirect()->to(site_url('admin/areas-comunes'))->with('success', $msgFinal);
     }
 
     /**
@@ -78,10 +145,12 @@ class AreasReservasController extends BaseController
     public function eliminarArea(int $id)
     {
         $areaModel = new AreaComunModel();
+        $area = $areaModel->find($id);
+        $nombre = $area['nombre'] ?? "#{$id}";
         $areaModel->update($id, ['estado' => 'Inactivo']);
 
         return redirect()->to(site_url('admin/areas-comunes'))
-            ->with('success', 'Área común desactivada.');
+            ->with('success', "Área común \"{$nombre}\" desactivada.");
     }
 
     // =================================================================

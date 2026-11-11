@@ -193,7 +193,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                             </div>
                         </div>
                         <div class="col-12 mt-4">
-                            <button type="submit" class="btn text-white w-100 py-3 rounded-pill fs-6 fw-bold shadow-sm" style="background: var(--agora-primary, #007bff); border: none;">
+                            <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-pill fs-6 fw-bold shadow-sm" style="background-color: #198754; border: none;">
                                 <i class="bi bi-send-check me-2"></i>Enviar Reporte de Pago
                             </button>
                         </div>

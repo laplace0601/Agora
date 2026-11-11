@@ -100,32 +100,44 @@ class FinanzasController extends BaseController
     }
 
     /**
-     * POST /crm/finanzas/facturar
+     * POST /crm/finanzas/facturar  y  POST /admin/finanzas/facturar
      *
      * Emite recibos mensuales masivos de forma segura usando transacciones.
      */
     public function emitirRecibos()
     {
         $session = session();
-        if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+        if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Acceso denegado. Se requiere rol de administrador.',
+                'csrf'    => csrf_hash(),
+            ])->setStatusCode(403);
         }
 
         $condominioId = (int) $this->request->getPost('condominio_id');
         $montoGlobal  = (float) $this->request->getPost('monto_global_gastos'); // Monto Base de Gastos Globales
         $mes          = (int) $this->request->getPost('mes');
         $anio         = (int) $this->request->getPost('anio');
-        $descripcion  = trim($this->request->getPost('descripcion') ?? '');
+        $descripcion  = trim((string) $this->request->getPost('descripcion'));
 
-        if ($condominioId <= 0 || $montoGlobal <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Datos inválidos. Verifique condominio_id, monto, mes y año.'])->setStatusCode(400);
+        if ($condominioId <= 0 || $montoGlobal <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000 || empty($descripcion)) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Datos inválidos. Verifique el condominio, monto, mes (1-12), año y la descripción del cobro (obligatoria).',
+                'csrf'    => csrf_hash(),
+            ])->setStatusCode(400);
         }
 
         $apartamentoModel = new ApartamentoModel();
         $apartamentos = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
 
         if (empty($apartamentos)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'No se encontraron apartamentos.'])->setStatusCode(404);
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'No se encontraron apartamentos registrados para este condominio.',
+                'csrf'    => csrf_hash(),
+            ])->setStatusCode(404);
         }
 
         // 1. Filtrar los apartamentos ocupados antes de entrar al bucle
@@ -138,8 +150,9 @@ class FinanzasController extends BaseController
         // 2. Validación y cálculo de la distribución exacta
         if ($totalOcupados === 0) {
             return $this->response->setJSON([
-                'status' => 'error', 
-                'message' => 'No hay apartamentos con residentes asignados para facturar.'
+                'status'  => 'error', 
+                'message' => 'No hay apartamentos con residentes asignados para facturar en este condominio.',
+                'csrf'    => csrf_hash(),
             ])->setStatusCode(400);
         }
 
@@ -157,7 +170,7 @@ class FinanzasController extends BaseController
                 continue;
             }
 
-            // Asignación estricta del monto calculado sin usar alícuotas
+            // Asignación estricta del monto calculado
             $recibosBatch[] = [
                 'apartamento_id'  => $apto['id'],
                 'mes'             => $mes,
@@ -174,7 +187,8 @@ class FinanzasController extends BaseController
         if (empty($recibosBatch)) {
             return $this->response->setJSON([
                 'status'  => 'warning',
-                'message' => "No se generaron recibos. Los {$yaExistentes} apartamentos ya estaban facturados en este mes y año."
+                'message' => "No se generaron recibos. Los {$yaExistentes} apartamentos ya estaban facturados en este mes y año.",
+                'csrf'    => csrf_hash(),
             ]);
         }
 
@@ -182,33 +196,34 @@ class FinanzasController extends BaseController
         // TRANSACCIÓN DE BASE DE DATOS (SEGURIDAD DE INTEGRIDAD)
         // ---------------------------------------------------------------
         $db = \Config\Database::connect();
-        $db->transStart(); // Inicia la transacción
+        $db->transStart();
 
         try {
-            // Inserción en bloque masiva, más eficiente que N inserts
             $reciboModel->insertBatch($recibosBatch);
         } catch (\Exception $e) {
-            $db->transRollback(); // Revertir todo si falla uno solo
+            $db->transRollback();
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Fallo crítico en la base de datos al generar facturas. Ningún recibo fue emitido por seguridad.',
-                'error'   => $e->getMessage()
+                'error'   => $e->getMessage(),
+                'csrf'    => csrf_hash(),
             ])->setStatusCode(500);
         }
 
-        $db->transComplete(); // Confirmar la transacción si todo fue bien
+        $db->transComplete();
 
-        // Segunda capa de seguridad de transacción
         if ($db->transStatus() === false) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'La transacción falló y ha sido revertida de forma segura por el motor de base de datos.'
+                'message' => 'La transacción falló y ha sido revertida de forma segura por el motor de base de datos.',
+                'csrf'    => csrf_hash(),
             ])->setStatusCode(500);
         }
 
         return $this->response->setJSON([
             'status'  => 'success',
             'message' => "Facturación masiva exitosa: " . count($recibosBatch) . " recibos emitidos.",
+            'csrf'    => csrf_hash(),
             'data'    => [
                 'recibos_emitidos'    => count($recibosBatch),
                 'recibos_ya_existian' => $yaExistentes,

@@ -61,7 +61,8 @@
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
                         <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña Temporal *</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="residente-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña Temporal * (mín. 8 caracteres)</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="residente-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
                         
                         <div class="col-md-6 form-floating">
                             <select class="form-select" name="condominio_id" id="residente-condominio" required>
@@ -112,7 +113,8 @@
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña *</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="admin-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña * (mín. 8 caracteres)</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="admin-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
                         
                         <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Dar de Alta Administrador</button></div>
                     </div>
@@ -128,7 +130,8 @@
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-12 form-floating"><input type="password" class="form-control" name="clave" placeholder="Contraseña" required minlength="6"><label class="ms-2">Contraseña *</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="super-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña * (mín. 8 caracteres)</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="super-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
                         
                         <div class="col-12 mt-4"><button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-semibold shadow-sm"><i class="bi bi-shield-check me-2"></i>Registrar Súper Usuario Maestro</button></div>
                     </div>
@@ -174,6 +177,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Validación de coincidencia y longitud de contraseñas
+    const paresClaves = [
+        { clave: 'residente-clave', confirm: 'residente-clave-confirm' },
+        { clave: 'admin-clave', confirm: 'admin-clave-confirm' },
+        { clave: 'super-clave', confirm: 'super-clave-confirm' }
+    ];
+
+    paresClaves.forEach(par => {
+        const inputClave = document.getElementById(par.clave);
+        const inputConfirm = document.getElementById(par.confirm);
+        if (inputClave && inputConfirm) {
+            function validarCoincidencia() {
+                if (inputClave.value.length > 0 && inputClave.value.length < 8) {
+                    inputClave.setCustomValidity('La contraseña debe tener al menos 8 caracteres.');
+                } else {
+                    inputClave.setCustomValidity('');
+                }
+
+                if (inputConfirm.value.length > 0 && inputClave.value !== inputConfirm.value) {
+                    inputConfirm.setCustomValidity('Las contraseñas no coinciden.');
+                } else {
+                    inputConfirm.setCustomValidity('');
+                }
+            }
+            inputClave.addEventListener('input', validarCoincidencia);
+            inputConfirm.addEventListener('input', validarCoincidencia);
+        }
+    });
 });
 </script>
 

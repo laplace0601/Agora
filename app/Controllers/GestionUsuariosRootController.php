@@ -75,6 +75,7 @@ class GestionUsuariosRootController extends BaseController
         $rol    = $this->request->getPost('rol');
         $estado = $this->request->getPost('estado');
         $nuevaClave = $this->request->getPost('nueva_clave');
+        $nuevaClaveConfirm = $this->request->getPost('nueva_clave_confirm');
 
         // --- Validación manual para evitar conflictos con reglas del modelo ---
 
@@ -115,12 +116,20 @@ class GestionUsuariosRootController extends BaseController
             ]);
         }
 
-        // Validar contraseña si se proporcionó
-        if (!empty($nuevaClave) && strlen($nuevaClave) < 6) {
-            return $this->response->setStatusCode(422)->setJSON([
-                'error'  => 'La contraseña debe tener al menos 6 caracteres.',
-                'csrf'   => csrf_hash(),
-            ]);
+        // Validar contraseña si se proporcionó en cualquiera de las 2 casillas
+        if (!empty($nuevaClave) || !empty($nuevaClaveConfirm)) {
+            if (strlen((string) $nuevaClave) < 8) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'error'  => 'La nueva contraseña debe tener al menos 8 caracteres.',
+                    'csrf'   => csrf_hash(),
+                ]);
+            }
+            if ($nuevaClave !== $nuevaClaveConfirm) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'error'  => 'Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.',
+                    'csrf'   => csrf_hash(),
+                ]);
+            }
         }
 
         // --- Construir datos de actualización ---

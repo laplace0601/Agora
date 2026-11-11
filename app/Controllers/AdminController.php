@@ -268,15 +268,28 @@ class AdminController extends BaseController
     /**
      * GET /admin/cartelera/eliminar/(:num)
      *
-     * Cambia el estado de un comunicado a 'borrado' (soft delete).
-     * Permanece aquí por ser una acción GET del panel, sin equivalente en CRM.
+     * Cambia el estado de un comunicado a 'borrado' (soft delete)
+     * y elimina el archivo físico de imagen del backend para liberar espacio.
      */
     public function eliminarAnuncio(int $id)
     {
         $comunicadoModel = new ComunicadoModel();
-        $comunicadoModel->update($id, ['estado' => 'borrado']);
+        $comunicado = $comunicadoModel->find($id);
+
+        if ($comunicado) {
+            // Eliminar archivo de imagen físico si existía
+            if (!empty($comunicado['imagen_url'])) {
+                $comunicadoModel->eliminarArchivoImagen($comunicado['imagen_url']);
+            }
+
+            // Actualizar estado a borrado y limpiar la referencia de imagen
+            $comunicadoModel->update($id, [
+                'estado'     => 'borrado',
+                'imagen_url' => null,
+            ]);
+        }
 
         return redirect()->to(site_url('admin/cartelera'))
-            ->with('success', 'Anuncio eliminado.');
+            ->with('success', 'Anuncio eliminado correctamente.');
     }
 }

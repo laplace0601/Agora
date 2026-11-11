@@ -16,7 +16,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_planes']);
 <main class="p-5" role="main">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 border-bottom pb-4">
         <div>
-            <h1 class="fw-bold h3 text-dark mb-1">Mi Plan y Suscripción</h1>
+            <h1 class="fw-bold h3 text-dark mb-1">Mi Plan</h1>
             <p class="text-secondary small mb-0">Visualiza las capacidades de tu plan actual y gestiona escalabilidades o cambios de servicio.</p>
         </div>
         <div>

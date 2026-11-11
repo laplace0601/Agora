@@ -143,7 +143,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-agora-admin text-white w-100 py-2 rounded-pill fw-semibold shadow-sm mt-2">
+                        <button type="submit" class="btn btn-success text-white w-100 py-2 rounded-pill fw-semibold shadow-sm mt-2" style="background-color: #198754; border-color: #198754;">
                             <i class="bi bi-check-circle me-1"></i> Aplicar Identidad de Marca
                         </button>
                     </form>

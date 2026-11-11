@@ -83,7 +83,8 @@ if (! function_exists('colorPrimario')) {
      */
     function colorPrimario(): string
     {
-        return obtenerMarca()['color_primario'] ?? '#007bff';
+        $color = trim(obtenerMarca()['color_primario'] ?? '');
+        return !empty($color) ? $color : '#007bff';
     }
 }
 

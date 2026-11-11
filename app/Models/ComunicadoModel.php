@@ -79,4 +79,21 @@ class ComunicadoModel extends Model
                     ->orderBy('noticias_comunicados.fecha_publicacion', 'DESC')
                     ->findAll();
     }
+
+    /**
+     * Elimina físicamente la imagen asociada al comunicado si existe en el almacenamiento.
+     */
+    public function eliminarArchivoImagen(?string $imagenUrl): bool
+    {
+        if (empty($imagenUrl)) {
+            return false;
+        }
+
+        $rutaFisica = FCPATH . ltrim($imagenUrl, '/\\');
+        if (is_file($rutaFisica) && file_exists($rutaFisica)) {
+            return @unlink($rutaFisica);
+        }
+
+        return false;
+    }
 }

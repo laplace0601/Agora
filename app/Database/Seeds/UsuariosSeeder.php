@@ -22,7 +22,7 @@ class UsuariosSeeder extends Seeder
         $this->db->table('usuarios')->insert([
             'correo'         => 'admin@agora.com',
             'nombre_usuario' => 'admin',
-            'clave'          => password_hash('123456', PASSWORD_DEFAULT),
+            'clave'          => password_hash('bievenidoatucondominio2026', PASSWORD_DEFAULT),
             'rol'            => 'root',
             'estado'         => 'activo',
         ]);

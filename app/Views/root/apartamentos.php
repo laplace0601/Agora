@@ -28,11 +28,11 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
             <p class="text-secondary small mb-0">Registra y administra los condominios, torres y bloques de apartamentos.</p>
         </div>
         <div class="d-flex gap-2 flex-wrap">
-            <button type="button" class="btn btn-super-primary text-white rounded-pill px-4 py-2 shadow-sm fw-semibold" style="background-color: #0F172A; border-color: #0F172A;"
+            <button type="button" class="btn btn-success text-white rounded-pill px-4 py-2 shadow-sm fw-semibold" style="background-color: #198754; border-color: #198754;"
                 data-bs-toggle="modal" data-bs-target="#Mcondominiotorre">
                 <i class="bi bi-building-add me-1"></i> Registrar Condominio
             </button>
-            <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold"
+            <button type="button" class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold"
                 data-bs-toggle="modal" data-bs-target="#Mbloqueapartamento">
                 <i class="bi bi-door-open me-1"></i> Registrar Apartamento
             </button>
@@ -78,7 +78,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                     <p class="text-secondary small mx-auto mb-4" style="max-width:380px;">
                         Usa el botón <strong>Registrar Condominio</strong> para agregar el primero.
                     </p>
-                    <button type="button" class="btn btn-super-primary text-white rounded-pill px-4 py-2 shadow-sm fw-semibold" style="background-color: #0F172A; border-color: #0F172A;"
+                    <button type="button" class="btn btn-success text-white rounded-pill px-4 py-2 shadow-sm fw-semibold" style="background-color: #198754; border-color: #198754;"
                         data-bs-toggle="modal" data-bs-target="#Mcondominiotorre">
                         <i class="bi bi-building-add me-2"></i>Registrar primer condominio
                     </button>
@@ -166,7 +166,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-agora-admin text-white w-100 py-3 rounded-3 fw-bold shadow-sm">
+                    <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-cloud-arrow-up me-1"></i> Guardar Condominio
                     </button>
                 </div>
@@ -238,7 +238,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
 
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-agora-admin text-white w-100 py-3 rounded-3 fw-bold shadow-sm">
+                    <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-cloud-arrow-up me-1"></i> Guardar Apartamento
                     </button>
                 </div>

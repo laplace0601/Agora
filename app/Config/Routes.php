@@ -97,6 +97,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     // ---------------------------------------------------------------
     $routes->get('areas-comunes',                    'AreasReservasController::areasComunes');
     $routes->post('areas-comunes/guardar',           'AreasReservasController::guardarArea');
+    $routes->post('areas-comunes/cambiar-estado',    'AreasReservasController::cambiarEstado');
     $routes->get('areas-comunes/eliminar/(:num)',    'AreasReservasController::eliminarArea/$1');
 
     $routes->get('reservas',                         'AreasReservasController::listarReservas');

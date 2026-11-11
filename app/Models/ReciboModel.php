@@ -31,6 +31,7 @@ class ReciboModel extends Model
         'monto_base'     => 'required|decimal',
         'monto_total'    => 'required|decimal',
         'estado_pago'    => 'required|in_list[Pendiente,Pagado]',
+        'descripcion'    => 'required|string',
     ];
 
     /**

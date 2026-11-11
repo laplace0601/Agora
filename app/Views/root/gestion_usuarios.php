@@ -13,7 +13,7 @@
             <p class="text-secondary small">Administración integral de cuentas de la plataforma Ágora.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="<?= site_url('super/crear-usuario') ?>" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm fw-bold">
+            <a href="<?= site_url('super/crear-usuario') ?>" class="btn btn-success text-white rounded-pill px-4 py-2 shadow-sm fw-bold">
                 <i class="bi bi-person-plus-fill me-1"></i> Crear Usuario
             </a>
         </div>
@@ -82,10 +82,14 @@
                     <hr class="my-4 text-muted">
 
                     <h6 class="fw-bold mb-3">Seguridad</h6>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="edit-clave" name="nueva_clave" placeholder="Nueva Contraseña" minlength="8">
+                        <label for="edit-clave">Nueva Contraseña (Opcional - mín. 8 caracteres)</label>
+                    </div>
                     <div class="form-floating mb-2">
-                        <input type="password" class="form-control" id="edit-clave" name="nueva_clave" placeholder="Nueva Contraseña">
-                        <label for="edit-clave">Nueva Contraseña (Opcional)</label>
-                        <div class="form-text text-muted small mt-1">Déjalo en blanco si no deseas cambiar la contraseña actual.</div>
+                        <input type="password" class="form-control" id="edit-clave-confirm" name="nueva_clave_confirm" placeholder="Confirmar Nueva Contraseña" minlength="8">
+                        <label for="edit-clave-confirm">Confirmar Nueva Contraseña</label>
+                        <div class="form-text text-muted small mt-1">Déjalo en blanco si no deseas cambiar la contraseña actual. Si se ingresa, debe tener mínimo 8 caracteres y coincidir en ambas casillas.</div>
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
@@ -201,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('edit-rol').value = usuario.rol;
         document.getElementById('edit-estado').value = usuario.estado;
         document.getElementById('edit-clave').value = ''; // Limpiar campo clave
+        document.getElementById('edit-clave-confirm').value = ''; // Limpiar campo confirmación
         
         // Bloquear rol si es él mismo
         if (parseInt(usuario.id) === currentUserId) {
@@ -214,15 +219,48 @@ document.addEventListener('DOMContentLoaded', function() {
         modalEditar.show();
     }
 
+    // Validación de coincidencia de contraseñas en edición
+    const editClave = document.getElementById('edit-clave');
+    const editClaveConfirm = document.getElementById('edit-clave-confirm');
+    function validarClavesEdicion() {
+        if (editClave.value.length > 0 && editClave.value.length < 8) {
+            editClave.setCustomValidity('La contraseña debe tener al menos 8 caracteres.');
+        } else {
+            editClave.setCustomValidity('');
+        }
+        if (editClaveConfirm.value.length > 0 && editClave.value !== editClaveConfirm.value) {
+            editClaveConfirm.setCustomValidity('Las contraseñas no coinciden.');
+        } else {
+            editClaveConfirm.setCustomValidity('');
+        }
+    }
+    editClave.addEventListener('input', validarClavesEdicion);
+    editClaveConfirm.addEventListener('input', validarClavesEdicion);
+
     // Guardar Edición
     formEditar.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const btnGuardar = document.getElementById('btn-guardar-edicion');
+        const id = document.getElementById('edit-id').value;
+        const nuevaClave = document.getElementById('edit-clave').value;
+        const nuevaClaveConfirm = document.getElementById('edit-clave-confirm').value;
+
+        // Validar contraseña si se escribió en cualquiera de las casillas
+        if (nuevaClave || nuevaClaveConfirm) {
+            if (nuevaClave.length < 8) {
+                showAlert('danger', 'La nueva contraseña debe tener al menos 8 caracteres.');
+                return;
+            }
+            if (nuevaClave !== nuevaClaveConfirm) {
+                showAlert('danger', 'Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.');
+                return;
+            }
+        }
+
         btnGuardar.disabled = true;
         btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
 
-        const id = document.getElementById('edit-id').value;
         const formData = new FormData();
         formData.append('correo', document.getElementById('edit-correo').value);
         
@@ -236,9 +274,9 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('estado', document.getElementById('edit-estado').value);
         }
 
-        const nuevaClave = document.getElementById('edit-clave').value;
         if (nuevaClave) {
             formData.append('nueva_clave', nuevaClave);
+            formData.append('nueva_clave_confirm', nuevaClaveConfirm);
         }
 
         // Agregar Token CSRF
