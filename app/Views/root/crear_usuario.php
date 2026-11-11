@@ -1,9 +1,10 @@
-<?php 
-    /**
-     * @file crear_usuario.php
-     * @description Panel maestro del Súper Usuario para dar de alta los 3 roles del ecosistema Ágora.
-     */
-    echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']); 
+<?php
+
+/**
+ * @file crear_usuario.php
+ * @description Panel maestro del Súper Usuario para dar de alta los 3 roles del ecosistema Ágora.
+ */
+echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
 ?>
 
 <main class="container my-5" role="main">
@@ -50,7 +51,7 @@
     </ul>
 
     <div class="tab-content" id="roleTabsContent">
-        
+
         <div class="tab-pane fade show active" id="panel-residente" role="tabpanel">
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Datos Personales y de Vivienda</h2>
@@ -63,7 +64,7 @@
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="residente-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña Temporal * (mín. 8 caracteres)</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="residente-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
-                        
+
                         <div class="col-md-6 form-floating">
                             <select class="form-select" name="condominio_id" id="residente-condominio" required>
                                 <option value="" selected disabled>Selecciona el condominio asignado</option>
@@ -79,13 +80,13 @@
                             <select class="form-select" name="apartamento_id" id="residente-apartamento" required disabled>
                                 <option value="" selected disabled>Selecciona primero un condominio</option>
                                 <?php if (!empty($apartamentos)): ?>
-                                    <?php foreach ($apartamentos as $apto): 
+                                    <?php foreach ($apartamentos as $apto):
                                         $ocupado = !empty($apto['residente_id']);
                                     ?>
-                                        <option value="<?= $apto['id'] ?>" 
-                                                data-condominio="<?= $apto['condominio_id'] ?>" 
-                                                <?= $ocupado ? 'disabled' : '' ?>
-                                                style="display: none;">
+                                        <option value="<?= $apto['id'] ?>"
+                                            data-condominio="<?= $apto['condominio_id'] ?>"
+                                            <?= $ocupado ? 'disabled' : '' ?>
+                                            style="display: none;">
                                             Apto. <?= esc($apto['nro_apartamento'] ?? 'N/A') ?>
                                             <?php if ($ocupado): ?>
                                                 — ⛔ Ocupado (<?= esc($apto['nombre_residente'] ?? 'Asignado') ?>)
@@ -98,8 +99,8 @@
                             </select>
                             <label class="ms-2">Nro de Departamento / Ubicación *</label>
                         </div>
-                        
-                        <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Crear Cuenta de Residente</button></div>
+
+                        <div class="col-12 mt-4"><button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-semibold shadow-sm">Crear Cuenta de Residente</button></div>
                     </div>
                 </form>
             </div>
@@ -115,8 +116,8 @@
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="admin-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña * (mín. 8 caracteres)</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="admin-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
-                        
-                        <div class="col-12 mt-4"><button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-semibold shadow-sm">Dar de Alta Administrador</button></div>
+
+                        <div class="col-12 mt-4"><button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-semibold shadow-sm">Registrar Administrador</button></div>
                     </div>
                 </form>
             </div>
@@ -132,8 +133,8 @@
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="super-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña * (mín. 8 caracteres)</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="super-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
-                        
-                        <div class="col-12 mt-4"><button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-semibold shadow-sm"><i class="bi bi-shield-check me-2"></i>Registrar Súper Usuario Maestro</button></div>
+
+                        <div class="col-12 mt-4"><button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-semibold shadow-sm"><i class="bi bi-shield-check me-2"></i>Registrar Súper Usuario Maestro</button></div>
                     </div>
                 </form>
             </div>
@@ -142,71 +143,79 @@
     </div>
 </main>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selectCondominio = document.getElementById('residente-condominio');
-    const selectApartamento = document.getElementById('residente-apartamento');
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectCondominio = document.getElementById('residente-condominio');
+        const selectApartamento = document.getElementById('residente-apartamento');
 
-    if (selectCondominio && selectApartamento) {
-        selectCondominio.addEventListener('change', function() {
-            const condoId = this.value;
-            let hasOptions = false;
+        if (selectCondominio && selectApartamento) {
+            selectCondominio.addEventListener('change', function() {
+                const condoId = this.value;
+                let hasOptions = false;
 
-            // Mostrar solo apartamentos del condominio seleccionado
-            Array.from(selectApartamento.options).forEach(option => {
-                if (option.value === "") return; // Ignorar el placeholder
-                
-                if (option.getAttribute('data-condominio') === condoId) {
-                    option.style.display = '';
-                    // Solo contar como disponible si no está disabled
-                    if (!option.disabled) hasOptions = true;
+                // Mostrar solo apartamentos del condominio seleccionado
+                Array.from(selectApartamento.options).forEach(option => {
+                    if (option.value === "") return; // Ignorar el placeholder
+
+                    if (option.getAttribute('data-condominio') === condoId) {
+                        option.style.display = '';
+                        // Solo contar como disponible si no está disabled
+                        if (!option.disabled) hasOptions = true;
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+
+                // Habilitar o deshabilitar
+                selectApartamento.disabled = !hasOptions;
+
+                // Resetear valor si no hay o si se cambia
+                selectApartamento.value = "";
+
+                if (!hasOptions) {
+                    selectApartamento.options[0].text = "No hay apartamentos disponibles en este condominio";
                 } else {
-                    option.style.display = 'none';
+                    selectApartamento.options[0].text = "Selecciona un apartamento...";
                 }
             });
+        }
 
-            // Habilitar o deshabilitar
-            selectApartamento.disabled = !hasOptions;
-            
-            // Resetear valor si no hay o si se cambia
-            selectApartamento.value = "";
-            
-            if (!hasOptions) {
-                selectApartamento.options[0].text = "No hay apartamentos disponibles en este condominio";
-            } else {
-                selectApartamento.options[0].text = "Selecciona un apartamento...";
+        // Validación de coincidencia y longitud de contraseñas
+        const paresClaves = [{
+                clave: 'residente-clave',
+                confirm: 'residente-clave-confirm'
+            },
+            {
+                clave: 'admin-clave',
+                confirm: 'admin-clave-confirm'
+            },
+            {
+                clave: 'super-clave',
+                confirm: 'super-clave-confirm'
+            }
+        ];
+
+        paresClaves.forEach(par => {
+            const inputClave = document.getElementById(par.clave);
+            const inputConfirm = document.getElementById(par.confirm);
+            if (inputClave && inputConfirm) {
+                function validarCoincidencia() {
+                    if (inputClave.value.length > 0 && inputClave.value.length < 8) {
+                        inputClave.setCustomValidity('La contraseña debe tener al menos 8 caracteres.');
+                    } else {
+                        inputClave.setCustomValidity('');
+                    }
+
+                    if (inputConfirm.value.length > 0 && inputClave.value !== inputConfirm.value) {
+                        inputConfirm.setCustomValidity('Las contraseñas no coinciden.');
+                    } else {
+                        inputConfirm.setCustomValidity('');
+                    }
+                }
+                inputClave.addEventListener('input', validarCoincidencia);
+                inputConfirm.addEventListener('input', validarCoincidencia);
             }
         });
-    }
-
-    // Validación de coincidencia y longitud de contraseñas
-    const paresClaves = [
-        { clave: 'residente-clave', confirm: 'residente-clave-confirm' },
-        { clave: 'admin-clave', confirm: 'admin-clave-confirm' },
-        { clave: 'super-clave', confirm: 'super-clave-confirm' }
-    ];
-
-    paresClaves.forEach(par => {
-        const inputClave = document.getElementById(par.clave);
-        const inputConfirm = document.getElementById(par.confirm);
-        if (inputClave && inputConfirm) {
-            function validarCoincidencia() {
-                if (inputClave.value.length > 0 && inputClave.value.length < 8) {
-                    inputClave.setCustomValidity('La contraseña debe tener al menos 8 caracteres.');
-                } else {
-                    inputClave.setCustomValidity('');
-                }
-
-                if (inputConfirm.value.length > 0 && inputClave.value !== inputConfirm.value) {
-                    inputConfirm.setCustomValidity('Las contraseñas no coinciden.');
-                } else {
-                    inputConfirm.setCustomValidity('');
-                }
-            }
-            inputClave.addEventListener('input', validarCoincidencia);
-            inputConfirm.addEventListener('input', validarCoincidencia);
-        }
     });
-});
 </script>
 
 <?php echo view('template/super_footer', ['pagina_actual' => 'super_crear_usuario']); ?>
