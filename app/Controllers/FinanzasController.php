@@ -263,11 +263,19 @@ class FinanzasController extends BaseController
             ])->setStatusCode(403);
         }
 
+        $metodoInput = trim($this->request->getPost('metodo_pago') ?? '');
+        $metodoPago  = formatearMetodoPago($metodoInput);
+        $referencia  = trim($this->request->getPost('referencia_transaccion') ?? '');
+
+        if ($metodoPago === 'Efectivo' && empty($referencia)) {
+            $referencia = 'Efectivo / Sin referencia';
+        }
+
         $datos = [
             'recibo_mensual_id'      => (int) $this->request->getPost('recibo_mensual_id'),
             'monto_pagado'           => (float) $this->request->getPost('monto_pagado'),
-            'metodo_pago'            => trim($this->request->getPost('metodo_pago') ?? ''),
-            'referencia_transaccion' => trim($this->request->getPost('referencia_transaccion') ?? ''),
+            'metodo_pago'            => $metodoPago,
+            'referencia_transaccion' => $referencia,
             'comprobante_url'        => trim($this->request->getPost('comprobante_url') ?? ''),
             'fecha_registro'         => date('Y-m-d H:i:s'),
             'estado_validacion'      => 'Por Validar',

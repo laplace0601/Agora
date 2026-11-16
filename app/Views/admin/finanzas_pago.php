@@ -61,8 +61,8 @@
                                     </td>
                                     <td>
                                         <div class="small text-secondary">
-                                            <strong>Método:</strong> <?= htmlspecialchars($pago['metodo_pago'] ?? '—') ?><br>
-                                            <strong>Ref:</strong> #<?= htmlspecialchars($pago['referencia_transaccion'] ?? '—') ?><br>
+                                            <strong>Método:</strong> <?= htmlspecialchars(formatearMetodoPago($pago['metodo_pago'] ?? '')) ?><br>
+                                            <strong>Ref:</strong> <?= htmlspecialchars(formatearReferenciaPago($pago['referencia_transaccion'] ?? '', $pago['metodo_pago'] ?? '')) ?><br>
                                             <strong>Fecha:</strong> <?= date('d/m/Y', strtotime($pago['fecha_registro'])) ?>
                                         </div>
                                     </td>
@@ -136,8 +136,8 @@
                                     </td>
                                     <td>
                                         <div class="small text-secondary">
-                                            <strong>Método:</strong> <?= htmlspecialchars($hp['metodo_pago'] ?? '—') ?><br>
-                                            <strong>Ref:</strong> #<?= htmlspecialchars($hp['referencia_transaccion'] ?? '—') ?><br>
+                                            <strong>Método:</strong> <?= htmlspecialchars(formatearMetodoPago($hp['metodo_pago'] ?? '')) ?><br>
+                                            <strong>Ref:</strong> <?= htmlspecialchars(formatearReferenciaPago($hp['referencia_transaccion'] ?? '', $hp['metodo_pago'] ?? '')) ?><br>
                                             <span class="text-muted"><?= date('d/m/Y H:i', strtotime($hp['fecha_registro'])) ?></span>
                                         </div>
                                     </td>

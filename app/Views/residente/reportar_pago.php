@@ -42,7 +42,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                             <div class="bg-white p-3 rounded-3 border border-danger border-opacity-25">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="fw-bold small text-dark">
-                                        Recibo: <?= $pr['mes'] ?>/<?= $pr['anio'] ?> · Ref #<?= htmlspecialchars($pr['referencia_transaccion'] ?? '—') ?> · $<?= number_format((float)($pr['monto_pagado'] ?? 0), 2) ?>
+                                        Recibo: <?= $pr['mes'] ?>/<?= $pr['anio'] ?> · <?= htmlspecialchars(formatearMetodoPago($pr['metodo_pago'] ?? '')) ?> · Ref: <?= htmlspecialchars(formatearReferenciaPago($pr['referencia_transaccion'] ?? '', $pr['metodo_pago'] ?? '')) ?> · $<?= number_format((float)($pr['monto_pagado'] ?? 0), 2) ?>
                                     </span>
                                     <span class="badge bg-danger rounded-pill px-2.5 py-1">Rechazado</span>
                                 </div>
@@ -166,45 +166,31 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                     <i class="bi bi-pencil-square me-2" style="color: var(--agora-primary, #007bff);"></i>Registrar Datos de tu Transacción
                 </h5>
 
-                <form action="<?= site_url('residente/pago/enviar') ?>" method="POST" enctype="multipart/form-data">
+                <div id="alertaErrorPago" class="alert alert-danger alert-dismissible fade show border-0 rounded-4 shadow-sm mb-4 d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i><span id="mensajeErrorPago"></span>
+                    <button type="button" class="btn-close" onclick="document.getElementById('alertaErrorPago').classList.add('d-none')"></button>
+                </div>
+
+                <form id="formReportarPago" action="<?= site_url('residente/pago/enviar') ?>" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
                             <div class="form-floating">
                                 <select class="form-select" id="bancoOrigen" name="banco" required>
-                                    <option value="" selected disabled>Selecciona tu banco</option>
-                                    <option value="1">Banco de Venezuela (BDV)</option>
-                                    <option value="2">Banesco Banco Universal</option>
-                                    <option value="3">BBVA Provincial</option>
-                                    <option value="4">Banco Nacional de Crédito (BNC)</option>
-                                    <option value="5">Mercantil Banco Universal</option>
-                                    <option value="6">Bancamiga Banco Universal</option>
-                                    <option value="7">Banco del Tesoro</option>
-                                    <option value="8">Banco Digital de los Trabajadores (BDT)</option>
-                                    <option value="9">Bancaribe Banco Universal</option>
-                                    <option value="10">Banco Exterior</option>
-                                    <option value="11">Banco Fondo Común (BFC)</option>
-                                    <option value="12">Banco Venezolano de Crédito</option>
-                                    <option value="13">Banco Activo</option>
-                                    <option value="14">Banco del Caribe</option>
-                                    <option value="15">Banco Caroní</option>
-                                    <option value="16">Bancrecer</option>
-                                    <option value="17">Banplus</option>
-                                    <option value="18">Banco Plaza</option>
-                                    <option value="19">100% Banco</option>
-                                    <option value="20">Del Sur Banco Universal</option>
-                                    <option value="21">Banco Sofitasa</option>
-                                    <option value="22">Banco de la Gente Emprendedora (Bangente)</option>
-                                    <option value="23">Mi Banco</option>
-                                    <option value="24">N58</option>
+                                    <option value="" selected disabled>Selecciona el método de pago</option>
+                                    <option value="Pago Móvil">Pago Móvil</option>
+                                    <option value="Efectivo">Efectivo</option>
                                 </select>
-                                <label for="bancoOrigen">Banco Emisor (Tu Banco) *</label>
+                                <label for="bancoOrigen">Método de Pago *</label>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="numReferencia" name="referencia" placeholder="Número completo de la transacción" required>
-                                <label for="numReferencia">Número de Referencia Completo *</label>
+                                <input type="text" class="form-control" id="numReferencia" name="referencia" placeholder="Número de referencia bancaria" required>
+                                <label for="numReferencia" id="labelNumReferencia">Número de Referencia Completo *</label>
+                            </div>
+                            <div id="ayudaReferencia" class="form-text small text-muted mt-1 d-none">
+                                <i class="bi bi-info-circle me-1"></i>Para pagos en efectivo puedes dejar este campo vacío o indicar algún detalle (ej: Entregado en conserjería).
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -213,7 +199,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                                     <option value="" <?= empty($reciboIdUrl) ? 'selected' : '' ?> disabled>Selecciona el recibo a pagar</option>
                                     <?php if (!empty($recibos_pendientes)): ?>
                                         <?php foreach ($recibos_pendientes as $recibo): ?>
-                                            <?php 
+                                             <?php 
                                             $isSelected = (!empty($reciboIdUrl) && $reciboIdUrl == $recibo['id']); 
                                             ?>
                                             <option value="<?= $recibo['id'] ?>" data-monto="<?= $recibo['monto_total'] ?>" <?= $isSelected ? 'selected' : '' ?>>
@@ -234,7 +220,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                             </div>
                         </div>
                         <div class="col-12 mt-4">
-                            <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-pill fs-6 fw-bold shadow-sm" style="background-color: #198754; border: none;">
+                            <button type="submit" id="btnEnviarPago" class="btn btn-success text-white w-100 py-3 rounded-pill fs-6 fw-bold shadow-sm" style="background-color: #198754; border: none;">
                                 <i class="bi bi-send-check me-2"></i>Enviar Reporte de Pago
                             </button>
                         </div>
@@ -244,6 +230,72 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
         </div>
     </div>
 </main>
+
+<!-- ======================================================== -->
+<!-- MODAL: MINI VENTANA DE CONFIRMACIÓN DE PAGO REPORTADO    -->
+<!-- ======================================================== -->
+<div class="modal fade" id="modalPagoReportado" tabindex="-1" aria-labelledby="modalPagoReportadoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden text-center p-3 p-md-4 position-relative">
+            
+            <!-- Icono circular animado superior -->
+            <div class="mx-auto mb-3 mt-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                 style="width: 72px; height: 72px; background: rgba(25, 135, 84, 0.12); color: #198754;">
+                <i class="bi bi-clock-history fs-1"></i>
+            </div>
+
+            <!-- Título y Subtítulo -->
+            <h4 class="fw-bold text-dark mb-1" id="modalPagoReportadoLabel">¡Pago Reportado!</h4>
+            <p class="text-secondary small mb-3">Tu notificación de pago ha sido registrada correctamente.</p>
+
+            <!-- Mini Alerta de Espera de Confirmación -->
+            <div class="alert alert-warning border-0 rounded-3 p-3 mb-3 text-start d-flex align-items-start gap-2 shadow-sm" style="background-color: #fff9e6; color: #856404;">
+                <i class="bi bi-hourglass-split fs-5 flex-shrink-0 mt-0.5 text-warning"></i>
+                <div class="small">
+                    <strong>Por favor, espera la confirmación:</strong><br>
+                    La administración revisará y validará tu comprobante en breve. Una vez verificado el depósito, tu recibo pasará automáticamente a estado <strong>Solvente</strong>.
+                </div>
+            </div>
+
+            <!-- Resumen de Datos del Pago -->
+            <div class="bg-light rounded-3 p-3 mb-4 text-start small border">
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">N° Recibo:</span>
+                    <strong class="text-dark" id="modalConfirmRecibo">—</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Método de Pago:</span>
+                    <span class="text-dark fw-semibold" id="modalConfirmBanco">—</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Referencia:</span>
+                    <span class="text-dark font-monospace fw-bold" id="modalConfirmRef">—</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Monto Reportado:</span>
+                    <strong class="text-success fs-6" id="modalConfirmMonto">$0.00</strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <span class="text-muted">Estatus Actual:</span>
+                    <span class="badge rounded-pill px-2.5 py-1 text-uppercase fw-semibold" style="background: rgba(255, 193, 7, 0.2); color: #997404;">
+                        <i class="bi bi-hourglass-split me-1"></i>Por Validar
+                    </span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex flex-column gap-2">
+                <a href="<?= site_url('residente/finanzas') ?>" class="btn btn-success text-white rounded-pill py-2.5 fw-bold shadow-sm" style="background-color: #198754; border: none;">
+                    <i class="bi bi-wallet2 me-1"></i> Ir a Mis Recibos y Solvencia
+                </a>
+                <a href="<?= site_url('residente/dashboard') ?>" class="btn btn-link text-secondary text-decoration-none small py-1">
+                    Volver al Dashboard
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <script>
 function copiarDato(elementId, btn) {
@@ -260,8 +312,48 @@ function copiarDato(elementId, btn) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const reciboSelect = document.getElementById('recibo');
-    const montoInput = document.getElementById('monto');
+    const formReportar       = document.getElementById('formReportarPago');
+    const reciboSelect       = document.getElementById('recibo');
+    const montoInput         = document.getElementById('monto');
+    const bancoOrigen        = document.getElementById('bancoOrigen');
+    const numReferencia      = document.getElementById('numReferencia');
+    const labelNumReferencia = document.getElementById('labelNumReferencia');
+    const ayudaReferencia    = document.getElementById('ayudaReferencia');
+    const btnEnviar          = document.getElementById('btnEnviarPago');
+    const alertaError        = document.getElementById('alertaErrorPago');
+    const mensajeError       = document.getElementById('mensajeErrorPago');
+
+    // Manejar cambio de método de pago: si es Efectivo, la referencia es opcional
+    function alternarMetodoPago() {
+        if (!bancoOrigen || !numReferencia) return;
+        const esEfectivo = (bancoOrigen.value === 'Efectivo');
+
+        if (esEfectivo) {
+            numReferencia.removeAttribute('required');
+            numReferencia.placeholder = 'Opcional (Ej. Entregado en conserjería)';
+            if (labelNumReferencia) {
+                labelNumReferencia.textContent = 'Número de Referencia (Opcional)';
+            }
+            if (ayudaReferencia) {
+                ayudaReferencia.classList.remove('d-none');
+            }
+        } else {
+            numReferencia.setAttribute('required', 'required');
+            numReferencia.placeholder = 'Número de referencia bancaria';
+            if (labelNumReferencia) {
+                labelNumReferencia.textContent = 'Número de Referencia Completo *';
+            }
+            if (ayudaReferencia) {
+                ayudaReferencia.classList.add('d-none');
+            }
+        }
+    }
+
+    if (bancoOrigen) {
+        bancoOrigen.addEventListener('change', alternarMetodoPago);
+        alternarMetodoPago(); // Ejecutar al cargar por si hay valor previo
+    }
+
     if (reciboSelect && montoInput) {
         reciboSelect.addEventListener('change', function() {
             const opt = this.options[this.selectedIndex];
@@ -276,6 +368,92 @@ document.addEventListener('DOMContentLoaded', function() {
                 montoInput.value = parseFloat(opt.dataset.monto).toFixed(2);
             }
         }
+    }
+
+    // Interceptar envío del formulario para mostrar la mini ventana de confirmación
+    if (formReportar) {
+        formReportar.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (alertaError) alertaError.classList.add('d-none');
+
+            const esEfectivo = (bancoOrigen.value === 'Efectivo');
+
+            if (!reciboSelect.value || !montoInput.value || !bancoOrigen.value) {
+                if (alertaError && mensajeError) {
+                    mensajeError.textContent = 'Por favor completa todos los campos obligatorios antes de enviar.';
+                    alertaError.classList.remove('d-none');
+                }
+                return;
+            }
+
+            if (!esEfectivo && !numReferencia.value.trim()) {
+                if (alertaError && mensajeError) {
+                    mensajeError.textContent = 'El número de referencia es obligatorio para pagos por Pago Móvil.';
+                    alertaError.classList.remove('d-none');
+                }
+                numReferencia.focus();
+                return;
+            }
+
+            const originalBtnHtml = btnEnviar.innerHTML;
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registrando pago...';
+
+            try {
+                const formData = new FormData(formReportar);
+                const resp = await fetch(formReportar.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const result = await resp.json();
+
+                if (result.status === 'success') {
+                    // Refrescar token CSRF si la respuesta lo suministra
+                    if (result.csrf) {
+                        const csrfInput = formReportar.querySelector('input[name="<?= csrf_token() ?>"]');
+                        if (csrfInput) csrfInput.value = result.csrf;
+                    }
+
+                    // Llenar datos en el modal de confirmación
+                    const payload = result.data || {};
+                    const metodoFinal = payload.metodo || bancoOrigen.value;
+                    const refFinal = payload.referencia || (numReferencia.value.trim() ? numReferencia.value.trim() : (esEfectivo ? 'Efectivo / Sin referencia' : '—'));
+
+                    document.getElementById('modalConfirmRecibo').textContent = '#' + (payload.recibo_id || reciboSelect.value);
+                    document.getElementById('modalConfirmBanco').textContent = metodoFinal;
+                    document.getElementById('modalConfirmRef').textContent = refFinal;
+                    document.getElementById('modalConfirmMonto').textContent = '$' + (payload.monto || parseFloat(montoInput.value).toFixed(2));
+
+                    // Desplegar mini ventana de confirmación
+                    const modalEl = document.getElementById('modalPagoReportado');
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+
+                    // Limpiar formulario para evitar envíos duplicados si se cierra
+                    formReportar.reset();
+                    alternarMetodoPago();
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = originalBtnHtml;
+                } else {
+                    if (alertaError && mensajeError) {
+                        mensajeError.textContent = result.message || 'Error al procesar el reporte de pago.';
+                        alertaError.classList.remove('d-none');
+                    }
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = originalBtnHtml;
+                }
+            } catch (err) {
+                console.warn('Fallo en solicitud AJAX, enviando por flujo estándar:', err);
+                // Si la conexión AJAX falla, se envía por el método tradicional del navegador
+                formReportar.submit();
+            }
+        });
     }
 });
 </script>

@@ -316,14 +316,14 @@
                                     Recibo: <?= $pr['mes'] ?? '—' ?>/<?= $pr['anio'] ?? '—' ?>
                                 </span>
                                 <span class="ms-2 small text-muted">
-                                    — Ref: <span class="font-monospace">#<?= htmlspecialchars($pr['referencia_transaccion'] ?? '—') ?></span>
+                                    — Ref: <span class="font-monospace"><?= htmlspecialchars(formatearReferenciaPago($pr['referencia_transaccion'] ?? '', $pr['metodo_pago'] ?? '')) ?></span>
                                 </span>
                                 <span class="ms-2 fw-bold text-dark font-monospace">
                                     $<?= number_format((float)($pr['monto_pagado'] ?? 0), 2) ?>
                                 </span>
                                 <div class="small text-muted mt-1">
                                     Enviado el <?= date('d/m/Y H:i', strtotime($pr['fecha_registro'])) ?>
-                                    · Vía: <?= htmlspecialchars($pr['metodo_pago'] ?? '—') ?>
+                                    · Vía: <?= htmlspecialchars(formatearMetodoPago($pr['metodo_pago'] ?? '')) ?>
                                 </div>
                             </div>
                             <span class="badge badge-soft-danger rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1">
@@ -357,5 +357,72 @@
         <?php endif; ?>
     </div>
 </main>
+
+<?php 
+$pagoReportadoModal = session()->getFlashdata('pago_reportado_modal'); 
+?>
+<?php if (!empty($pagoReportadoModal)): ?>
+<!-- Modal: Mini Ventana de Confirmación de Pago Reportado (desplegado tras redirección) -->
+<div class="modal fade" id="modalPagoReportadoRedirect" tabindex="-1" aria-labelledby="modalPagoReportadoRedirectLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden text-center p-3 p-md-4 position-relative">
+            
+            <div class="mx-auto mb-3 mt-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
+                 style="width: 72px; height: 72px; background: rgba(25, 135, 84, 0.12); color: #198754;">
+                <i class="bi bi-clock-history fs-1"></i>
+            </div>
+
+            <h4 class="fw-bold text-dark mb-1" id="modalPagoReportadoRedirectLabel">¡Pago Reportado!</h4>
+            <p class="text-secondary small mb-3">Tu notificación de pago ha sido registrada en el sistema.</p>
+
+            <div class="alert alert-warning border-0 rounded-3 p-3 mb-3 text-start d-flex align-items-start gap-2 shadow-sm" style="background-color: #fff9e6; color: #856404;">
+                <i class="bi bi-hourglass-split fs-5 flex-shrink-0 mt-0.5 text-warning"></i>
+                <div class="small">
+                    <strong>Por favor, espera la confirmación:</strong><br>
+                    La administración revisará y validará tu comprobante en breve. Una vez verificado el depósito, tu recibo cambiará automáticamente a estado <strong>Solvente</strong>.
+                </div>
+            </div>
+
+            <div class="bg-light rounded-3 p-3 mb-4 text-start small border">
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">N° Recibo:</span>
+                    <strong class="text-dark">#<?= esc($pagoReportadoModal['recibo_id'] ?? '—') ?></strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Método de Pago:</span>
+                    <span class="text-dark fw-semibold"><?= esc(formatearMetodoPago($pagoReportadoModal['metodo'] ?? '')) ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Referencia:</span>
+                    <span class="text-dark font-monospace fw-bold"><?= esc(formatearReferenciaPago($pagoReportadoModal['referencia'] ?? '', $pagoReportadoModal['metodo'] ?? '')) ?></span>
+                </div>
+                <div class="d-flex justify-content-between mb-1.5">
+                    <span class="text-muted">Monto Reportado:</span>
+                    <strong class="text-success fs-6">$<?= esc($pagoReportadoModal['monto'] ?? '0.00') ?></strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <span class="text-muted">Estatus Actual:</span>
+                    <span class="badge rounded-pill px-2.5 py-1 text-uppercase fw-semibold" style="background: rgba(255, 193, 7, 0.2); color: #997404;">
+                        <i class="bi bi-hourglass-split me-1"></i>Por Validar
+                    </span>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-success text-white rounded-pill w-100 py-2.5 fw-bold shadow-sm" data-bs-dismiss="modal" style="background-color: #198754; border: none;">
+                <i class="bi bi-check2-circle me-1"></i> Entendido
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('modalPagoReportadoRedirect');
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+});
+</script>
+<?php endif; ?>
 
 <?php echo view('template/residente_footer', ['pagina_actual' => $pagina_actual]); ?>

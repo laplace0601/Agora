@@ -111,14 +111,27 @@ class ResidenteController extends BaseController
 
         // Guardia de sesión: solo residentes autenticados
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente' || ! $usuarioId) {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión para reportar un pago.');
+            return $this->responder('error', 'Debes iniciar sesión para reportar un pago.', 401, [], 'auth/login');
         }
 
         $reciboId    = (int) $this->request->getPost('recibo_id');
         $montoPagado = (float) $this->request->getPost('monto');
+        $referencia  = trim($this->request->getPost('referencia') ?? '');
+        $metodoInput = trim($this->request->getPost('banco') ?? $this->request->getPost('metodo_pago') ?? '');
+        $metodoPago  = formatearMetodoPago($metodoInput);
 
         if ($reciboId <= 0 || $montoPagado <= 0) {
-            return redirect()->back()->with('error', 'El recibo y el monto son obligatorios.');
+            return $this->responder('error', 'El recibo y el monto son obligatorios.', 400);
+        }
+
+        // Si es Efectivo, la referencia es opcional (si está vacía, se autocompleta para el modelo)
+        if ($metodoPago === 'Efectivo' && empty($referencia)) {
+            $referencia = 'Efectivo / Sin referencia';
+        }
+
+        // Si es Pago Móvil, la referencia es estrictamente obligatoria
+        if ($metodoPago === 'Pago Móvil' && empty($referencia)) {
+            return $this->responder('error', 'El número de referencia de la transacción es obligatorio para Pago Móvil.', 400);
         }
 
         // SEGURIDAD: Verificar que el recibo pertenece a alguno de los apartamentos del residente
@@ -127,7 +140,7 @@ class ResidenteController extends BaseController
         $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
         if (empty($apartamentos)) {
-            return redirect()->back()->with('error', 'No tienes un apartamento asignado.');
+            return $this->responder('error', 'No tienes un apartamento asignado.', 400);
         }
 
         $idsApartamentos = array_column($apartamentos, 'id');
@@ -138,14 +151,14 @@ class ResidenteController extends BaseController
                                    ->first();
 
         if (! $recibo) {
-            return redirect()->back()->with('error', 'El recibo indicado no existe o no pertenece a tus apartamentos.');
+            return $this->responder('error', 'El recibo indicado no existe o no pertenece a tus apartamentos.', 404);
         }
 
         $datos = [
             'recibo_mensual_id'      => $reciboId,
             'monto_pagado'           => $montoPagado,
-            'metodo_pago'            => trim($this->request->getPost('banco') ?? 'Transferencia'),
-            'referencia_transaccion' => trim($this->request->getPost('referencia') ?? ''),
+            'metodo_pago'            => $metodoPago,
+            'referencia_transaccion' => $referencia,
             'comprobante_url'        => '',
             'fecha_registro'         => date('Y-m-d H:i:s'),
             'estado_validacion'      => 'Por Validar',
@@ -154,12 +167,35 @@ class ResidenteController extends BaseController
         $pagoModel = new PagoModel();
 
         if (! $pagoModel->insert($datos)) {
-            return redirect()->back()
-                             ->with('error', 'Error al registrar el pago: ' . implode(', ', $pagoModel->errors()));
+            return $this->responder('error', 'Error al registrar el pago: ' . implode(', ', $pagoModel->errors()), 422);
         }
 
-        return redirect()->to(site_url('residente/dashboard'))
-                         ->with('success', 'Pago reportado. El administrador lo validará pronto.');
+        $pagoId = $pagoModel->getInsertID();
+
+        // Flashdata para abrir automáticamente la mini ventana de confirmación si hay redirección web
+        session()->setFlashdata('pago_reportado_modal', [
+            'pago_id'    => $pagoId,
+            'recibo_id'  => $reciboId,
+            'monto'      => number_format($montoPagado, 2),
+            'referencia' => $referencia,
+            'metodo'     => $datos['metodo_pago'],
+        ]);
+
+        return $this->responder(
+            'success',
+            'Pago reportado exitosamente. Por favor espera la confirmación por parte de la administración.',
+            200,
+            [
+                'data' => [
+                    'pago_id'    => $pagoId,
+                    'recibo_id'  => $reciboId,
+                    'monto'      => number_format($montoPagado, 2),
+                    'referencia' => $referencia,
+                    'metodo'     => $datos['metodo_pago'],
+                ],
+            ],
+            'residente/finanzas'
+        );
     }
 
     /**

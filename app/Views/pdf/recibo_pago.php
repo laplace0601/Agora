@@ -374,11 +374,11 @@
                     <div class="info-col-title">Detalles del Pago Aprobado</div>
                     <div class="info-row">
                         <span class="info-label">Forma de Pago:</span>
-                        <span class="info-value"><?= esc(!empty($pago['metodo_pago']) ? $pago['metodo_pago'] : 'Transferencia / Pago Móvil') ?></span>
+                        <span class="info-value"><?= esc(formatearMetodoPago($pago['metodo_pago'] ?? '')) ?></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">N° Referencia:</span>
-                        <span class="info-value" style="font-family: monospace;"><?= esc(!empty($pago['referencia_transaccion']) ? $pago['referencia_transaccion'] : 'CONCILIADO') ?></span>
+                        <span class="info-value" style="font-family: monospace;"><?= esc(formatearReferenciaPago($pago['referencia_transaccion'] ?? '', $pago['metodo_pago'] ?? '')) ?></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Estatus de Pago:</span>

@@ -162,3 +162,48 @@ if (! function_exists('bancoPago')) {
     }
 }
 
+if (! function_exists('formatearMetodoPago')) {
+    /**
+     * Normaliza y formatea el método de pago para el sistema.
+     * Mapea IDs numéricos heredados ("1", "17", "18", etc.) o textos bancarios
+     * estrictamente a las dos opciones oficiales: "Pago Móvil" o "Efectivo".
+     */
+    function formatearMetodoPago(?string $metodo): string
+    {
+        $m = trim((string) $metodo);
+
+        if (empty($m)) {
+            return 'Pago Móvil';
+        }
+
+        // Si indica efectivo
+        if (stripos($m, 'efectivo') !== false || stripos($m, 'cash') !== false) {
+            return 'Efectivo';
+        }
+
+        // Si es numérico (IDs antiguos de banco como "1", "17", "18") o cualquier otra vía electrónica
+        return 'Pago Móvil';
+    }
+}
+
+if (! function_exists('formatearReferenciaPago')) {
+    /**
+     * Formatea la referencia bancaria / comprobante de pago para visualización.
+     * Si el método es Efectivo y no tiene referencia, retorna "Efectivo / Sin referencia".
+     */
+    function formatearReferenciaPago(?string $referencia, ?string $metodo = null): string
+    {
+        $ref = trim((string) $referencia);
+        $met = formatearMetodoPago($metodo);
+
+        if ($met === 'Efectivo') {
+            if (empty($ref) || $ref === '—' || $ref === '-' || $ref === 'CONCILIADO' || stripos($ref, 'sin referencia') !== false) {
+                return 'Efectivo / Sin referencia';
+            }
+            return $ref;
+        }
+
+        return !empty($ref) ? $ref : 'CONCILIADO';
+    }
+}
+
