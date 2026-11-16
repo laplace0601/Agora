@@ -383,14 +383,16 @@ class ResidenteController extends BaseController
             'logoBase64' => $logoBase64,
         ];
 
-        $html = view('pdf/recibo_pago', $data);
-
         // Si dompdf está instalado en el proyecto, generar y enviar PDF binario nativo
         if (class_exists(\Dompdf\Dompdf::class)) {
+            $data['isDompdf'] = true;
+            $html = view('pdf/recibo_pago', $data);
+
             $options = new \Dompdf\Options();
             $options->set('isRemoteEnabled', true);
             $options->set('isHtml5ParserEnabled', true);
             $options->set('defaultFont', 'DejaVu Sans');
+            $options->setDefaultMediaType('print');
 
             $dompdf = new \Dompdf\Dompdf($options);
             $dompdf->loadHtml($html);
@@ -404,7 +406,8 @@ class ResidenteController extends BaseController
                 ->setBody($dompdf->output());
         }
 
-        // Fallback: Si dompdf aún no está instalado vía composer, renderiza la vista imprimible
-        return $this->response->setBody($html);
+        // Fallback: Si dompdf aún no está instalado vía composer, renderiza la vista imprimible en navegador
+        $data['isDompdf'] = false;
+        return $this->response->setBody(view('pdf/recibo_pago', $data));
     }
 }

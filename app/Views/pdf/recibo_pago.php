@@ -267,7 +267,8 @@
 </head>
 <body>
 
-    <!-- Barra de acciones en el navegador (se oculta al imprimir o exportar) -->
+    <?php if (empty($isDompdf)): ?>
+    <!-- Barra de acciones en el navegador (solo visible en vista previa web, excluida en PDF) -->
     <div class="no-print">
         <div style="font-size: 13px; font-weight: 600;">
             Comprobante de Pago Electrónico · Recibo #<?= str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) ?>
@@ -281,6 +282,7 @@
             </button>
         </div>
     </div>
+    <?php endif; ?>
 
     <div class="pdf-wrapper">
         <!-- 1. Encabezado con Identidad de Marca Blanca -->

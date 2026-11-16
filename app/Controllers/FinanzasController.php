@@ -534,13 +534,15 @@ class FinanzasController extends BaseController
             'logoBase64' => $logoBase64,
         ];
 
-        $html = view('pdf/recibo_pago', $data);
-
         if (class_exists(\Dompdf\Dompdf::class)) {
+            $data['isDompdf'] = true;
+            $html = view('pdf/recibo_pago', $data);
+
             $options = new \Dompdf\Options();
             $options->set('isRemoteEnabled', true);
             $options->set('isHtml5ParserEnabled', true);
             $options->set('defaultFont', 'DejaVu Sans');
+            $options->setDefaultMediaType('print');
 
             $dompdf = new \Dompdf\Dompdf($options);
             $dompdf->loadHtml($html);
@@ -554,6 +556,7 @@ class FinanzasController extends BaseController
                 ->setBody($dompdf->output());
         }
 
-        return $this->response->setBody($html);
+        $data['isDompdf'] = false;
+        return $this->response->setBody(view('pdf/recibo_pago', $data));
     }
 }
