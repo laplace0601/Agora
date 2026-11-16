@@ -19,6 +19,8 @@ class ReciboModel extends Model
         'monto_intereses',
         'monto_total',
         'estado_pago',
+        'fecha_emision',
+        'fecha_pago',
         'descripcion',
     ];
 
@@ -58,10 +60,15 @@ class ReciboModel extends Model
 
     /**
      * Cambia el estado de pago de un recibo.
+     * Si pasa a Pagado, guarda la fecha real del pago o aprobación.
      */
-    public function actualizarEstadoPago(int $reciboId, string $estado): bool
+    public function actualizarEstadoPago(int $reciboId, string $estado, ?string $fechaPago = null): bool
     {
-        return $this->update($reciboId, ['estado_pago' => $estado]);
+        $data = ['estado_pago' => $estado];
+        if ($estado === 'Pagado') {
+            $data['fecha_pago'] = $fechaPago ?? date('Y-m-d H:i:s');
+        }
+        return $this->update($reciboId, $data);
     }
 
     /**

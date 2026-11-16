@@ -1,33 +1,110 @@
 /**
  * @file residente_finanzas.css
- * @description Estilos para la vista de finanzas y recibos del residente.
+ * @description Estilos modernos SaaS para la vista de finanzas y recibos del residente.
  */
 
-/* Tarjeta de estado de cuenta con gradiente corporativo */
+/* Tarjetas y Contenedores */
 .card-agora-form {
-    background: #fff;
+    background: #ffffff;
     border-radius: 16px;
-    border: 1px solid #F1F5F9;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-/* Badge de recibo Pendiente */
-.badge.bg-danger {
-    background-color: #EF4444 !important;
+/* Tarjetas KPI Superiores */
+.kpi-card-agora {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease-in-out;
+}
+.kpi-card-agora:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+.kpi-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
 }
 
-/* Badge de recibo Pagado */
-.badge.bg-success {
-    background-color: #10B981 !important;
+/* Soft Badges Modernos (SaaS Pastel) */
+.badge-soft-danger {
+    background-color: #FEE2E2 !important;
+    color: #991B1B !important;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    font-weight: 600;
+}
+.badge-soft-warning {
+    background-color: #FEF3C7 !important;
+    color: #92400E !important;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    font-weight: 600;
+}
+.badge-soft-success {
+    background-color: #D1FAE5 !important;
+    color: #065F46 !important;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-weight: 600;
+}
+.badge-soft-info {
+    background-color: #E0F2FE !important;
+    color: #075985 !important;
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    font-weight: 600;
+}
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
 }
 
-/* Botón de descarga deshabilitado */
-.btn.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* Botones de Marca Blanca */
+.btn-brand-primary {
+    background-color: var(--agora-primary, #0d6efd);
+    color: #ffffff !important;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-brand-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.btn-brand-primary:active {
+    transform: translateY(0);
 }
 
-/* Tabla con hover suave */
+/* Botón PDF estilizado */
+.btn-pdf-agora {
+    background-color: #ffffff;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-pdf-agora:hover:not(.disabled) {
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
+    color: #0F172A;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* Tablas */
 .table-hover > tbody > tr:hover > td {
-    background-color: rgba(31, 78, 86, 0.04);
+    background-color: rgba(0, 0, 0, 0.015);
+}
+.table thead th {
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #E2E8F0;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
 }

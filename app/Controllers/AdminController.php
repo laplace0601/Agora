@@ -157,7 +157,21 @@ class AdminController extends BaseController
             ->orderBy('pagos_recibidos.fecha_registro', 'DESC')
             ->findAll();
 
-        return view('admin/finanzas_pago', ['pagos' => $pagos]);
+        // Historial reciente de pagos validados / rechazados
+        $historial = $pagoModel
+            ->select('pagos_recibidos.*, recibos_mensuales.mes, recibos_mensuales.anio, recibos_mensuales.monto_total, apartamentos.nro_apartamento, residentes.nombre_completo')
+            ->join('recibos_mensuales', 'recibos_mensuales.id = pagos_recibidos.recibo_mensual_id')
+            ->join('apartamentos', 'apartamentos.id = recibos_mensuales.apartamento_id')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->whereIn('pagos_recibidos.estado_validacion', ['Aprobado', 'Rechazado'])
+            ->orderBy('pagos_recibidos.fecha_registro', 'DESC')
+            ->limit(30)
+            ->findAll();
+
+        return view('admin/finanzas_pago', [
+            'pagos'     => $pagos,
+            'historial' => $historial,
+        ]);
     }
 
     /**

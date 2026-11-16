@@ -170,7 +170,7 @@ class FinanzasController extends BaseController
                 continue;
             }
 
-            // Asignación estricta del monto calculado
+            // Asignación estricta del monto calculado y fecha real de emisión
             $recibosBatch[] = [
                 'apartamento_id'  => $apto['id'],
                 'mes'             => $mes,
@@ -179,6 +179,7 @@ class FinanzasController extends BaseController
                 'monto_intereses' => 0,
                 'monto_total'     => $montoIndividual,
                 'estado_pago'     => 'Pendiente',
+                'fecha_emision'   => date('Y-m-d H:i:s'),
                 'descripcion'     => $descripcion,
             ];
         }
@@ -222,7 +223,7 @@ class FinanzasController extends BaseController
 
         return $this->response->setJSON([
             'status'  => 'success',
-            'message' => "Facturación masiva exitosa: " . count($recibosBatch) . " recibos emitidos.",
+            'message' => "Creación de recibos exitosa: " . count($recibosBatch) . " recibos emitidos.",
             'csrf'    => csrf_hash(),
             'data'    => [
                 'recibos_emitidos'    => count($recibosBatch),
@@ -320,6 +321,18 @@ class FinanzasController extends BaseController
             return redirect()->back()->with('error', 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).');
         }
 
+        // Validar que el motivo sea obligatorio al rechazar
+        $motivoRechazo = trim($this->request->getPost('motivo_rechazo') ?? '');
+        if ($accion === 'rechazar' && $motivoRechazo === '') {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Debe ingresar el motivo del rechazo.',
+                ])->setStatusCode(422);
+            }
+            return redirect()->back()->with('error', 'El motivo de rechazo es obligatorio para rechazar un pago.');
+        }
+
         $pagoModel = new PagoModel();
         $pago      = $pagoModel->obtenerConRecibo($pagoId);
 
@@ -339,13 +352,14 @@ class FinanzasController extends BaseController
             // Actualizar pago → Aprobado
             $pagoModel->actualizarValidacion($pagoId, 'Aprobado');
 
-            // AUTOMATIZACIÓN: actualizar recibo → Pagado
-            $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado');
+            // AUTOMATIZACIÓN: actualizar recibo → Pagado con la fecha real del pago o aprobación
+            $fechaPago = !empty($pago['fecha_registro']) ? $pago['fecha_registro'] : date('Y-m-d H:i:s');
+            $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado', $fechaPago);
 
             $mensajeExito = 'Pago aprobado. El recibo mensual ha sido marcado como Pagado automáticamente.';
         } else {
-            // Acción: rechazar
-            $pagoModel->actualizarValidacion($pagoId, 'Rechazado');
+            // Acción: rechazar — guardar también el motivo
+            $pagoModel->actualizarValidacion($pagoId, 'Rechazado', $motivoRechazo);
             $mensajeExito = 'Pago rechazado. El recibo mensual permanece como Pendiente.';
         }
 
@@ -443,5 +457,103 @@ class FinanzasController extends BaseController
             ->findAll();
 
         return $this->response->setJSON($pagosPendientes)->setStatusCode(200);
+    }
+
+    /**
+     * GET /admin/recibo/pdf/(:num) o /crm/finanzas/recibo/pdf/(:num)
+     *
+     * Permite descargar o previsualizar el PDF del recibo para administradores o residentes autorizados.
+     */
+    public function descargarRecibo(int $id)
+    {
+        $session = session();
+        if (! $session->get('isLoggedIn')) {
+            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión.');
+        }
+
+        $rol       = $session->get('rol');
+        $usuarioId = $session->get('usuario_id');
+
+        $reciboModel = new ReciboModel();
+        $recibo = $reciboModel
+            ->select('recibos_mensuales.*, 
+                      apartamentos.nro_apartamento, apartamentos.nombre_edificio_torre, apartamentos.alicuota,
+                      condominios.nombre_condominio, condominios.rif_jurisdiccion, condominios.direccion as direccion_condominio,
+                      residentes.nombre_completo as residente_nombre, residentes.cedula_identidad as residente_cedula, residentes.telefono as residente_telefono')
+            ->join('apartamentos', 'apartamentos.id = recibos_mensuales.apartamento_id')
+            ->join('condominios', 'condominios.id = apartamentos.condominio_id', 'left')
+            ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->where('recibos_mensuales.id', $id)
+            ->first();
+
+        if (! $recibo) {
+            return redirect()->back()->with('error', 'El recibo solicitado no existe.');
+        }
+
+        if ($rol === 'residente') {
+            $apartamentoModel      = new ApartamentoModel();
+            $apartamentosResidente = $apartamentoModel->obtenerPorUsuario($usuarioId);
+            $idsApartamentos       = array_column($apartamentosResidente, 'id');
+
+            if (! in_array($recibo['apartamento_id'], $idsApartamentos)) {
+                return redirect()->back()->with('error', 'Acceso denegado: este recibo no pertenece a tu apartamento.');
+            }
+        } elseif (! in_array($rol, ['admin', 'root'], true)) {
+            return redirect()->back()->with('error', 'No tienes permisos para consultar este recibo.');
+        }
+
+        if (($recibo['estado_pago'] ?? '') !== 'Pagado') {
+            return redirect()->back()->with('error', 'El recibo aún no se encuentra marcado como Pagado.');
+        }
+
+        $pagoModel = new PagoModel();
+        $pago = $pagoModel
+            ->where('recibo_mensual_id', $id)
+            ->where('estado_validacion', 'Aprobado')
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if (! $pago) {
+            $pago = $pagoModel->where('recibo_mensual_id', $id)->orderBy('id', 'DESC')->first() ?? [];
+        }
+
+        $logoBase64 = null;
+        $marca      = obtenerMarca();
+        if (!empty($marca['logo_url'])) {
+            $logoPath = FCPATH . ltrim($marca['logo_url'], '/\\');
+            if (is_file($logoPath)) {
+                $mimeType   = mime_content_type($logoPath) ?: 'image/png';
+                $logoBase64 = 'data:' . $mimeType . ';base64,' . base64_encode(file_get_contents($logoPath));
+            }
+        }
+
+        $data = [
+            'recibo'     => $recibo,
+            'pago'       => $pago,
+            'marca'      => $marca,
+            'logoBase64' => $logoBase64,
+        ];
+
+        $html = view('pdf/recibo_pago', $data);
+
+        if (class_exists(\Dompdf\Dompdf::class)) {
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('defaultFont', 'DejaVu Sans');
+
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            $filename = 'Recibo_Solvencia_' . str_pad($recibo['id'], 5, '0', STR_PAD_LEFT) . '.pdf';
+            return $this->response
+                ->setHeader('Content-Type', 'application/pdf')
+                ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+                ->setBody($dompdf->output());
+        }
+
+        return $this->response->setBody($html);
     }
 }

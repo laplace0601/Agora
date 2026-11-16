@@ -19,6 +19,7 @@ class PagoModel extends Model
         'comprobante_url',
         'fecha_registro',
         'estado_validacion',
+        'motivo_rechazo',
     ];
 
     protected $useTimestamps = false;
@@ -43,10 +44,15 @@ class PagoModel extends Model
 
     /**
      * Cambia el estado de validación de un pago.
+     * Si la acción es rechazar, también guarda el motivo.
      */
-    public function actualizarValidacion(int $pagoId, string $estado): bool
+    public function actualizarValidacion(int $pagoId, string $estado, ?string $motivo = null): bool
     {
-        return $this->update($pagoId, ['estado_validacion' => $estado]);
+        $data = ['estado_validacion' => $estado];
+        if ($estado === 'Rechazado') {
+            $data['motivo_rechazo'] = $motivo;
+        }
+        return $this->update($pagoId, $data);
     }
 
     /**

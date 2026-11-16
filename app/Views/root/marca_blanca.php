@@ -46,21 +46,48 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                         </div>
 
                         <!-- Logo Actual (preview) -->
-                        <?php if (!empty($marca['logo_url'])): ?>
-                            <div class="mb-3">
-                                <label class="form-label text-secondary small fw-bold text-uppercase">Logo Actual</label>
-                                <div class="text-center"><img src="<?= base_url($marca['logo_url']) ?>" alt="Logo actual" style="max-height: 80px;" class="rounded"></div>
+                        <?php 
+                        $currentLogo = $marca['logo_url'] ?? null;
+                        $logoExiste = !empty($currentLogo) && is_file(FCPATH . ltrim($currentLogo, '/\\'));
+                        ?>
+                        <?php if ($logoExiste): ?>
+                            <div class="mb-3 p-3 bg-light rounded-3 border">
+                                <label class="form-label text-secondary small fw-bold text-uppercase d-block mb-2">Logotipo Actual Guardado</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="<?= base_url($currentLogo) . '?v=' . filemtime(FCPATH . ltrim($currentLogo, '/\\')) ?>" alt="Logo actual" style="max-height: 70px; max-width: 160px; object-fit: contain;" class="rounded bg-white p-2 border">
+                                    <div>
+                                        <p class="small text-muted mb-2">Logotipo activo en cabeceras y reportes.</p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="eliminar_logo" id="eliminar_logo" value="1">
+                                            <label class="form-check-label small text-danger fw-semibold" for="eliminar_logo">
+                                                <i class="bi bi-trash me-1"></i>Eliminar logo y usar predeterminado
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php elseif (!empty($currentLogo)): ?>
+                            <div class="alert alert-warning py-2 small mb-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i> El logo configurado no se encontró en el disco. Sube uno nuevo para reemplazarlo.
                             </div>
                         <?php endif; ?>
 
                         <!-- Subida de Logo -->
                         <div class="mb-4">
                             <label class="form-label text-secondary small fw-bold text-uppercase">Logotipo Oficial (Fondo Transparente)</label>
-                            <div class="upload-zone-agora rounded-3 p-4 text-center border border-dashed d-flex flex-column align-items-center justify-content-center position-relative">
+                            <div class="upload-zone-agora rounded-3 p-4 text-center border border-dashed d-flex flex-column align-items-center justify-content-center position-relative" id="dropzone-logo">
                                 <i class="bi bi-cloud-arrow-up text-secondary fs-2 mb-2"></i>
-                                <span class="small fw-medium text-dark">Arrastra tu logo aquí o <span class="text-agora-teal cursor-pointer">examina tus archivos</span></span>
-                                <span class="fs-7 text-secondary mt-1">Soporta PNG, SVG o JPEG (Máx. 2MB)</span>
-                                <input type="file" id="logo-input" name="logo_condominio" accept="image/jpeg,image/png,image/webp,image/svg+xml" class="position-absolute opacity-0 w-100 h-100 start-0 top-0 cursor-pointer">
+                                <span class="small fw-medium text-dark" id="logo-label">Arrastra tu logo aquí o <span class="text-agora-teal cursor-pointer">examina tus archivos</span></span>
+                                <span class="fs-7 text-secondary mt-1">Soporta PNG, SVG, JPG o WebP (Máx. 2MB)</span>
+                                <input type="file" id="logo-input" name="logo_condominio" accept="image/jpeg,image/png,image/webp,image/svg+xml,image/jpg" class="position-absolute opacity-0 w-100 h-100 start-0 top-0 cursor-pointer">
+                            </div>
+                            <div id="logo-preview-container" class="mt-2 text-center d-none">
+                                <div class="badge bg-success-subtle text-success p-2 mb-2">
+                                    <i class="bi bi-file-earmark-image me-1"></i><span id="logo-filename">logo.png</span>
+                                </div>
+                                <div>
+                                    <img id="logo-preview" src="#" alt="Previsualización logo" class="rounded shadow-sm border bg-white p-2" style="max-height: 80px; max-width: 100%;">
+                                </div>
                             </div>
                         </div>
 
@@ -71,21 +98,47 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                         <!-- ============================================= -->
                         <h6 class="fw-bold text-dark mb-3"><i class="bi bi-image me-2 text-agora-teal"></i>Imagen de Fondo del Login</h6>
 
-                        <?php if (!empty($marca['login_bg_url'])): ?>
-                            <div class="mb-3">
-                                <label class="form-label text-secondary small fw-bold text-uppercase">Fondo Actual</label>
-                                <div class="text-center">
-                                    <img src="<?= base_url($marca['login_bg_url']) ?>" alt="Fondo login actual" style="max-height: 120px; max-width: 100%; border-radius: 8px;" class="shadow-sm border">
+                        <?php 
+                        $currentBg = $marca['login_bg_url'] ?? null;
+                        $bgExiste = !empty($currentBg) && is_file(FCPATH . ltrim($currentBg, '/\\'));
+                        ?>
+                        <?php if ($bgExiste): ?>
+                            <div class="mb-3 p-3 bg-light rounded-3 border">
+                                <label class="form-label text-secondary small fw-bold text-uppercase d-block mb-2">Fondo Actual Guardado</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="<?= base_url($currentBg) . '?v=' . filemtime(FCPATH . ltrim($currentBg, '/\\')) ?>" alt="Fondo login actual" style="max-height: 100px; max-width: 180px; object-fit: cover;" class="rounded shadow-sm border">
+                                    <div>
+                                        <p class="small text-muted mb-2">Esta es la imagen que se muestra actualmente en la pantalla de inicio de sesión.</p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="eliminar_login_bg" id="eliminar_login_bg" value="1">
+                                            <label class="form-check-label small text-danger fw-semibold" for="eliminar_login_bg">
+                                                <i class="bi bi-trash me-1"></i>Eliminar y restaurar imagen por defecto
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                        <?php elseif (!empty($currentBg)): ?>
+                            <div class="alert alert-warning py-2 small mb-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i> La imagen previamente configurada no se encontró en el disco. Sube una nueva para reemplazarla.
                             </div>
                         <?php endif; ?>
 
                         <div class="mb-4">
-                            <div class="upload-zone-agora rounded-3 p-4 text-center border border-dashed d-flex flex-column align-items-center justify-content-center position-relative">
+                            <label class="form-label text-secondary small fw-bold text-uppercase">Subir Nueva Imagen de Fondo</label>
+                            <div class="upload-zone-agora rounded-3 p-4 text-center border border-dashed d-flex flex-column align-items-center justify-content-center position-relative" id="dropzone-login-bg">
                                 <i class="bi bi-card-image text-secondary fs-2 mb-2"></i>
-                                <span class="small fw-medium text-dark">Sube la imagen de fondo para la pantalla de inicio de sesión</span>
-                                <span class="fs-7 text-secondary mt-1">JPG, PNG o WebP — Máx. 5MB — Resolución recomendada: 1920×1080</span>
-                                <input type="file" name="login_bg" accept="image/jpeg,image/png,image/webp" class="position-absolute opacity-0 w-100 h-100 start-0 top-0 cursor-pointer">
+                                <span class="small fw-medium text-dark" id="login-bg-label">Arrastra tu imagen aquí o <span class="text-agora-teal cursor-pointer">examina tus archivos</span></span>
+                                <span class="fs-7 text-secondary mt-1">JPG, JPEG, PNG o WebP — Máx. 5MB — Recomendado: 1920×1080</span>
+                                <input type="file" id="login-bg-input" name="login_bg" accept="image/jpeg,image/png,image/webp,image/jpg" class="position-absolute opacity-0 w-100 h-100 start-0 top-0 cursor-pointer">
+                            </div>
+                            <div id="login-bg-preview-container" class="mt-2 text-center d-none">
+                                <div class="badge bg-success-subtle text-success p-2 mb-2">
+                                    <i class="bi bi-file-earmark-image me-1"></i><span id="login-bg-filename">fondo.jpg</span>
+                                </div>
+                                <div>
+                                    <img id="login-bg-preview" src="#" alt="Previsualización fondo" class="rounded shadow-sm border" style="max-height: 120px; max-width: 100%;">
+                                </div>
                             </div>
                         </div>
 

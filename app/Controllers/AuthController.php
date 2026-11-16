@@ -52,6 +52,7 @@ class AuthController extends BaseController
         // Guardar sesión — CLAVE UNIFICADA: 'isLoggedIn' (camelCase)
         // Todos los filtros y controladores usan esta misma clave.
         // ---------------------------------------------------------------
+        session()->regenerate();
         session()->set([
             'usuario_id'         => $usuario['id'],
             'nombre_usuario'     => $usuario['nombre_usuario'] ?? '',
@@ -69,7 +70,9 @@ class AuthController extends BaseController
      */
     public function logout()
     {
-        session()->destroy();
+        // Limpiar datos de autenticación del usuario sin invalidar el token CSRF de la navegación
+        session()->remove(['usuario_id', 'nombre_usuario', 'correo', 'rol', 'isLoggedIn', 'session_start_time']);
+        session()->regenerate(true);
         return redirect()->to(site_url('auth/login'));
     }
 

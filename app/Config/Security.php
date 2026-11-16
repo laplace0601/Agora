@@ -81,8 +81,8 @@ class Security extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Redirect to previous page with error on failure.
-     *
-     * @see https://codeigniter4.github.io/userguide/libraries/security.html#redirection-on-failure
+     * En true redirige al usuario con un mensaje de error y token renovado,
+     * en lugar de arrojar una SecurityException::forDisallowedAction() 403.
      */
-    public bool $redirect = (ENVIRONMENT === 'production');
+    public bool $redirect = true;
 }

@@ -62,6 +62,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->get('finanzas',              'AdminController::finanzas');
     $routes->get('finanzas/cobro',        'AdminController::finanzasCobro');
     $routes->get('finanzas/pagos',        'AdminController::finanzasPagos');
+    $routes->get('recibo/pdf/(:num)',     'FinanzasController::descargarRecibo/$1');
     $routes->get('cartelera',             'AdminController::cartelera');
     $routes->get('comunidad',             'AdminController::comunidad');
     $routes->get('soporte',               'AdminController::soporte');
@@ -116,6 +117,7 @@ $routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
     $routes->get('soporte',       'ResidenteController::soporte');
     $routes->post('soporte/abrir', 'ResidenteController::abrirTicket');
     $routes->get('finanzas',      'ResidenteController::finanzas');
+    $routes->get('recibo/pdf/(:num)', 'ResidenteController::descargarRecibo/$1');
 
     // ETAPA 3: Reservas para residentes
     $routes->get('reservas',           'AreasReservasController::formularioReserva');

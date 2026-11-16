@@ -44,6 +44,7 @@
                 src="<?= $bgLogin ?? base_url('images/edificio.jpg') ?>"
                 alt="Condominio Residencial"
                 style="min-height: 520px; object-position: center;"
+                onerror="this.onerror=null; this.src='<?= base_url('images/edificio.jpg') ?>';"
                 loading="lazy">
             </div>
 
@@ -71,6 +72,12 @@
                     <div class="alert alert-danger border-0 rounded-3 mb-3 small" role="alert">
                       <i class="bi bi-exclamation-circle-fill me-2"></i>
                       <?= session()->getFlashdata('error') ?>
+                    </div>
+                  <?php endif; ?>
+                  <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success border-0 rounded-3 mb-3 small" role="alert">
+                      <i class="bi bi-check-circle-fill me-2"></i>
+                      <?= session()->getFlashdata('success') ?>
                     </div>
                   <?php endif; ?>
 

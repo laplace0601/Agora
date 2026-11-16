@@ -28,6 +28,38 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                 <p class="text-secondary">Transfiere a las cuentas oficiales del condominio y registra el comprobante a continuación.</p>
             </div>
 
+            <!-- Aviso de pagos previamente rechazados con su motivo -->
+            <?php $pagos_rechazados = $pagos_rechazados ?? []; ?>
+            <?php if (!empty($pagos_rechazados)): ?>
+                <div class="alert alert-danger border-0 rounded-4 shadow-sm mb-4 p-4">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-exclamation-octagon-fill fs-4 text-danger"></i>
+                        <h5 class="fw-bold text-danger mb-0">Tienes pago(s) rechazado(s) por la administración</h5>
+                    </div>
+                    <p class="small text-secondary mb-3">La administración revisó tu comprobante y lo rechazó indicando el siguiente motivo. Por favor verifica tus datos bancarios y reporta el comprobante correcto en el formulario:</p>
+                    <div class="d-flex flex-column gap-2">
+                        <?php foreach ($pagos_rechazados as $pr): ?>
+                            <div class="bg-white p-3 rounded-3 border border-danger border-opacity-25">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold small text-dark">
+                                        Recibo: <?= $pr['mes'] ?>/<?= $pr['anio'] ?> · Ref #<?= htmlspecialchars($pr['referencia_transaccion'] ?? '—') ?> · $<?= number_format((float)($pr['monto_pagado'] ?? 0), 2) ?>
+                                    </span>
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1">Rechazado</span>
+                                </div>
+                                <?php if (!empty($pr['motivo_rechazo'])): ?>
+                                    <div class="small text-danger fw-semibold mt-1">
+                                        <i class="bi bi-chat-quote-fill me-1"></i>Motivo del Administrador:
+                                    </div>
+                                    <div class="small text-dark mt-1 bg-light p-2 rounded">
+                                        <?= nl2br(htmlspecialchars($pr['motivo_rechazo'])) ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- ======================================================== -->
             <!-- CARD DE DATOS DE PAGO DESTINO (MARCA BLANCA)             -->
             <!-- ======================================================== -->
@@ -125,6 +157,10 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
             <!-- ======================================================== -->
             <!-- FORMULARIO DE REPORTE DE PAGO                            -->
             <!-- ======================================================== -->
+            <?php
+            $reciboIdUrl = service('request')->getGet('recibo_id');
+            $montoUrl    = service('request')->getGet('monto');
+            ?>
             <div class="card-agora-form p-4 p-md-5 bg-white shadow-sm rounded-4 border border-light">
                 <h5 class="fw-bold text-dark mb-4">
                     <i class="bi bi-pencil-square me-2" style="color: var(--agora-primary, #007bff);"></i>Registrar Datos de tu Transacción
@@ -174,10 +210,15 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                         <div class="col-12 col-md-6">
                             <div class="form-floating">
                                 <select class="form-select" id="recibo" name="recibo_id" required>
-                                    <option value="" selected disabled>Selecciona el recibo a pagar</option>
+                                    <option value="" <?= empty($reciboIdUrl) ? 'selected' : '' ?> disabled>Selecciona el recibo a pagar</option>
                                     <?php if (!empty($recibos_pendientes)): ?>
                                         <?php foreach ($recibos_pendientes as $recibo): ?>
-                                            <option value="<?= $recibo['id'] ?>">Recibo #<?= $recibo['id'] ?> - $<?= number_format($recibo['monto_total'], 2) ?></option>
+                                            <?php 
+                                            $isSelected = (!empty($reciboIdUrl) && $reciboIdUrl == $recibo['id']); 
+                                            ?>
+                                            <option value="<?= $recibo['id'] ?>" data-monto="<?= $recibo['monto_total'] ?>" <?= $isSelected ? 'selected' : '' ?>>
+                                                Recibo #<?= $recibo['id'] ?> - $<?= number_format($recibo['monto_total'], 2) ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <option value="" disabled>No hay recibos pendientes</option>
@@ -188,7 +229,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-floating">
-                                <input type="number" step="0.01" class="form-control" id="monto" name="monto" placeholder="Monto pagado" required>
+                                <input type="number" step="0.01" class="form-control" id="monto" name="monto" placeholder="Monto pagado" value="<?= esc($montoUrl ?? '') ?>" required>
                                 <label for="monto">Monto Pagado ($) *</label>
                             </div>
                         </div>
@@ -217,6 +258,26 @@ function copiarDato(elementId, btn) {
         }, 1500);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const reciboSelect = document.getElementById('recibo');
+    const montoInput = document.getElementById('monto');
+    if (reciboSelect && montoInput) {
+        reciboSelect.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            if (opt && opt.dataset.monto) {
+                montoInput.value = parseFloat(opt.dataset.monto).toFixed(2);
+            }
+        });
+        // Si ya hay uno seleccionado y el monto está vacío, autocompletar
+        if (reciboSelect.selectedIndex > 0 && !montoInput.value) {
+            const opt = reciboSelect.options[reciboSelect.selectedIndex];
+            if (opt && opt.dataset.monto) {
+                montoInput.value = parseFloat(opt.dataset.monto).toFixed(2);
+            }
+        }
+    }
+});
 </script>
 
 <?php echo view('template/residente_footer', ['pagina_actual' => $pagina_actual]); ?>

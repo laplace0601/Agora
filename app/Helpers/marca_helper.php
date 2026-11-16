@@ -68,12 +68,19 @@ if (! function_exists('nombreEmpresa')) {
 
 if (! function_exists('logoEmpresa')) {
     /**
-     * Atajo: retorna la URL completa del logo, o null si no hay logo configurado.
+     * Atajo: retorna la URL completa del logo con cache-buster, o null si no hay logo configurado.
+     * Verifica que el archivo exista físicamente en disco.
      */
     function logoEmpresa(): ?string
     {
         $logo = obtenerMarca()['logo_url'] ?? null;
-        return $logo ? base_url($logo) : null;
+        if (!empty($logo)) {
+            $path = FCPATH . ltrim($logo, '/\\');
+            if (is_file($path)) {
+                return base_url($logo) . '?v=' . filemtime($path);
+            }
+        }
+        return null;
     }
 }
 
@@ -90,12 +97,27 @@ if (! function_exists('colorPrimario')) {
 
 if (! function_exists('loginBgEmpresa')) {
     /**
-     * Atajo: retorna la URL completa del fondo de login, o null si no hay configurado.
+     * Atajo: retorna la URL completa del fondo de login con cache-buster.
+     * Verifica que el archivo físico realmente exista en disco antes de devolver la URL.
+     * Si no existe o no está configurado, retorna la imagen por defecto edificio.jpg.
      */
     function loginBgEmpresa(): ?string
     {
         $bg = obtenerMarca()['login_bg_url'] ?? null;
-        return $bg ? base_url($bg) : null;
+        if (!empty($bg)) {
+            $path = FCPATH . ltrim($bg, '/\\');
+            if (is_file($path)) {
+                return base_url($bg) . '?v=' . filemtime($path);
+            }
+        }
+
+        // Si no hay imagen configurada o el archivo físico no existe en disco, fallback a edificio.jpg
+        $defaultImg = 'images/edificio.jpg';
+        if (is_file(FCPATH . $defaultImg)) {
+            return base_url($defaultImg);
+        }
+
+        return null;
     }
 }
 

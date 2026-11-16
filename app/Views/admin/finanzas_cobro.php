@@ -51,7 +51,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                         <div class="tab-pane fade show active" id="form-pane" role="tabpanel" aria-labelledby="form-tab">
                             <div class="text-center mb-4">
                                 <h1 class="fw-bold h3 text-dark mb-2">Generar Cobro</h1>
-                                <p class="text-secondary small">Rellene los datos para efectuar la facturación masiva del mes.</p>
+                                <p class="text-secondary small">Rellene los datos para efectuar la creación de recibos del mes.</p>
                             </div>
 
                             <form id="formFacturacion" action="<?= site_url('admin/finanzas/facturar') ?>" method="POST">
@@ -123,7 +123,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                         <!-- PESTAÑA: ÉXITO -->
                         <div class="tab-pane fade text-center py-4" id="success-pane" role="tabpanel" aria-labelledby="success-tab">
                             <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                            <h3 class="mt-3 text-dark fw-bold" id="successTitle">Generacion de recibos Exitosa</h3>
+                            <h3 class="mt-3 text-dark fw-bold" id="successTitle">Creación de recibos exitosa</h3>
                             <p class="text-secondary" id="successMessage"></p>
 
                             <div class="bg-light rounded-3 p-3 mt-4 text-start">
@@ -142,7 +142,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                         <!-- PESTAÑA: ERROR -->
                         <div class="tab-pane fade text-center py-4" id="error-pane" role="tabpanel" aria-labelledby="error-tab">
                             <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
-                            <h3 class="mt-3 text-dark fw-bold">Error en la Facturación</h3>
+                            <h3 class="mt-3 text-dark fw-bold">Error en la creación de recibos</h3>
                             <p class="text-danger mt-3 fw-medium p-3 bg-danger bg-opacity-10 rounded-3" id="errorMessage"></p>
 
                             <button type="button" class="btn btn-outline-danger mt-3 px-4 py-2 rounded-pill" onclick="resetForm()">
@@ -194,6 +194,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
             fetch(form.action, {
                     method: 'POST',
                     body: formData,
+                    credentials: 'same-origin',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': currentCsrfToken
@@ -228,8 +229,11 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                     }
 
                     if (data.status === 'success') {
-                        // Mostrar resultados
-                        document.getElementById('successMessage').textContent = data.message;
+                        // Mostrar resultados con texto adaptado
+                        let mensajeExito = data.message || 'Creación de recibos exitosa.';
+                        mensajeExito = mensajeExito.replace(/Facturación masiva/gi, 'Creación de recibos')
+                                                   .replace(/facturación/gi, 'creación de recibos');
+                        document.getElementById('successMessage').textContent = mensajeExito;
                         if (data.data) {
                             document.getElementById('successEmitidos').textContent = data.data.recibos_emitidos || 0;
                             document.getElementById('successTotal').textContent = data.data.total_apartamentos || 0;
@@ -254,7 +258,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
 
                     } else {
                         // Error de validación o lógica
-                        document.getElementById('errorMessage').textContent = data.message || 'Error en la facturación.';
+                        document.getElementById('errorMessage').textContent = data.message || 'Error en la creación de recibos.';
                         const tab = new bootstrap.Tab(document.getElementById('error-tab'));
                         document.getElementById('error-tab').classList.remove('d-none');
                         document.getElementById('success-tab').classList.add('d-none');
@@ -283,12 +287,12 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
             document.getElementById('form-tab').classList.remove('d-none');
             document.getElementById('success-tab').classList.add('d-none');
             document.getElementById('error-tab').classList.add('d-none');
-            
+
             // Preservar el token CSRF activo para que no se restablezca a un token obsoleto
             const tokenGuardado = currentCsrfToken;
             form.reset();
             actualizarCsrf(tokenGuardado);
-            
+
             tab.show();
         };
     });

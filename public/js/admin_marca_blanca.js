@@ -1,6 +1,6 @@
 /**
  * @file admin_marca_blanca.js
- * @description Reactividad e inyección dinámica de colores para la vista previa de marca blanca.
+ * @description Reactividad e inyección dinámica de colores y previsualización de imágenes para la vista previa de marca blanca.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,6 +38,56 @@ document.addEventListener('DOMContentLoaded', function() {
             const hexColor = e.target.value;
             textAccent.value = hexColor.toUpperCase(); // Sincroniza el texto hexadecimal
             previewActiveLink.style.backgroundColor = hexColor; // Muta el botón de la simulación
+        });
+    }
+
+    // 5. PREVISUALIZACIÓN INSTANTÁNEA PARA EL LOGO
+    const logoInput = document.getElementById('logo-input');
+    const logoContainer = document.getElementById('logo-preview-container');
+    const logoImg = document.getElementById('logo-preview');
+    const logoFilename = document.getElementById('logo-filename');
+    const logoLabel = document.getElementById('logo-label');
+
+    if (logoInput) {
+        logoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                if (logoFilename) logoFilename.textContent = file.name + ' (' + sizeMb + ' MB)';
+                if (logoLabel) logoLabel.innerHTML = 'Archivo seleccionado: <strong class="text-success">' + file.name + '</strong>';
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (logoImg) logoImg.src = e.target.result;
+                    if (logoContainer) logoContainer.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // 6. PREVISUALIZACIÓN INSTANTÁNEA PARA EL FONDO DEL LOGIN
+    const bgInput = document.getElementById('login-bg-input');
+    const bgContainer = document.getElementById('login-bg-preview-container');
+    const bgImg = document.getElementById('login-bg-preview');
+    const bgFilename = document.getElementById('login-bg-filename');
+    const bgLabel = document.getElementById('login-bg-label');
+
+    if (bgInput) {
+        bgInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                if (bgFilename) bgFilename.textContent = file.name + ' (' + sizeMb + ' MB)';
+                if (bgLabel) bgLabel.innerHTML = 'Archivo seleccionado: <strong class="text-success">' + file.name + '</strong>';
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (bgImg) bgImg.src = e.target.result;
+                    if (bgContainer) bgContainer.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
         });
     }
 });
