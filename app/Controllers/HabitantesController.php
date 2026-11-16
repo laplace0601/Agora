@@ -49,10 +49,7 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $habitanteModel = new HabitanteModel();
@@ -63,10 +60,7 @@ class HabitantesController extends BaseController
         // Validar que el apartamento existe
         $apartamentoModel = new ApartamentoModel();
         if (! $apartamentoModel->find($apartamentoId)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El apartamento indicado no existe.',
-            ])->setStatusCode(404);
+            return $this->responder('error', 'El apartamento indicado no existe.', 404);
         }
 
         $datos = [
@@ -82,42 +76,24 @@ class HabitantesController extends BaseController
 
         // Si se marca como principal, quitar el flag a los demás del mismo apartamento
         if ($datos['es_principal']) {
-            $db = \Config\Database::connect();
-            $db->table('habitantes')
-               ->where('apartamento_id', $apartamentoId)
-               ->update(['es_principal' => 0]);
+            $habitanteModel->desmarcarPrincipal($apartamentoId);
         }
 
         if ($id) {
             // Editar
             if (! $habitanteModel->update($id, $datos)) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Error al actualizar el habitante.',
-                    'errors'  => $habitanteModel->errors(),
-                ])->setStatusCode(422);
+                return $this->responder('error', 'Error al actualizar el habitante.', 422, ['errors' => $habitanteModel->errors()]);
             }
 
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Habitante actualizado correctamente.',
-            ]);
+            return $this->responder('success', 'Habitante actualizado correctamente.');
         }
 
         // Crear
         if (! $habitanteModel->insert($datos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Error al registrar el habitante.',
-                'errors'  => $habitanteModel->errors(),
-            ])->setStatusCode(422);
+            return $this->responder('error', 'Error al registrar el habitante.', 422, ['errors' => $habitanteModel->errors()]);
         }
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Habitante registrado correctamente.',
-            'data'    => ['id' => $habitanteModel->getInsertID()],
-        ]);
+        return $this->responder('success', 'Habitante registrado correctamente.', 200, ['data' => ['id' => $habitanteModel->getInsertID()]]);
     }
 
     /**
@@ -130,36 +106,24 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $id = (int) $this->request->getPost('id');
 
         if ($id <= 0) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'ID de habitante inválido.',
-            ])->setStatusCode(400);
+            return $this->responder('error', 'ID de habitante inválido.', 400);
         }
 
         $habitanteModel = new HabitanteModel();
 
         if (! $habitanteModel->find($id)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El habitante no existe.',
-            ])->setStatusCode(404);
+            return $this->responder('error', 'El habitante no existe.', 404);
         }
 
         $habitanteModel->delete($id);
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Habitante eliminado correctamente.',
-        ]);
+        return $this->responder('success', 'Habitante eliminado correctamente.');
     }
 
     /**
@@ -173,16 +137,10 @@ class HabitantesController extends BaseController
         $habitante = $habitanteModel->find($id);
 
         if (! $habitante) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Habitante no encontrado.',
-            ])->setStatusCode(404);
+            return $this->responder('error', 'Habitante no encontrado.', 404);
         }
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data'   => $habitante,
-        ]);
+        return $this->responder('success', 'Habitante encontrado.', 200, ['data' => $habitante]);
     }
 
     // ---------------------------------------------------------------
@@ -200,26 +158,28 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $usuarioId = $session->get('usuario_id');
 
-        // Obtener el apartamento del residente
+        // Obtener apartamento(s) del residente
         $apartamentoModel = new ApartamentoModel();
         $apartamentos = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
         if (empty($apartamentos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'No tienes un apartamento asignado.',
-            ])->setStatusCode(400);
+            return $this->responder('error', 'No tienes un apartamento asignado.', 400);
         }
 
-        $apartamentoId = (int) $apartamentos[0]['id'];
+        $apartamentosValidos = array_column($apartamentos, 'id');
+        $postAptoId = (int) $this->request->getPost('apartamento_id');
+
+        // Si se envió un apartamento_id, verificar que pertenezca al usuario; de lo contrario, usar el primero
+        if ($postAptoId > 0 && in_array($postAptoId, $apartamentosValidos, true)) {
+            $apartamentoId = $postAptoId;
+        } else {
+            $apartamentoId = (int) $apartamentos[0]['id'];
+        }
 
         $datos = [
             'apartamento_id'   => $apartamentoId,
@@ -235,17 +195,10 @@ class HabitantesController extends BaseController
         $habitanteModel = new HabitanteModel();
 
         if (! $habitanteModel->insert($datos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Error al enviar la solicitud.',
-                'errors'  => $habitanteModel->errors(),
-            ])->setStatusCode(422);
+            return $this->responder('error', 'Error al enviar la solicitud.', 422, ['errors' => $habitanteModel->errors()]);
         }
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Solicitud enviada. El administrador debe aprobar al nuevo habitante.',
-        ]);
+        return $this->responder('success', 'Solicitud enviada. El administrador debe aprobar al nuevo habitante.');
     }
 
     /**
@@ -263,19 +216,13 @@ class HabitantesController extends BaseController
         $apartamentos = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
         if (empty($apartamentos)) {
-            return $this->response->setJSON([
-                'status' => 'success',
-                'data'   => [],
-            ]);
+            return $this->responder('success', 'OK', 200, ['data' => []]);
         }
 
         $habitanteModel = new HabitanteModel();
         $habitantes = $habitanteModel->listarTodosPorApartamento($apartamentos[0]['id']);
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data'   => $habitantes,
-        ]);
+        return $this->responder('success', 'OK', 200, ['data' => $habitantes]);
     }
 
     // ---------------------------------------------------------------
@@ -292,10 +239,7 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $id = (int) $this->request->getPost('id');
@@ -303,25 +247,16 @@ class HabitantesController extends BaseController
         $habitante = $habitanteModel->find($id);
 
         if (! $habitante) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Habitante no encontrado.',
-            ])->setStatusCode(404);
+            return $this->responder('error', 'Habitante no encontrado.', 404);
         }
 
         if ($habitante['estado'] !== 'pendiente') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Esta solicitud ya fue procesada.',
-            ])->setStatusCode(400);
+            return $this->responder('error', 'Esta solicitud ya fue procesada.', 400);
         }
 
         $habitanteModel->update($id, ['estado' => 'aprobado']);
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Habitante aprobado exitosamente.',
-        ]);
+        return $this->responder('success', 'Habitante aprobado exitosamente.');
     }
 
     /**
@@ -334,10 +269,7 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $id = (int) $this->request->getPost('id');
@@ -345,25 +277,16 @@ class HabitantesController extends BaseController
         $habitante = $habitanteModel->find($id);
 
         if (! $habitante) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Habitante no encontrado.',
-            ])->setStatusCode(404);
+            return $this->responder('error', 'Habitante no encontrado.', 404);
         }
 
         if ($habitante['estado'] !== 'pendiente') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Esta solicitud ya fue procesada.',
-            ])->setStatusCode(400);
+            return $this->responder('error', 'Esta solicitud ya fue procesada.', 400);
         }
 
         $habitanteModel->update($id, ['estado' => 'rechazado']);
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Solicitud rechazada.',
-        ]);
+        return $this->responder('success', 'Solicitud rechazada.');
     }
 
     /**
@@ -376,20 +299,13 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403);
         }
 
         $habitanteModel = new HabitanteModel();
         $pendientes = $habitanteModel->listarPendientes();
         $total = count($pendientes);
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data'   => $pendientes,
-            'total'  => $total,
-        ]);
+        return $this->responder('success', 'OK', 200, ['data' => $pendientes, 'total' => $total]);
     }
 }

@@ -72,7 +72,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->post('finanzas/facturar',     'FinanzasController::emitirRecibos');     // ex AdminController::emitirRecibos (BUGFIX)
     $routes->post('finanzas/validar-pago', 'FinanzasController::validarPago');       // ex AdminController::validarPago
     $routes->post('cartelera/publicar',    'ComunidadController::crearComunicado'); // ex AdminController::publicarAnuncio
-    $routes->get('cartelera/eliminar/(:num)', 'AdminController::eliminarAnuncio/$1');
+    $routes->post('cartelera/eliminar/(:num)', 'AdminController::eliminarAnuncio/$1');
 
     // Morosidad / Estado de cuentas
     $routes->get('finanzas/morosidad',             'AdminController::morosidad');

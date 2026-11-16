@@ -121,7 +121,7 @@ class ResidenteController extends BaseController
             return redirect()->back()->with('error', 'El recibo y el monto son obligatorios.');
         }
 
-        // SEGURIDAD: Verificar que el recibo pertenece al apartamento del residente
+        // SEGURIDAD: Verificar que el recibo pertenece a alguno de los apartamentos del residente
         // Evita que un residente pague recibos de otro apartamento manipulando el POST
         $apartamentoModel = new ApartamentoModel();
         $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
@@ -130,15 +130,15 @@ class ResidenteController extends BaseController
             return redirect()->back()->with('error', 'No tienes un apartamento asignado.');
         }
 
-        $apartamentoId = (int) $apartamentos[0]['id'];
+        $idsApartamentos = array_column($apartamentos, 'id');
 
         $reciboModel = new ReciboModel();
         $recibo      = $reciboModel->where('id', $reciboId)
-                                   ->where('apartamento_id', $apartamentoId)
+                                   ->whereIn('apartamento_id', $idsApartamentos)
                                    ->first();
 
         if (! $recibo) {
-            return redirect()->back()->with('error', 'El recibo indicado no existe o no pertenece a tu apartamento.');
+            return redirect()->back()->with('error', 'El recibo indicado no existe o no pertenece a tus apartamentos.');
         }
 
         $datos = [

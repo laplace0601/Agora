@@ -60,7 +60,8 @@ class FinanzasController extends BaseController
             return !empty($apto['residente_id']);
         });
 
-        $totalOcupados = count($apartamentosOcupados);
+        $totalOcupados  = count($apartamentosOcupados);
+        $excluidosCount = count($apartamentos) - $totalOcupados;
 
         // 2. Validación de seguridad para evitar división por cero
         if ($totalOcupados > 0) {
@@ -70,10 +71,11 @@ class FinanzasController extends BaseController
             $montoIndividual = 0;
         }
 
-        // 3. Ahora el bucle solo recorre los ocupados y usa el monto ya calculado
+        $totalDistribuido = 0;
+        // 3. Ahora el bucle solo recorre los ocupados y acumula la distribución real
         foreach ($apartamentosOcupados as $apto) {
-            // Ya no hay necesidad de 'continue' aquí, porque ya filtramos la lista arriba
-            $montoApartamento = $montoIndividual;
+            $montoApartamento  = $montoIndividual;
+            $totalDistribuido += $montoApartamento;
 
             $simulacion[] = [
                 'apartamento_id'  => $apto['id'],
@@ -159,20 +161,31 @@ class FinanzasController extends BaseController
         $montoIndividual = $montoGlobal / $totalOcupados;
 
         $reciboModel = new ReciboModel();
-        $recibosBatch = [];
-        $yaExistentes = 0;
+        $idsOcupados = array_map('intval', array_column($apartamentosOcupados, 'id'));
 
-        // 3. Recorrer SÓLO los ocupados y usar el monto exacto
+        // Optimización N+1: Consulta consolidada para precargar todos los recibos ya emitidos en este periodo
+        $recibosExistentes = $reciboModel
+            ->select('apartamento_id')
+            ->whereIn('apartamento_id', $idsOcupados)
+            ->where('mes', $mes)
+            ->where('anio', $anio)
+            ->findAll();
+
+        $mapExistentes = array_fill_keys(array_column($recibosExistentes, 'apartamento_id'), true);
+        $recibosBatch  = [];
+        $yaExistentes  = 0;
+
+        // 3. Recorrer los ocupados verificando contra el mapa en memoria (0 consultas SQL dentro del bucle)
         foreach ($apartamentosOcupados as $apto) {
-            // Evitar duplicar recibos del mismo mes/año para el mismo apartamento
-            if ($reciboModel->existeRecibo((int) $apto['id'], $mes, $anio)) {
+            $aptoId = (int) $apto['id'];
+            if (isset($mapExistentes[$aptoId])) {
                 $yaExistentes++;
                 continue;
             }
 
             // Asignación estricta del monto calculado y fecha real de emisión
             $recibosBatch[] = [
-                'apartamento_id'  => $apto['id'],
+                'apartamento_id'  => $aptoId,
                 'mes'             => $mes,
                 'anio'            => $anio,
                 'monto_base'      => $montoIndividual,
@@ -347,20 +360,46 @@ class FinanzasController extends BaseController
         }
 
         $reciboModel = new ReciboModel();
+        $db = \Config\Database::connect();
+        $db->transStart();
 
-        if ($accion === 'aprobar') {
-            // Actualizar pago → Aprobado
-            $pagoModel->actualizarValidacion($pagoId, 'Aprobado');
+        try {
+            if ($accion === 'aprobar') {
+                // Actualizar pago → Aprobado
+                $pagoModel->actualizarValidacion($pagoId, 'Aprobado');
 
-            // AUTOMATIZACIÓN: actualizar recibo → Pagado con la fecha real del pago o aprobación
-            $fechaPago = !empty($pago['fecha_registro']) ? $pago['fecha_registro'] : date('Y-m-d H:i:s');
-            $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado', $fechaPago);
+                // AUTOMATIZACIÓN: actualizar recibo → Pagado con la fecha real del pago o aprobación
+                $fechaPago = !empty($pago['fecha_registro']) ? $pago['fecha_registro'] : date('Y-m-d H:i:s');
+                $reciboModel->actualizarEstadoPago((int) $pago['recibo_mensual_id'], 'Pagado', $fechaPago);
 
-            $mensajeExito = 'Pago aprobado. El recibo mensual ha sido marcado como Pagado automáticamente.';
-        } else {
-            // Acción: rechazar — guardar también el motivo
-            $pagoModel->actualizarValidacion($pagoId, 'Rechazado', $motivoRechazo);
-            $mensajeExito = 'Pago rechazado. El recibo mensual permanece como Pendiente.';
+                $mensajeExito = 'Pago aprobado. El recibo mensual ha sido marcado como Pagado automáticamente.';
+            } else {
+                // Acción: rechazar — guardar también el motivo
+                $pagoModel->actualizarValidacion($pagoId, 'Rechazado', $motivoRechazo);
+                $mensajeExito = 'Pago rechazado. El recibo mensual permanece como Pendiente.';
+            }
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('critical', '[FinanzasController::validarPago] Error transaccional: ' . $e->getMessage());
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Ocurrió un error en la base de datos al procesar el pago.',
+                ])->setStatusCode(500);
+            }
+            return redirect()->back()->with('error', 'Ocurrió un error en la base de datos al procesar el pago.');
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'La transacción contable falló y fue revertida por seguridad.',
+                ])->setStatusCode(500);
+            }
+            return redirect()->back()->with('error', 'La transacción contable falló y fue revertida por seguridad.');
         }
 
         if ($this->request->isAJAX()) {

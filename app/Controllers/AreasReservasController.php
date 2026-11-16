@@ -42,10 +42,7 @@ class AreasReservasController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
-            }
-            return redirect()->to(site_url('auth/login'))->with('error', 'Acceso denegado.');
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
         $areaModel = new AreaComunModel();
@@ -61,24 +58,17 @@ class AreasReservasController extends BaseController
         if ($id) {
             if (! $areaModel->update($id, $datos)) {
                 $errores = implode(', ', $areaModel->errors());
-                if ($this->request->isAJAX()) {
-                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al actualizar.', 'errors' => $areaModel->errors()])->setStatusCode(422);
-                }
-                return redirect()->to(site_url('admin/areas-comunes'))->with('error', 'Error al actualizar: ' . $errores);
+                return $this->responder('error', 'Error al actualizar: ' . $errores, 422, ['errors' => $areaModel->errors()]);
             }
-            session()->setFlashdata('success', 'Área común actualizada correctamente.');
-        } else {
-            if (! $areaModel->insert($datos)) {
-                $errores = implode(', ', $areaModel->errors());
-                if ($this->request->isAJAX()) {
-                    return $this->response->setJSON(['status' => 'error', 'message' => 'Error al crear.', 'errors' => $areaModel->errors()])->setStatusCode(422);
-                }
-                return redirect()->to(site_url('admin/areas-comunes'))->with('error', 'Error al crear: ' . $errores);
-            }
-            session()->setFlashdata('success', 'Área común registrada correctamente.');
+            return $this->responder('success', 'Área común actualizada correctamente.', 200, [], 'admin/areas-comunes');
         }
 
-        return redirect()->to(site_url('admin/areas-comunes'));
+        if (! $areaModel->insert($datos)) {
+            $errores = implode(', ', $areaModel->errors());
+            return $this->responder('error', 'Error al crear: ' . $errores, 422, ['errors' => $areaModel->errors()]);
+        }
+
+        return $this->responder('success', 'Área común registrada correctamente.', 200, [], 'admin/areas-comunes');
     }
 
     /**
@@ -90,31 +80,20 @@ class AreasReservasController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
-            }
-            return redirect()->to(site_url('auth/login'))->with('error', 'Acceso denegado.');
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
         $id     = (int) $this->request->getPost('id');
         $estado = trim($this->request->getPost('estado') ?? '');
 
         if (! in_array($estado, ['Activo', 'Mantenimiento', 'Inactivo'], true)) {
-            $msg = 'Estado no válido. Debe ser: Activo, Mantenimiento o Inactivo.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(422);
-            }
-            return redirect()->to(site_url('admin/areas-comunes'))->with('error', $msg);
+            return $this->responder('error', 'Estado no válido. Debe ser: Activo, Mantenimiento o Inactivo.', 422, [], 'admin/areas-comunes');
         }
 
         $areaModel = new AreaComunModel();
         $area = $areaModel->find($id);
         if (! $area) {
-            $msg = 'El área común seleccionada no existe.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(404);
-            }
-            return redirect()->to(site_url('admin/areas-comunes'))->with('error', $msg);
+            return $this->responder('error', 'El área común seleccionada no existe.', 404, [], 'admin/areas-comunes');
         }
 
         $areaModel->update($id, ['estado' => $estado]);
@@ -126,15 +105,7 @@ class AreasReservasController extends BaseController
         ];
         $msgFinal = $mensajes[$estado] ?? "Estado actualizado a {$estado}.";
 
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => $msgFinal,
-                'csrf'    => csrf_hash(),
-            ]);
-        }
-
-        return redirect()->to(site_url('admin/areas-comunes'))->with('success', $msgFinal);
+        return $this->responder('success', $msgFinal, 200, [], 'admin/areas-comunes');
     }
 
     /**
@@ -226,7 +197,7 @@ class AreasReservasController extends BaseController
         $usuarioId = $session->get('usuario_id');
 
         if (! $session->get('isLoggedIn') || ! $usuarioId) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Debe iniciar sesión.'])->setStatusCode(401);
+            return $this->responder('error', 'Debe iniciar sesión.', 401, [], 'auth/login');
         }
 
         $areaId        = (int) $this->request->getPost('area_id');
@@ -237,41 +208,25 @@ class AreasReservasController extends BaseController
 
         // --- Validaciones básicas ---
         if ($areaId <= 0 || $apartamentoId <= 0 || $fecha === '' || $horaInicio === '' || $horaFin === '') {
-            $msg = 'Todos los campos son obligatorios (área, apartamento, fecha, hora inicio y hora fin).';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', 'Todos los campos son obligatorios (área, apartamento, fecha, hora inicio y hora fin).', 400);
         }
 
         if ($horaInicio >= $horaFin) {
-            $msg = 'La hora de inicio debe ser anterior a la hora de fin.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', 'La hora de inicio debe ser anterior a la hora de fin.', 400);
         }
 
         // --- Verificar que el área existe y está activa ---
         $areaModel = new AreaComunModel();
         $area = $areaModel->find($areaId);
         if (! $area || $area['estado'] !== 'Activo') {
-            $msg = 'El área seleccionada no existe o no está disponible.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', 'El área seleccionada no existe o no está disponible.', 400);
         }
 
         // --- Verificar que el apartamento existe ---
         $apartamentoModel = new ApartamentoModel();
         $apartamento = $apartamentoModel->find($apartamentoId);
         if (! $apartamento) {
-            $msg = 'El apartamento seleccionado no existe.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', 'El apartamento seleccionado no existe.', 400);
         }
 
         // =============================================================
@@ -283,11 +238,7 @@ class AreasReservasController extends BaseController
             $msg = "No se puede reservar: ya existe una reserva confirmada para \"{$area['nombre']}\" "
                  . "el día {$fecha} que se solapa con el horario {$horaInicio} - {$horaFin}. "
                  . "Por favor, seleccione otro horario.";
-
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg])->setStatusCode(409);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', $msg, 409);
         }
 
         // =============================================================
@@ -304,19 +255,15 @@ class AreasReservasController extends BaseController
         ];
 
         if (! $reservaModel->insert($datosReserva)) {
-            $msg = 'Error al crear la reserva.';
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => $msg, 'errors' => $reservaModel->errors()])->setStatusCode(422);
-            }
-            return redirect()->back()->with('error', $msg);
+            return $this->responder('error', 'Error al crear la reserva.', 422, ['errors' => $reservaModel->errors()]);
         }
 
         // =============================================================
         // INTEGRACIÓN AUTOMÁTICA CON LA BITÁCORA
         // Publicar comunicado informando sobre la reserva confirmada
         // =============================================================
-        $nroApto   = $apartamento['nro_apartamento'];
-        $nombreArea = $area['nombre'];
+        $nroApto         = $apartamento['nro_apartamento'];
+        $nombreArea      = $area['nombre'];
         $fechaFormateada = date('d/m/Y', strtotime($fecha));
 
         $comunicadoModel = new ComunicadoModel();
@@ -330,19 +277,11 @@ class AreasReservasController extends BaseController
         ]);
 
         // --- Respuesta exitosa ---
-        $msgExito = "Reserva confirmada: {$nombreArea} el {$fechaFormateada} de {$horaInicio} a {$horaFin}.";
-
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => $msgExito,
-                'data'    => ['reserva_id' => $reservaModel->getInsertID()],
-            ]);
-        }
-
-        $rol = $session->get('rol');
+        $msgExito    = "Reserva confirmada: {$nombreArea} el {$fechaFormateada} de {$horaInicio} a {$horaFin}.";
+        $rol         = $session->get('rol');
         $redireccion = ($rol === 'residente') ? 'residente/reservas' : 'admin/reservas';
-        return redirect()->to(site_url($redireccion))->with('success', $msgExito);
+
+        return $this->responder('success', $msgExito, 200, ['data' => ['reserva_id' => $reservaModel->getInsertID()]], $redireccion);
     }
 
     /**
@@ -355,7 +294,7 @@ class AreasReservasController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Acceso denegado.'])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
         $id = (int) $this->request->getPost('reserva_id');
@@ -363,12 +302,12 @@ class AreasReservasController extends BaseController
         $reserva = $reservaModel->find($id);
 
         if (! $reserva) {
-            return redirect()->back()->with('error', 'La reserva no existe.');
+            return $this->responder('error', 'La reserva no existe.', 404, [], 'admin/reservas');
         }
 
         $reservaModel->update($id, ['estado' => 'Cancelada']);
 
-        return redirect()->to(site_url('admin/reservas'))->with('success', "Reserva #{$id} cancelada.");
+        return $this->responder('success', "Reserva #{$id} cancelada.", 200, [], 'admin/reservas');
     }
 
     // =================================================================

@@ -3,9 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\PagoModel;
+use App\Traits\FileUploadTrait;
 
 class SuperController extends BaseController
 {
+    use FileUploadTrait;
+
     public function panel()
     {
         return view('super/welcome_message');
@@ -273,100 +276,50 @@ class SuperController extends BaseController
             $data['color_primario'] = trim($colorPrimario);
         }
 
-        $uploadPath = FCPATH . 'uploads/branding/';
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0775, true);
-        }
-
-        // 1. Manejo de Logotipo (Eliminar o Subir)
+        // 1. Manejo de Logotipo (Eliminar o Subir con FileUploadTrait)
         if ($this->request->getPost('eliminar_logo') == '1') {
-            if (!empty($currentMarca['logo_url'])) {
-                $oldFile = FCPATH . ltrim($currentMarca['logo_url'], '/\\');
-                if (is_file($oldFile) && strpos($currentMarca['logo_url'], 'uploads/branding/') !== false) {
-                    @unlink($oldFile);
-                }
-            }
+            $this->eliminarArchivoSeguro($currentMarca['logo_url'] ?? null);
             $data['logo_url'] = null;
         } else {
-            $logo = $this->request->getFile('logo_condominio');
-            if ($logo && $logo->getError() !== UPLOAD_ERR_NO_FILE) {
-                if (!$logo->isValid()) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'Error al procesar el logo: ' . $logo->getErrorString());
-                }
+            $subidaLogo = $this->subirImagenSegura(
+                $this->request->getFile('logo_condominio'),
+                'branding',
+                $currentMarca['logo_url'] ?? null,
+                2,
+                ['jpg', 'jpeg', 'png', 'webp', 'svg', 'jfif']
+            );
 
-                $allowedTypes = ['jpg', 'jpeg', 'png', 'webp', 'svg', 'jfif'];
-                $allowedMimes = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/svg', 'image/jpg', 'image/jfif', 'image/x-png'];
-                $ext = strtolower($logo->getClientExtension());
-                $mime = strtolower($logo->getMimeType());
+            if (is_array($subidaLogo) && isset($subidaLogo['error'])) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', $subidaLogo['error']);
+            }
 
-                if (!in_array($ext, $allowedTypes) || !in_array($mime, $allowedMimes)) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'Formato de imagen de logo no permitido. Use: jpg, jpeg, png, webp o svg.');
-                }
-
-                if ($logo->getSizeByUnit('mb') > 2) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'El logo no debe superar los 2 MB.');
-                }
-
-                // Eliminar archivo anterior si existía
-                if (!empty($currentMarca['logo_url'])) {
-                    $oldFile = FCPATH . ltrim($currentMarca['logo_url'], '/\\');
-                    if (is_file($oldFile) && strpos($currentMarca['logo_url'], 'uploads/branding/') !== false) {
-                        @unlink($oldFile);
-                    }
-                }
-
-                $newName = $logo->getRandomName();
-                $logo->move($uploadPath, $newName);
-                $data['logo_url'] = 'uploads/branding/' . $newName;
+            if ($subidaLogo !== null) {
+                $data['logo_url'] = $subidaLogo;
             }
         }
 
-        // 2. Manejo de Fondo del Login (Eliminar o Subir)
+        // 2. Manejo de Fondo del Login (Eliminar o Subir con FileUploadTrait)
         if ($this->request->getPost('eliminar_login_bg') == '1') {
-            if (!empty($currentMarca['login_bg_url'])) {
-                $oldFile = FCPATH . ltrim($currentMarca['login_bg_url'], '/\\');
-                if (is_file($oldFile) && strpos($currentMarca['login_bg_url'], 'uploads/branding/') !== false) {
-                    @unlink($oldFile);
-                }
-            }
+            $this->eliminarArchivoSeguro($currentMarca['login_bg_url'] ?? null);
             $data['login_bg_url'] = null;
         } else {
-            $loginBg = $this->request->getFile('login_bg');
-            if ($loginBg && $loginBg->getError() !== UPLOAD_ERR_NO_FILE) {
-                if (!$loginBg->isValid()) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'Error al procesar la imagen de fondo: ' . $loginBg->getErrorString());
-                }
+            $subidaBg = $this->subirImagenSegura(
+                $this->request->getFile('login_bg'),
+                'branding',
+                $currentMarca['login_bg_url'] ?? null,
+                5,
+                ['jpg', 'jpeg', 'png', 'webp', 'jfif'],
+                'login_bg_'
+            );
 
-                $allowedTypes = ['jpg', 'jpeg', 'png', 'webp', 'jfif'];
-                $allowedMimes = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp', 'image/jpg', 'image/jfif', 'image/x-png', 'image/x-citrix-jpeg', 'image/pipeg'];
-                $ext = strtolower($loginBg->getClientExtension());
-                $mime = strtolower($loginBg->getMimeType());
+            if (is_array($subidaBg) && isset($subidaBg['error'])) {
+                return redirect()->to(site_url('super/marca-blanca'))
+                    ->with('error', $subidaBg['error']);
+            }
 
-                if (!in_array($ext, $allowedTypes) || !in_array($mime, $allowedMimes)) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'Formato de fondo de login no permitido. Use: jpg, jpeg, png o webp.');
-                }
-
-                if ($loginBg->getSizeByUnit('mb') > 5) {
-                    return redirect()->to(site_url('super/marca-blanca'))
-                        ->with('error', 'La imagen de fondo del login no debe superar los 5 MB.');
-                }
-
-                // Eliminar archivo anterior si existía
-                if (!empty($currentMarca['login_bg_url'])) {
-                    $oldFile = FCPATH . ltrim($currentMarca['login_bg_url'], '/\\');
-                    if (is_file($oldFile) && strpos($currentMarca['login_bg_url'], 'uploads/branding/') !== false) {
-                        @unlink($oldFile);
-                    }
-                }
-
-                $newName = 'login_bg_' . $loginBg->getRandomName();
-                $loginBg->move($uploadPath, $newName);
-                $data['login_bg_url'] = 'uploads/branding/' . $newName;
+            if ($subidaBg !== null) {
+                $data['login_bg_url'] = $subidaBg;
             }
         }
 

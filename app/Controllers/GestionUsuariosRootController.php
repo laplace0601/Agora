@@ -4,28 +4,33 @@ namespace App\Controllers;
 
 use App\Models\UsuarioModel;
 use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\Exceptions\PageNotFoundException;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * GestionUsuariosRootController
  *
  * API JSON para gestión integral de usuarios desde el panel Root.
- * Protegido doblemente: filtro de ruta + guardia de constructor.
+ * Protegido doblemente: filtro de ruta + guardia de ciclo de vida CI4.
  */
 class GestionUsuariosRootController extends BaseController
 {
     use ResponseTrait;
 
-    public function __construct()
-    {
-        $session = session();
-        
-        // SEGURIDAD CRÍTICA: Impedir el acceso a cualquier rol que no sea 'root'
-        // Esto protege el controlador incluso si se omiten los filtros en Routes.php
-        // Garantiza la separación entre el Superadmin de infraestructura y el Administrador de condominio.
-        if ($session->get('rol') !== 'root') {
-            header('HTTP/1.1 403 Forbidden');
-            echo json_encode(['error' => 'Acceso denegado. Se requiere privilegios de superadmin (root).']);
-            exit;
+    public function initController(
+        RequestInterface $request,
+        ResponseInterface $response,
+        LoggerInterface $logger
+    ) {
+        parent::initController($request, $response, $logger);
+
+        // Guardia de seguridad en el ciclo de vida de CI4:
+        // El filtro 'auth:root' en Routes.php ya protege estas rutas, pero esta comprobación
+        // proporciona defensa en profundidad sin romper el framework con llamadas a exit().
+        if (session()->get('rol') !== 'root') {
+            throw PageNotFoundException::forPageNotFound('Acceso denegado. Se requieren privilegios de superadmin.');
         }
     }
 

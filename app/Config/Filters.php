@@ -74,12 +74,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            'csrf' => [
-                'except' => [
-                    'admin/finanzas/facturar',
-                    'crm/finanzas/facturar',
-                ],
-            ],
+            'csrf',
             // 'invalidchars',
             // NOTA: El filtro 'auth' ya no se aplica globalmente.
             // Cada grupo de rutas en Routes.php lo aplica individualmente:

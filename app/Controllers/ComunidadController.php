@@ -4,14 +4,17 @@ namespace App\Controllers;
 
 use App\Models\TicketModel;
 use App\Models\ComunicadoModel;
+use App\Traits\FileUploadTrait;
 
 class ComunidadController extends BaseController
 {
+    use FileUploadTrait;
+
     /**
      * POST /crm/comunidad/comunicado  o  POST /admin/cartelera/publicar
      *
      * El admin publica una noticia o comunicado en la bitácora/cartelera digital.
-     * Soporta adjuntar una imagen (jpg, png, webp, máx 2MB).
+     * Soporta adjuntar una imagen (jpg, png, webp, máx 2MB) con FileUploadTrait.
      * Solo para rol 'admin'.
      */
     public function crearComunicado()
@@ -19,64 +22,27 @@ class ComunidadController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Acceso denegado. Solo los administradores pueden publicar comunicados.',
-                ])->setStatusCode(403);
-            }
-            return redirect()->back()->with('error', 'Acceso denegado.');
+            return $this->responder('error', 'Acceso denegado. Solo los administradores pueden publicar comunicados.', 403);
         }
 
         $titulo    = trim($this->request->getPost('titulo') ?? '');
         $contenido = trim($this->request->getPost('contenido') ?? $this->request->getPost('descripcion') ?? '');
 
         if ($titulo === '' || $contenido === '') {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'El título y el contenido son obligatorios.',
-                ])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', 'El título y el contenido son obligatorios.');
+            return $this->responder('error', 'El título y el contenido son obligatorios.', 400);
         }
 
-        // ---------------------------------------------------------------
-        // Procesamiento de imagen adjunta (ETAPA 1)
-        // ---------------------------------------------------------------
-        $imagenUrl = null;
-        $imagen    = $this->request->getFile('imagen');
+        // Procesamiento seguro de imagen adjunta vía FileUploadTrait
+        $subidaImg = $this->subirImagenSegura(
+            $this->request->getFile('imagen'),
+            'bitacora',
+            null,
+            2,
+            ['jpg', 'jpeg', 'png', 'webp']
+        );
 
-        if ($imagen && $imagen->isValid() && ! $imagen->hasMoved()) {
-            // Validar tipo y tamaño (máx 2MB)
-            $reglas = [
-                'imagen' => [
-                    'rules'  => 'uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]|mime_in[imagen,image/jpeg,image/png,image/webp]',
-                    'errors' => [
-                        'max_size' => 'La imagen no debe superar los 2 MB.',
-                        'is_image' => 'El archivo debe ser una imagen válida.',
-                        'mime_in'  => 'Solo se permiten imágenes JPG, PNG o WebP.',
-                    ],
-                ],
-            ];
-
-            if (! $this->validate($reglas)) {
-                $erroresImg = implode(' ', $this->validator->getErrors());
-                if ($this->request->isAJAX()) {
-                    return $this->response->setJSON([
-                        'status'  => 'error',
-                        'message' => $erroresImg,
-                    ])->setStatusCode(400);
-                }
-                return redirect()->back()->with('error', $erroresImg);
-            }
-
-            // Mover el archivo a public/uploads/bitacora/
-            $nuevoNombre = $imagen->getRandomName();
-            $imagen->move(FCPATH . 'uploads/bitacora', $nuevoNombre);
-
-            // Guardar la ruta relativa para la BD
-            $imagenUrl = 'uploads/bitacora/' . $nuevoNombre;
+        if (is_array($subidaImg) && isset($subidaImg['error'])) {
+            return $this->responder('error', $subidaImg['error'], 400);
         }
 
         $comunicadoModel = new ComunicadoModel();
@@ -85,33 +51,21 @@ class ComunidadController extends BaseController
             'autor_id'          => $session->get('usuario_id'),
             'titulo'            => $titulo,
             'contenido'         => $contenido,
-            'imagen_url'        => $imagenUrl,
+            'imagen_url'        => $subidaImg,
             'fecha_publicacion' => date('Y-m-d H:i:s'),
         ];
 
         if (! $comunicadoModel->insert($datos)) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Error al publicar el comunicado.',
-                    'errors'  => $comunicadoModel->errors(),
-                ])->setStatusCode(422);
-            }
-            return redirect()->back()->with('error', 'Error al publicar el comunicado.');
+            return $this->responder('error', 'Error al publicar el comunicado.', 422, ['errors' => $comunicadoModel->errors()]);
         }
 
-        // Respuesta dual: soporta tanto AJAX como formulario estándar
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Comunicado publicado exitosamente.',
-                'data'    => [
-                    'comunicado_id' => $comunicadoModel->getInsertID(),
-                ],
-            ]);
-        }
-
-        return redirect()->to(site_url('admin/cartelera'))->with('success', 'Comunicado publicado exitosamente.');
+        return $this->responder(
+            'success',
+            'Comunicado publicado exitosamente.',
+            200,
+            ['data' => ['comunicado_id' => $comunicadoModel->getInsertID()]],
+            'admin/cartelera'
+        );
     }
 
     /**

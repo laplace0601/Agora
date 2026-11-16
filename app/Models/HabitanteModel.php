@@ -112,4 +112,14 @@ class HabitanteModel extends Model
     {
         return $this->where('estado', 'pendiente')->countAllResults();
     }
+
+    /**
+     * Desmarca el flag 'es_principal' para todos los habitantes de un apartamento.
+     */
+    public function desmarcarPrincipal(int $apartamentoId): bool
+    {
+        return (bool) $this->where('apartamento_id', $apartamentoId)
+                           ->set(['es_principal' => 0])
+                           ->update();
+    }
 }

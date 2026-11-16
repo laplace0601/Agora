@@ -44,11 +44,17 @@
             foreach ($anuncios_activos as $anuncio): 
         ?>
             <div class="col-12 col-md-6 col-lg-4">
-                <article class="card h-100 anuncio-card border-0 border-start border-warning border-3 shadow-sm bg-white rounded-4 overflow-hidden">
-                    <a href="<?= site_url('admin/cartelera/eliminar/' . $anuncio['id']) ?>" 
-                       class="btn-eliminar" 
-                       title="Eliminar anuncio"
-                       onclick="return confirm('¿Eliminar este anuncio?');">&times;</a>
+                <article class="card h-100 anuncio-card border-0 border-start border-warning border-3 shadow-sm bg-white rounded-4 overflow-hidden position-relative">
+                    <form action="<?= site_url('admin/cartelera/eliminar/' . $anuncio['id']) ?>" 
+                          method="POST" 
+                          class="position-absolute top-0 end-0 m-2 z-2" 
+                          onsubmit="return confirm('¿Seguro que deseas eliminar este anuncio?');">
+                        <?= csrf_field() ?>
+                        <button type="submit" 
+                                class="btn-eliminar-anuncio border-0 bg-transparent p-1 lh-1" 
+                                title="Eliminar anuncio" 
+                                aria-label="Eliminar anuncio">&times;</button>
+                    </form>
 
                     <!-- Imagen adjunta con lightbox -->
                     <?php if (!empty($anuncio['imagen_url'])): ?>

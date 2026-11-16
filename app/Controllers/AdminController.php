@@ -28,35 +28,44 @@ class AdminController extends BaseController
      *
      * Vista del Directorio de Departamentos (reemplaza el antiguo directorio de residentes).
      * Muestra todos los apartamentos con su residente principal y estado de deuda.
+     * Optimizado: 1 sola consulta SQL consolidada sin antipatrón N+1 queries.
      */
     public function residentes()
     {
         $apartamentoModel = new ApartamentoModel();
-        $reciboModel      = new ReciboModel();
 
-        // Obtener todos los apartamentos con datos del condominio y residente
+        // Obtener todos los apartamentos con datos del condominio, residente y agregación de deuda en 1 sola consulta
         $apartamentos = $apartamentoModel
-            ->select('apartamentos.*, condominios.nombre_condominio, residentes.nombre_completo, residentes.cedula_identidad, residentes.telefono')
+            ->select('apartamentos.id,
+                      apartamentos.condominio_id,
+                      apartamentos.residente_id,
+                      apartamentos.nombre_edificio_torre,
+                      apartamentos.nro_apartamento,
+                      apartamentos.metros_cuadrados,
+                      apartamentos.alicuota,
+                      condominios.nombre_condominio, 
+                      residentes.nombre_completo, 
+                      residentes.cedula_identidad, 
+                      residentes.telefono,
+                      COALESCE(SUM(CASE WHEN recibos_mensuales.estado_pago = "Pendiente" THEN recibos_mensuales.monto_total ELSE 0 END), 0) AS deuda_total,
+                      COUNT(CASE WHEN recibos_mensuales.estado_pago = "Pendiente" THEN recibos_mensuales.id ELSE NULL END) AS recibos_pendientes')
             ->join('condominios', 'condominios.id = apartamentos.condominio_id')
             ->join('residentes', 'residentes.id = apartamentos.residente_id', 'left')
+            ->join('recibos_mensuales', 'recibos_mensuales.apartamento_id = apartamentos.id', 'left')
+            ->groupBy('apartamentos.id,
+                       apartamentos.condominio_id,
+                       apartamentos.residente_id,
+                       apartamentos.nombre_edificio_torre,
+                       apartamentos.nro_apartamento,
+                       apartamentos.metros_cuadrados,
+                       apartamentos.alicuota,
+                       condominios.nombre_condominio, 
+                       residentes.nombre_completo, 
+                       residentes.cedula_identidad, 
+                       residentes.telefono')
             ->orderBy('condominios.nombre_condominio', 'ASC')
             ->orderBy('apartamentos.nro_apartamento', 'ASC')
             ->findAll();
-
-        // Calcular deuda por apartamento
-        foreach ($apartamentos as &$apto) {
-            $pendientes = $reciboModel
-                ->where('apartamento_id', $apto['id'])
-                ->where('estado_pago', 'Pendiente')
-                ->findAll();
-
-            $deuda = 0;
-            foreach ($pendientes as $r) {
-                $deuda += (float) $r['monto_total'];
-            }
-            $apto['deuda_total'] = $deuda;
-            $apto['recibos_pendientes'] = count($pendientes);
-        }
 
         return view('admin/directorio_departamentos', ['apartamentos' => $apartamentos]);
     }
@@ -181,8 +190,7 @@ class AdminController extends BaseController
      */
     public function morosidad()
     {
-        $reciboModel      = new ReciboModel();
-        $apartamentoModel = new ApartamentoModel();
+        $reciboModel = new ReciboModel();
 
         // Filtros opcionales por mes y año
         $filtroMes  = $this->request->getGet('mes')  ? (int) $this->request->getGet('mes')  : null;
@@ -280,9 +288,9 @@ class AdminController extends BaseController
     // ---------------------------------------------------------------
 
     /**
-     * GET /admin/cartelera/eliminar/(:num)
+     * POST /admin/cartelera/eliminar/(:num)
      *
-     * Cambia el estado de un comunicado a 'borrado' (soft delete)
+     * Cambia el estado de un comunicado a 'borrado' (soft delete) de forma segura
      * y elimina el archivo físico de imagen del backend para liberar espacio.
      */
     public function eliminarAnuncio(int $id)
