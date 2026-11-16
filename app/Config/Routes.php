@@ -11,22 +11,20 @@ use CodeIgniter\Router\RouteCollection;
 // Rutas Públicas (sin autenticación)
 // ---------------------------------------------------------------
 
-$routes->get('/', function () {
-    return view('landing/landing'); // carga la landing page principal
-});
-
+// Ruta principal: carga directamente el Login
+$routes->get('/', 'AuthController::login');
+// el landing sigue en los archivos pero la ruta esta desactivada
 // Login — GET muestra el formulario, POST lo procesa
 $routes->get('login',              'AuthController::login');
 $routes->get('auth/login',         'AuthController::login');
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
 $routes->get('auth/logout',        'AuthController::logout');
-
 // ---------------------------------------------------------------
 // Panel Super-Admin (rol: root)
 // ---------------------------------------------------------------
 $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->get('panel', 'SuperController::panel');
-    
+
     // Inmuebles / Apartamentos (ahora exclusivos de root)
     $routes->get('apartamentos',          'SuperController::apartamentos');
     $routes->post('apartamentos/registrar-condominio',  'SuperController::registrarCondominio');
@@ -66,7 +64,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->get('cartelera',             'AdminController::cartelera');
     $routes->get('comunidad',             'AdminController::comunidad');
     $routes->get('soporte',               'AdminController::soporte');
-    
+
     // Handlers POST — Delegados a controladores especializados
     $routes->post('soporte/validar',       'ComunidadController::responderTicket');  // ex AdminController::validarTicket
     $routes->post('finanzas/facturar',     'FinanzasController::emitirRecibos');     // ex AdminController::emitirRecibos (BUGFIX)
