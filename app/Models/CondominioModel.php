@@ -31,7 +31,7 @@ class CondominioModel extends Model
 
     protected $validationRules = [
         'nombre_condominio'      => 'required|max_length[255]',
-        'rif_jurisdiccion'       => 'permit_empty|max_length[50]',
+        'rif_jurisdiccion'       => 'permit_empty|max_length[20]',
         'direccion'              => 'permit_empty|max_length[500]',
         'total_metros_cuadrados' => 'permit_empty|decimal',
         'propietario'            => 'permit_empty|max_length[255]',

@@ -30,7 +30,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark py-3 shadow" style="background-color: #0F172A;">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="<?= site_url('super/apartamentos') ?>">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="<?= base_url('super/apartamentos') ?>">
                 <span class="bg-primary text-white px-2 py-1 rounded fs-6"><i class="bi bi-shield-fill-check"></i></span>
                 <?php if (logoEmpresa()): ?>
                     <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="height: 28px;">
@@ -48,26 +48,26 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4 gap-1">
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/apartamentos' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
-                            href="<?= site_url('super/apartamentos') ?>">
+                            href="<?= base_url('super/apartamentos') ?>">
                             <i class="bi bi-buildings me-1"></i> Inmuebles
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/gestion_usuarios' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
-                            href="<?= site_url('super/gestion_usuarios') ?>">
+                            href="<?= base_url('super/gestion_usuarios') ?>">
                             <i class="bi bi-person-plus me-1"></i> Gestionar Usuarios
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/planes' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
-                            href="<?= site_url('super/planes') ?>">
+                            href="<?= base_url('super/planes') ?>">
                             <i class="bi bi-patch-check me-1"></i> Planes
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link rounded-2 px-3 py-2 <?= (uri_string() === 'super/marca-blanca' ? 'active fw-semibold bg-white bg-opacity-10' : '') ?>"
-                            href="<?= site_url('super/marca-blanca') ?>">
+                            href="<?= base_url('super/marca-blanca') ?>">
                             <i class="bi bi-palette me-1"></i> Marca Blanca
                         </a>
                     </li>
@@ -77,7 +77,7 @@
                         <span class="text-light small fw-bold">
                             <i class="bi bi-person-badge-fill me-1"></i> @<?= session()->get('nombre_usuario') ?? 'root' ?>
                         </span>
-                        <a href="<?= site_url('auth/logout') ?>" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
+                        <a href="<?= base_url('auth/logout') ?>" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
                             Salir <i class="bi bi-box-arrow-right ms-1"></i>
                         </a>
                     </div>

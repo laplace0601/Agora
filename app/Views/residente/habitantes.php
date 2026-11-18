@@ -43,12 +43,69 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
         </div>
     <?php endif; ?>
 
-    <!-- Tabla de habitantes -->
+    <!-- Tabla de habitantes (Renderizado PHP en Servidor) -->
     <div id="contenedorHabitantes">
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted mt-2">Cargando habitantes...</p>
-        </div>
+        <?php
+        $habitantes_lista = $habitantes ?? [];
+        if (empty($habitantes_lista)):
+        ?>
+            <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
+                <i class="bi bi-people text-muted fs-1 d-block mb-2"></i>
+                <p class="text-secondary mb-0">No hay habitantes registrados aún.</p>
+            </div>
+        <?php else: ?>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Nombre Completo</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Tipo</th>
+                                <th class="text-center">Principal</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($habitantes_lista as $h): ?>
+                                <?php
+                                if ($h['estado'] === 'aprobado') {
+                                    $estadoBadge = '<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Aprobado</span>';
+                                } elseif ($h['estado'] === 'pendiente') {
+                                    $estadoBadge = '<span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Pendiente</span>';
+                                } else {
+                                    $estadoBadge = '<span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>Rechazado</span>';
+                                }
+                                ?>
+                                <tr class="<?= $h['estado'] === 'rechazado' ? 'table-light text-muted' : '' ?>">
+                                    <td class="ps-4 fw-medium"><?= esc($h['nombre']) ?> <?= esc($h['apellido']) ?></td>
+                                    <td class="small"><?= esc($h['cedula_identidad'] ?? '—') ?></td>
+                                    <td class="small"><?= esc($h['telefono'] ?? '—') ?></td>
+                                    <td><span class="badge bg-info-subtle text-info rounded-pill"><?= esc($h['tipo_habitante']) ?></span></td>
+                                    <td class="text-center"><?= ($h['es_principal'] == 1) ? '<i class="bi bi-star-fill text-warning"></i>' : '' ?></td>
+                                    <td class="text-center"><?= $estadoBadge ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php
+            $aprobados = count(array_filter($habitantes_lista, fn($h) => $h['estado'] === 'aprobado'));
+            $pendientes = count(array_filter($habitantes_lista, fn($h) => $h['estado'] === 'pendiente'));
+            ?>
+            <div class="d-flex gap-3 mt-3">
+                <span class="badge bg-light text-dark border px-3 py-2">
+                    <i class="bi bi-people-fill me-1 text-success"></i> <?= $aprobados ?> aprobado<?= $aprobados !== 1 ? 's' : '' ?>
+                </span>
+                <?php if ($pendientes > 0): ?>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+                        <i class="bi bi-hourglass-split me-1"></i> <?= $pendientes ?> pendiente<?= $pendientes !== 1 ? 's' : '' ?> de aprobación
+                    </span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
 </main>
@@ -63,7 +120,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <form id="formSolicitarHabitante">
+            <form id="formSolicitarHabitante" action="<?= base_url('residente/habitantes/solicitar') ?>" method="POST">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="alert alert-info border-0 small py-2">
@@ -121,132 +178,15 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const contenedor = document.getElementById('contenedorHabitantes');
-
-    // --- Cargar tabla de habitantes ---
-    async function cargarHabitantes() {
-        try {
-            const resp = await fetch('<?= site_url('residente/habitantes/listar') ?>');
-            const result = await resp.json();
-
-            if (result.status === 'success') {
-                const habitantes = result.data;
-
-                if (habitantes.length === 0) {
-                    contenedor.innerHTML = `
-                        <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
-                            <i class="bi bi-people text-muted fs-1 d-block mb-2"></i>
-                            <p class="text-secondary mb-0">No hay habitantes registrados aún.</p>
-                        </div>`;
-                    return;
-                }
-
-                let html = `
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Nombre Completo</th>
-                                    <th>Cédula</th>
-                                    <th>Teléfono</th>
-                                    <th>Tipo</th>
-                                    <th class="text-center">Principal</th>
-                                    <th class="text-center">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
-                habitantes.forEach(h => {
-                    let estadoBadge = '';
-                    if (h.estado === 'aprobado') {
-                        estadoBadge = '<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>Aprobado</span>';
-                    } else if (h.estado === 'pendiente') {
-                        estadoBadge = '<span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Pendiente</span>';
-                    } else {
-                        estadoBadge = '<span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>Rechazado</span>';
-                    }
-
-                    html += `<tr class="${h.estado === 'rechazado' ? 'table-light text-muted' : ''}">
-                        <td class="ps-4 fw-medium">${h.nombre} ${h.apellido}</td>
-                        <td class="small">${h.cedula_identidad || '—'}</td>
-                        <td class="small">${h.telefono || '—'}</td>
-                        <td><span class="badge bg-info-subtle text-info rounded-pill">${h.tipo_habitante}</span></td>
-                        <td class="text-center">${h.es_principal == 1 ? '<i class="bi bi-star-fill text-warning"></i>' : ''}</td>
-                        <td class="text-center">${estadoBadge}</td>
-                    </tr>`;
-                });
-
-                html += '</tbody></table></div></div>';
-
-                // Resumen
-                const aprobados = habitantes.filter(h => h.estado === 'aprobado').length;
-                const pendientes = habitantes.filter(h => h.estado === 'pendiente').length;
-
-                let resumen = `<div class="d-flex gap-3 mt-3">
-                    <span class="badge bg-light text-dark border px-3 py-2">
-                        <i class="bi bi-people-fill me-1 text-success"></i> ${aprobados} aprobado${aprobados !== 1 ? 's' : ''}
-                    </span>`;
-                if (pendientes > 0) {
-                    resumen += `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
-                        <i class="bi bi-hourglass-split me-1"></i> ${pendientes} pendiente${pendientes !== 1 ? 's' : ''} de aprobación
-                    </span>`;
-                }
-                resumen += '</div>';
-
-                contenedor.innerHTML = html + resumen;
-            } else {
-                contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar los habitantes.</div>';
-            }
-        } catch (err) {
-            contenedor.innerHTML = '<div class="alert alert-danger">Error de conexión.</div>';
-            console.error(err);
-        }
-    }
-
-    cargarHabitantes();
-
-    // --- Formulario de solicitud ---
     const form = document.getElementById('formSolicitarHabitante');
     const btnEnviar = document.getElementById('btnEnviarSolicitud');
 
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
-
-        try {
-            const formData = new FormData(form);
-            const resp = await fetch('<?= site_url('residente/habitantes/solicitar') ?>', {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            const result = await resp.json();
-
-            if (result.status === 'success') {
-                bootstrap.Modal.getInstance(document.getElementById('modalSolicitarHabitante')).hide();
-                form.reset();
-
-                // Mostrar alerta de éxito
-                const alertaHtml = `<div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i>${result.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>`;
-                contenedor.insertAdjacentHTML('beforebegin', alertaHtml);
-
-                cargarHabitantes();
-            } else {
-                alert(result.message || 'Error al enviar la solicitud.');
-            }
-        } catch (err) {
-            alert('Error de conexión. Inténtalo de nuevo.');
-            console.error(err);
-        } finally {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Solicitud';
-        }
-    });
+    if (form && btnEnviar) {
+        form.addEventListener('submit', function() {
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+        });
+    }
 });
 </script>
 

@@ -45,30 +45,35 @@ class AreasReservasController extends BaseController
             return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $areaModel = new AreaComunModel();
-        $id = $this->request->getPost('id');
+        try {
+            $areaModel = new AreaComunModel();
+            $id = $this->request->getPost('id');
 
-        $datos = [
-            'nombre'           => trim($this->request->getPost('nombre') ?? ''),
-            'descripcion'      => trim($this->request->getPost('descripcion') ?? ''),
-            'capacidad_maxima' => (int) ($this->request->getPost('capacidad_maxima') ?? 0) ?: null,
-            'estado'           => $this->request->getPost('estado') ?? 'Activo',
-        ];
+            $datos = [
+                'nombre'           => trim($this->request->getPost('nombre') ?? ''),
+                'descripcion'      => trim($this->request->getPost('descripcion') ?? ''),
+                'capacidad_maxima' => (int) ($this->request->getPost('capacidad_maxima') ?? 0) ?: null,
+                'estado'           => $this->request->getPost('estado') ?? 'Activo',
+            ];
 
-        if ($id) {
-            if (! $areaModel->update($id, $datos)) {
-                $errores = implode(', ', $areaModel->errors());
-                return $this->responder('error', 'Error al actualizar: ' . $errores, 422, ['errors' => $areaModel->errors()]);
+            if ($id) {
+                if (! $areaModel->update($id, $datos)) {
+                    $errores = implode(', ', $areaModel->errors());
+                    return $this->responder('error', 'Error al actualizar: ' . $errores, 422, ['errors' => $areaModel->errors()], 'admin/areas-comunes');
+                }
+                return $this->responder('success', 'Área común actualizada correctamente.', 200, [], 'admin/areas-comunes');
             }
-            return $this->responder('success', 'Área común actualizada correctamente.', 200, [], 'admin/areas-comunes');
-        }
 
-        if (! $areaModel->insert($datos)) {
-            $errores = implode(', ', $areaModel->errors());
-            return $this->responder('error', 'Error al crear: ' . $errores, 422, ['errors' => $areaModel->errors()]);
-        }
+            if (! $areaModel->insert($datos)) {
+                $errores = implode(', ', $areaModel->errors());
+                return $this->responder('error', 'Error al crear: ' . $errores, 422, ['errors' => $areaModel->errors()], 'admin/areas-comunes');
+            }
 
-        return $this->responder('success', 'Área común registrada correctamente.', 200, [], 'admin/areas-comunes');
+            return $this->responder('success', 'Área común registrada correctamente.', 200, [], 'admin/areas-comunes');
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::guardarArea] ' . $e->getMessage());
+            return $this->responder('error', 'Ocurrió un error en el servidor al guardar el área: ' . $e->getMessage(), 500, [], 'admin/areas-comunes');
+        }
     }
 
     /**
@@ -83,29 +88,34 @@ class AreasReservasController extends BaseController
             return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $id     = (int) $this->request->getPost('id');
-        $estado = trim($this->request->getPost('estado') ?? '');
+        try {
+            $id     = (int) $this->request->getPost('id');
+            $estado = trim($this->request->getPost('estado') ?? '');
 
-        if (! in_array($estado, ['Activo', 'Mantenimiento', 'Inactivo'], true)) {
-            return $this->responder('error', 'Estado no válido. Debe ser: Activo, Mantenimiento o Inactivo.', 422, [], 'admin/areas-comunes');
+            if (! in_array($estado, ['Activo', 'Mantenimiento', 'Inactivo'], true)) {
+                return $this->responder('error', 'Estado no válido. Debe ser: Activo, Mantenimiento o Inactivo.', 422, [], 'admin/areas-comunes');
+            }
+
+            $areaModel = new AreaComunModel();
+            $area = $areaModel->find($id);
+            if (! $area) {
+                return $this->responder('error', 'El área común seleccionada no existe.', 404, [], 'admin/areas-comunes');
+            }
+
+            $areaModel->update($id, ['estado' => $estado]);
+
+            $mensajes = [
+                'Activo'        => "Área \"{$area['nombre']}\" activada con éxito. Ya está disponible para reservas.",
+                'Mantenimiento' => "Área \"{$area['nombre']}\" colocada en estado de Mantenimiento.",
+                'Inactivo'      => "Área \"{$area['nombre']}\" desactivada.",
+            ];
+            $msgFinal = $mensajes[$estado] ?? "Estado actualizado a {$estado}.";
+
+            return $this->responder('success', $msgFinal, 200, [], 'admin/areas-comunes');
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::cambiarEstado] ' . $e->getMessage());
+            return $this->responder('error', 'Error al cambiar el estado del área: ' . $e->getMessage(), 500, [], 'admin/areas-comunes');
         }
-
-        $areaModel = new AreaComunModel();
-        $area = $areaModel->find($id);
-        if (! $area) {
-            return $this->responder('error', 'El área común seleccionada no existe.', 404, [], 'admin/areas-comunes');
-        }
-
-        $areaModel->update($id, ['estado' => $estado]);
-
-        $mensajes = [
-            'Activo'        => "Área \"{$area['nombre']}\" activada con éxito. Ya está disponible para reservas.",
-            'Mantenimiento' => "Área \"{$area['nombre']}\" colocada en estado de Mantenimiento.",
-            'Inactivo'      => "Área \"{$area['nombre']}\" desactivada.",
-        ];
-        $msgFinal = $mensajes[$estado] ?? "Estado actualizado a {$estado}.";
-
-        return $this->responder('success', $msgFinal, 200, [], 'admin/areas-comunes');
     }
 
     /**
@@ -115,13 +125,19 @@ class AreasReservasController extends BaseController
      */
     public function eliminarArea(int $id)
     {
-        $areaModel = new AreaComunModel();
-        $area = $areaModel->find($id);
-        $nombre = $area['nombre'] ?? "#{$id}";
-        $areaModel->update($id, ['estado' => 'Inactivo']);
+        try {
+            $areaModel = new AreaComunModel();
+            $area = $areaModel->find($id);
+            $nombre = $area['nombre'] ?? "#{$id}";
+            $areaModel->update($id, ['estado' => 'Inactivo']);
 
-        return redirect()->to(site_url('admin/areas-comunes'))
-            ->with('success', "Área común \"{$nombre}\" desactivada.");
+            return redirect()->to(base_url('admin/areas-comunes'))
+                ->with('success', "Área común \"{$nombre}\" desactivada.");
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::eliminarArea] ' . $e->getMessage());
+            return redirect()->to(base_url('admin/areas-comunes'))
+                ->with('error', 'Error al desactivar el área: ' . $e->getMessage());
+        }
     }
 
     // =================================================================
@@ -193,95 +209,100 @@ class AreasReservasController extends BaseController
      */
     public function crearReserva()
     {
-        $session   = session();
-        $usuarioId = $session->get('usuario_id');
+        $session     = session();
+        $usuarioId   = $session->get('usuario_id');
+        $rol         = $session->get('rol');
+        $redireccion = ($rol === 'residente') ? 'residente/reservas' : 'admin/reservas/nueva';
 
         if (! $session->get('isLoggedIn') || ! $usuarioId) {
             return $this->responder('error', 'Debe iniciar sesión.', 401, [], 'auth/login');
         }
 
-        $areaId        = (int) $this->request->getPost('area_id');
-        $apartamentoId = (int) $this->request->getPost('apartamento_id');
-        $fecha         = trim($this->request->getPost('fecha_reserva') ?? '');
-        $horaInicio    = trim($this->request->getPost('hora_inicio') ?? '');
-        $horaFin       = trim($this->request->getPost('hora_fin') ?? '');
+        try {
+            $areaId        = (int) $this->request->getPost('area_id');
+            $apartamentoId = (int) $this->request->getPost('apartamento_id');
+            $fecha         = trim($this->request->getPost('fecha_reserva') ?? '');
+            $horaInicio    = trim($this->request->getPost('hora_inicio') ?? '');
+            $horaFin       = trim($this->request->getPost('hora_fin') ?? '');
 
-        // --- Validaciones básicas ---
-        if ($areaId <= 0 || $apartamentoId <= 0 || $fecha === '' || $horaInicio === '' || $horaFin === '') {
-            return $this->responder('error', 'Todos los campos son obligatorios (área, apartamento, fecha, hora inicio y hora fin).', 400);
+            // --- Validaciones básicas ---
+            if ($areaId <= 0 || $apartamentoId <= 0 || $fecha === '' || $horaInicio === '' || $horaFin === '') {
+                return $this->responder('error', 'Todos los campos son obligatorios (área, apartamento, fecha, hora inicio y hora fin).', 400, [], $redireccion);
+            }
+
+            if ($horaInicio >= $horaFin) {
+                return $this->responder('error', 'La hora de inicio debe ser anterior a la hora de fin.', 400, [], $redireccion);
+            }
+
+            // --- Verificar que el área existe y está activa ---
+            $areaModel = new AreaComunModel();
+            $area = $areaModel->find($areaId);
+            if (! $area || $area['estado'] !== 'Activo') {
+                return $this->responder('error', 'El área seleccionada no existe o no está disponible.', 400, [], $redireccion);
+            }
+
+            // --- Verificar que el apartamento existe ---
+            $apartamentoModel = new ApartamentoModel();
+            $apartamento = $apartamentoModel->find($apartamentoId);
+            if (! $apartamento) {
+                return $this->responder('error', 'El apartamento seleccionado no existe.', 400, [], $redireccion);
+            }
+
+            // =============================================================
+            // VALIDACIÓN ESTRICTA DE SOLAPAMIENTO HORARIO
+            // =============================================================
+            $reservaModel = new ReservaAreaModel();
+
+            if ($reservaModel->existeSolapamiento($areaId, $fecha, $horaInicio, $horaFin)) {
+                $msg = "No se puede reservar: ya existe una reserva confirmada para \"{$area['nombre']}\" "
+                     . "el día {$fecha} que se solapa con el horario {$horaInicio} - {$horaFin}. "
+                     . "Por favor, seleccione otro horario.";
+                return $this->responder('error', $msg, 409, [], $redireccion);
+            }
+
+            // =============================================================
+            // CREAR LA RESERVA
+            // =============================================================
+            $datosReserva = [
+                'area_id'        => $areaId,
+                'apartamento_id' => $apartamentoId,
+                'usuario_id'     => $usuarioId,
+                'fecha_reserva'  => $fecha,
+                'hora_inicio'    => $horaInicio,
+                'hora_fin'       => $horaFin,
+                'estado'         => 'Confirmada',
+            ];
+
+            if (! $reservaModel->insert($datosReserva)) {
+                return $this->responder('error', 'Error al crear la reserva: ' . implode(', ', $reservaModel->errors()), 422, ['errors' => $reservaModel->errors()], $redireccion);
+            }
+
+            // =============================================================
+            // INTEGRACIÓN AUTOMÁTICA CON LA BITÁCORA
+            // =============================================================
+            $nroApto         = $apartamento['nro_apartamento'];
+            $nombreArea      = $area['nombre'];
+            $fechaFormateada = date('d/m/Y', strtotime($fecha));
+
+            $comunicadoModel = new ComunicadoModel();
+            $comunicadoModel->insert([
+                'autor_id'          => $usuarioId,
+                'titulo'            => "Reserva de área común: {$nombreArea}",
+                'contenido'         => "El área \"{$nombreArea}\" ha sido reservada por el apartamento {$nroApto} "
+                                     . "para el día {$fechaFormateada} de {$horaInicio} a {$horaFin}.",
+                'fecha_publicacion' => date('Y-m-d H:i:s'),
+                'estado'            => 'publicado',
+            ]);
+
+            // --- Respuesta exitosa ---
+            $msgExito         = "Reserva confirmada: {$nombreArea} el {$fechaFormateada} de {$horaInicio} a {$horaFin}.";
+            $redireccionFinal = ($rol === 'residente') ? 'residente/reservas' : 'admin/reservas';
+
+            return $this->responder('success', $msgExito, 200, ['data' => ['reserva_id' => $reservaModel->getInsertID()]], $redireccionFinal);
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::crearReserva] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al procesar la reserva: ' . $e->getMessage(), 500, [], $redireccion);
         }
-
-        if ($horaInicio >= $horaFin) {
-            return $this->responder('error', 'La hora de inicio debe ser anterior a la hora de fin.', 400);
-        }
-
-        // --- Verificar que el área existe y está activa ---
-        $areaModel = new AreaComunModel();
-        $area = $areaModel->find($areaId);
-        if (! $area || $area['estado'] !== 'Activo') {
-            return $this->responder('error', 'El área seleccionada no existe o no está disponible.', 400);
-        }
-
-        // --- Verificar que el apartamento existe ---
-        $apartamentoModel = new ApartamentoModel();
-        $apartamento = $apartamentoModel->find($apartamentoId);
-        if (! $apartamento) {
-            return $this->responder('error', 'El apartamento seleccionado no existe.', 400);
-        }
-
-        // =============================================================
-        // VALIDACIÓN ESTRICTA DE SOLAPAMIENTO HORARIO
-        // =============================================================
-        $reservaModel = new ReservaAreaModel();
-
-        if ($reservaModel->existeSolapamiento($areaId, $fecha, $horaInicio, $horaFin)) {
-            $msg = "No se puede reservar: ya existe una reserva confirmada para \"{$area['nombre']}\" "
-                 . "el día {$fecha} que se solapa con el horario {$horaInicio} - {$horaFin}. "
-                 . "Por favor, seleccione otro horario.";
-            return $this->responder('error', $msg, 409);
-        }
-
-        // =============================================================
-        // CREAR LA RESERVA
-        // =============================================================
-        $datosReserva = [
-            'area_id'        => $areaId,
-            'apartamento_id' => $apartamentoId,
-            'usuario_id'     => $usuarioId,
-            'fecha_reserva'  => $fecha,
-            'hora_inicio'    => $horaInicio,
-            'hora_fin'       => $horaFin,
-            'estado'         => 'Confirmada',
-        ];
-
-        if (! $reservaModel->insert($datosReserva)) {
-            return $this->responder('error', 'Error al crear la reserva.', 422, ['errors' => $reservaModel->errors()]);
-        }
-
-        // =============================================================
-        // INTEGRACIÓN AUTOMÁTICA CON LA BITÁCORA
-        // Publicar comunicado informando sobre la reserva confirmada
-        // =============================================================
-        $nroApto         = $apartamento['nro_apartamento'];
-        $nombreArea      = $area['nombre'];
-        $fechaFormateada = date('d/m/Y', strtotime($fecha));
-
-        $comunicadoModel = new ComunicadoModel();
-        $comunicadoModel->insert([
-            'autor_id'          => $usuarioId,
-            'titulo'            => "Reserva de área común: {$nombreArea}",
-            'contenido'         => "El área \"{$nombreArea}\" ha sido reservada por el apartamento {$nroApto} "
-                                 . "para el día {$fechaFormateada} de {$horaInicio} a {$horaFin}.",
-            'fecha_publicacion' => date('Y-m-d H:i:s'),
-            'estado'            => 'publicado',
-        ]);
-
-        // --- Respuesta exitosa ---
-        $msgExito    = "Reserva confirmada: {$nombreArea} el {$fechaFormateada} de {$horaInicio} a {$horaFin}.";
-        $rol         = $session->get('rol');
-        $redireccion = ($rol === 'residente') ? 'residente/reservas' : 'admin/reservas';
-
-        return $this->responder('success', $msgExito, 200, ['data' => ['reserva_id' => $reservaModel->getInsertID()]], $redireccion);
     }
 
     /**
@@ -297,17 +318,22 @@ class AreasReservasController extends BaseController
             return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $id = (int) $this->request->getPost('reserva_id');
-        $reservaModel = new ReservaAreaModel();
-        $reserva = $reservaModel->find($id);
+        try {
+            $id = (int) $this->request->getPost('reserva_id');
+            $reservaModel = new ReservaAreaModel();
+            $reserva = $reservaModel->find($id);
 
-        if (! $reserva) {
-            return $this->responder('error', 'La reserva no existe.', 404, [], 'admin/reservas');
+            if (! $reserva) {
+                return $this->responder('error', 'La reserva no existe.', 404, [], 'admin/reservas');
+            }
+
+            $reservaModel->update($id, ['estado' => 'Cancelada']);
+
+            return $this->responder('success', "Reserva #{$id} cancelada.", 200, [], 'admin/reservas');
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::cancelarReserva] ' . $e->getMessage());
+            return $this->responder('error', 'Error al cancelar la reserva: ' . $e->getMessage(), 500, [], 'admin/reservas');
         }
-
-        $reservaModel->update($id, ['estado' => 'Cancelada']);
-
-        return $this->responder('success', "Reserva #{$id} cancelada.", 200, [], 'admin/reservas');
     }
 
     // =================================================================
@@ -321,20 +347,25 @@ class AreasReservasController extends BaseController
      */
     public function disponibilidad()
     {
-        $areaId = (int) $this->request->getGet('area_id');
-        $fecha  = $this->request->getGet('fecha');
+        try {
+            $areaId = (int) $this->request->getGet('area_id');
+            $fecha  = $this->request->getGet('fecha');
 
-        if ($areaId <= 0 || empty($fecha)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Parámetros inválidos.'])->setStatusCode(400);
+            if ($areaId <= 0 || empty($fecha)) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Parámetros inválidos.'])->setStatusCode(400);
+            }
+
+            $reservaModel = new ReservaAreaModel();
+            $reservas = $reservaModel->listarPorAreaYFecha($areaId, $fecha);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data'   => $reservas,
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', '[AreasReservasController::disponibilidad] ' . $e->getMessage());
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Error al obtener disponibilidad.'])->setStatusCode(500);
         }
-
-        $reservaModel = new ReservaAreaModel();
-        $reservas = $reservaModel->listarPorAreaYFecha($areaId, $fecha);
-
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data'   => $reservas,
-        ]);
     }
 }
 

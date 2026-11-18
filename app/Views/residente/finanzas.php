@@ -27,7 +27,7 @@
     <!-- Navegación y Encabezado de Página -->
     <div class="row mb-4">
         <div class="col-12">
-            <a href="<?= site_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center mb-3">
+            <a href="<?= base_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center mb-3">
                 <i class="bi bi-arrow-left me-2"></i> Volver al Dashboard
             </a>
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
@@ -132,7 +132,7 @@
                         <span class="text-muted small">Listado de cuotas pendientes asociadas a tu inmueble.</span>
                     </div>
                     <!-- Botón de pagar en color verde -->
-                    <a href="<?= site_url('residente/pago') ?>" class="btn btn-success text-white rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" style="background-color: #198754; border-color: #198754;">
+                    <a href="<?= base_url('residente/pago') ?>" class="btn btn-success text-white rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 shadow-sm" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-plus-circle-fill fs-6"></i>
                         <span>Reportar Pago</span>
                     </a>
@@ -191,7 +191,7 @@
                                                 </button>
                                             <?php else: ?>
                                                 <!-- Botón rápido Pagar en color verde con pre-carga de recibo_id y monto -->
-                                                <a href="<?= site_url('residente/pago?recibo_id=' . $recibo['id'] . '&monto=' . urlencode($recibo['monto_total'])) ?>" 
+                                                <a href="<?= base_url('residente/pago?recibo_id=' . $recibo['id'] . '&monto=' . urlencode($recibo['monto_total'])) ?>" 
                                                    class="btn btn-sm btn-success text-white rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-sm"
                                                    style="background-color: #198754; border-color: #198754;"
                                                    title="Pagar ahora este recibo">
@@ -269,7 +269,7 @@
                                         </td>
                                         <td class="text-center pe-3">
                                             <!-- Botón PDF que abre el comprobante en una nueva pestaña -->
-                                            <a href="<?= site_url('residente/recibo/pdf/' . $recibo['id']) ?>" 
+                                            <a href="<?= base_url('residente/recibo/pdf/' . $recibo['id']) ?>" 
                                                target="_blank" 
                                                class="btn btn-sm btn-pdf-agora rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5 shadow-2xs" 
                                                title="Ver y Descargar Comprobante de Pago en PDF">
@@ -345,7 +345,7 @@
                         </div>
                         <?php endif; ?>
                         <div class="mt-3">
-                            <a href="<?= site_url('residente/pago') ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-medium d-inline-flex align-items-center gap-1">
+                            <a href="<?= base_url('residente/pago') ?>" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-medium d-inline-flex align-items-center gap-1">
                                 <i class="bi bi-arrow-repeat"></i> Reportar nuevo pago
                             </a>
                         </div>

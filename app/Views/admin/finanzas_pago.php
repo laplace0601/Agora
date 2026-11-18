@@ -75,7 +75,8 @@
                                     <td class="text-center pe-4">
                                         <div class="d-inline-flex gap-2">
                                             <!-- Aprobar: submit directo -->
-                                            <form action="<?= site_url('admin/finanzas/validar-pago') ?>" method="POST" class="d-inline">
+                                            <form action="<?= base_url('admin/finanzas/validar-pago') ?>" method="POST" class="d-inline"
+                                                  onsubmit="const btn=this.querySelector('button'); btn.disabled=true; btn.innerHTML='<span class=\'spinner-border spinner-border-sm me-1\'></span> Aprobando...'; return true;">
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="pago_id" value="<?= $pago['id'] ?>">
                                                 <input type="hidden" name="accion" value="aprobar">
@@ -190,7 +191,7 @@
 <div class="modal fade" id="modalRechazo" tabindex="-1" aria-labelledby="modalRechazoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
-            <form action="<?= site_url('admin/finanzas/validar-pago') ?>" method="POST" id="formRechazo" novalidate>
+            <form action="<?= base_url('admin/finanzas/validar-pago') ?>" method="POST" id="formRechazo" novalidate>
                 <?= csrf_field() ?>
                 <input type="hidden" name="pago_id" id="rechazo_pago_id">
                 <input type="hidden" name="accion" value="rechazar">
@@ -273,6 +274,11 @@
             textarea.focus();
         } else {
             textarea.classList.remove('is-invalid');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Rechazando...';
+            }
         }
     });
 })();

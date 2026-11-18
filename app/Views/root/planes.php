@@ -7,13 +7,24 @@
  */
 
 // Inclusión simulada/real del controlador de planes para obtener el plan activo actual
-// Nota: Por defecto simularemos que el condominio tiene contratado el "Plan Bronce"
-$plan_actual = 'Bronce';
+$plan_actual = $plan_actual ?? 'Bronce';
 
 echo view('template/super_header', ['pagina_actual' => 'admin_planes']);
 ?>
 
 <main class="p-5" role="main">
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 border-bottom pb-4">
         <div>
             <h1 class="fw-bold h3 text-dark mb-1">Mi Plan</h1>
@@ -170,7 +181,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_planes']);
                 <h5 class="modal-title fw-bold" id="modalCambioPlanLabel">🔄 Confirmar Solicitud de Cambio</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formActivarLicencia" action="<?= site_url('crm/licencia/activar') ?>" method="POST">
+            <form id="formActivarLicencia" action="<?= base_url('crm/licencia/activar') ?>" method="POST">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4 pt-4">
                     <p class="text-dark small lh-base">Introduce la clave de activación para hacer Upgrade al nivel de licencia de la plataforma Ágora.</p>
@@ -330,80 +341,9 @@ echo view('template/super_footer', ['pagina_actual' => 'admin_planes']);
         const alertBox = document.getElementById('licencia-alert');
         const btnSubmit = document.getElementById('btnSubmitLicencia');
 
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            // Reiniciar alertas y spinner
-            alertBox.classList.add('d-none');
-            alertBox.classList.remove('alert-danger', 'alert-success');
+        form.addEventListener('submit', function() {
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Validando...';
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                const data = await response.json();
-
-                // Renovar token CSRF en el formulario
-                if (data.csrf) {
-                    const csrfInput = form.querySelector('input[name="<?= csrf_token() ?>"]');
-                    if (csrfInput) csrfInput.value = data.csrf;
-                }
-
-                // ── Error del servidor ──────────────────────────────────────────
-                if (!response.ok) {
-                    // Mostrar debug_info en consola si existe (solo dev)
-                    if (data.debug_info) {
-                        console.group('%c[Ágora] Debug de Licencia — Comparación de caracteres', 'color:#f59e0b;font-weight:bold');
-                        console.table(data.debug_info);
-                        console.groupEnd();
-                    }
-                    throw new Error(data.error || 'Error al validar la licencia.');
-                }
-
-                // ── Éxito ───────────────────────────────────────────────────────
-                // 1. Cerrar el modal suavemente
-                if (bsModal) bsModal.hide();
-
-                // 2. Actualizar la UI sin reload
-                actualizarInterfazPlan(planDestinoActual);
-
-                // 3. Disparar Toast SweetAlert2
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 4500,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
-
-                Toast.fire({
-                    icon: 'success',
-                    title: `¡Plan ${planDestinoActual} activado! 🎉`,
-                    text: data.message,
-                });
-
-                // Limpiar campo de clave para futuros usos
-                form.querySelector('#codigo_activacion').value = '';
-
-            } catch (error) {
-                // ── Mostrar error en el modal ───────────────────────────────────
-                alertBox.classList.remove('d-none');
-                alertBox.classList.add('alert-danger');
-                alertBox.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i> ${error.message}`;
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="bi bi-key me-1"></i> Activar Licencia';
-            }
         });
 
     });

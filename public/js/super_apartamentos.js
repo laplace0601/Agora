@@ -1,140 +1,79 @@
 /**
  * @file super_apartamentos.js
  * @description Lógica interactiva para el módulo de gestión inmobiliaria (root).
- * - Rellena automáticamente el select de condominio_id en el modal de apartamentos
- *   cuando el usuario abre el modal, usando los valores del modal de condominios.
+ * - Validación frontend y feedback visual de guardado.
+ * - Envíos nativos compatibles con firewalls y servidores compartidos (InfinityFree).
  */
 document.addEventListener('DOMContentLoaded', function () {
 
-    // AJAX para registrar un condominio
+    // ── Envío de formulario para Registrar Condominio ──────────────────────
     const formCondominio = document.querySelector('#Mcondominiotorre form');
-    if (formCondominio) {
-        formCondominio.addEventListener('submit', async function (e) {
-            e.preventDefault(); // Evitar envío nativo
+    const btnCondo = document.getElementById('btn-guardar-condo') || formCondominio?.querySelector('button[type="submit"]');
 
+    if (formCondominio) {
+        formCondominio.addEventListener('submit', function (e) {
             const nombre = document.getElementById('condo-name')?.value?.trim();
+            const metros = parseFloat(document.getElementById('condo-metros')?.value);
+
             if (!nombre) {
+                e.preventDefault();
                 alert('El nombre del condominio es obligatorio.');
                 return;
             }
 
-            const formData = new FormData(formCondominio);
+            if (isNaN(metros) || metros <= 0) {
+                e.preventDefault();
+                alert('El total de metros cuadrados debe ser un número mayor a 0.');
+                return;
+            }
 
-            try {
-                const response = await fetch(formCondominio.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                const result = await response.json();
-
-                // Siempre renovamos el token CSRF si viene en la respuesta
-                if (result.csrf) {
-                    const csrfInput = formCondominio.querySelector('input[name="csrf_test_name"]');
-                    if (csrfInput) {
-                        csrfInput.value = result.csrf;
-                    }
-                }
-
-                if (response.ok && result.status === 'success') {
-                    // Recargar la página para ver el nuevo condominio
-                    window.location.reload();
-                } else {
-                    alert(result.error || 'Error al registrar el condominio.');
-                }
-            } catch (error) {
-                console.error('Error en la petición:', error);
-                alert('Ocurrió un error de conexión.');
+            // Feedback visual y bloqueo anti doble clic
+            if (btnCondo) {
+                btnCondo.disabled = true;
+                btnCondo.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Guardando Condominio...';
             }
         });
     }
 
-    // ── AJAX para registrar apartamentos masivamente ───────────────────────────
+    // ── Envío de formulario para Registrar Apartamentos ───────────────────
     const formApartamento = document.querySelector('#Mbloqueapartamento form');
+    const btnApto = document.getElementById('btn-guardar-apto') || formApartamento?.querySelector('button[type="submit"]');
+
     if (formApartamento) {
-        formApartamento.addEventListener('submit', async function (e) {
-            e.preventDefault();
+        formApartamento.addEventListener('submit', function (e) {
+            const condoId     = document.getElementById('apto-condo')?.value;
+            const numInicial  = parseInt(document.getElementById('apto-num-inicial')?.value, 10);
+            const cantidad    = parseInt(document.getElementById('apto-cantidad')?.value, 10);
+            const metrosApto  = parseFloat(document.getElementById('apto-metros')?.value);
 
-            // Validaciones frontend rápidas
-            const numInicial = parseInt(document.getElementById('apto-num-inicial')?.value);
-            const cantidad   = parseInt(document.getElementById('apto-cantidad')?.value);
-
-            if (!numInicial || numInicial <= 0) {
-                Swal.fire({ icon: 'error', title: 'Campo requerido', text: 'El número inicial debe ser mayor a 0.' });
-                return;
-            }
-            if (!cantidad || cantidad <= 0) {
-                Swal.fire({ icon: 'error', title: 'Campo requerido', text: 'La cantidad a generar debe ser mayor a 0.' });
+            if (!condoId) {
+                e.preventDefault();
+                alert('Debe seleccionar un condominio o torre.');
                 return;
             }
 
-            // Mostrar loading
-            Swal.fire({
-                title: 'Procesando...',
-                text: `Generando ${cantidad} apartamento(s). Por favor espera.`,
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
+            if (isNaN(numInicial) || numInicial <= 0) {
+                e.preventDefault();
+                alert('El número inicial debe ser mayor a 0.');
+                return;
+            }
 
-            const formData = new FormData(formApartamento);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                e.preventDefault();
+                alert('La cantidad a generar debe ser mayor a 0.');
+                return;
+            }
 
-            try {
-                const response = await fetch(formApartamento.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
+            if (isNaN(metrosApto) || metrosApto <= 0) {
+                e.preventDefault();
+                alert('Los metros cuadrados por apartamento deben ser mayor a 0.');
+                return;
+            }
 
-                const result = await response.json();
-
-                // Renovar token CSRF si viene en la respuesta
-                if (result.csrf) {
-                    const csrfInput = formApartamento.querySelector('input[type="hidden"]');
-                    if (csrfInput) csrfInput.value = result.csrf;
-                }
-
-                if (response.ok && result.status === 'success') {
-                    // Toast de éxito + recarga de página
-                    Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true
-                    }).fire({ icon: 'success', title: result.message });
-
-                    setTimeout(() => window.location.reload(), 1500);
-
-                } else if (result.error_type === 'plan_limit') {
-                    // ── Advertencia especial para límite de plan ───────────────
-                    Swal.fire({
-                        icon: 'warning',
-                        title: '⚠️ Límite del plan alcanzado',
-                        html: `<p class="mb-0">${result.error}</p>`,
-                        confirmButtonText: 'Entendido',
-                        confirmButtonColor: '#f59e0b',
-                        background: '#fffbeb',
-                        customClass: {
-                            title: 'text-warning',
-                            htmlContainer: 'text-start'
-                        }
-                    });
-
-                } else {
-                    // Error genérico
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: result.error || 'No se pudieron registrar los apartamentos.'
-                    });
-                }
-
-            } catch (err) {
-                console.error('Error de red:', err);
-                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo conectar con el servidor.' });
+            // Feedback visual y bloqueo anti doble clic
+            if (btnApto) {
+                btnApto.disabled = true;
+                btnApto.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Generando Apartamentos...';
             }
         });
     }

@@ -31,7 +31,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-agora py-3" role="navigation">
         <div class="container">
-            <a class="navbar-brand brand-agora d-flex align-items-center gap-2" href="<?= site_url('residente/dashboard') ?>">
+            <a class="navbar-brand brand-agora d-flex align-items-center gap-2" href="<?= base_url('residente/dashboard') ?>">
                 <?php if (logoEmpresa()): ?>
                     <img src="<?= logoEmpresa() ?>" alt="<?= esc(nombreEmpresa()) ?>" style="height: 32px;">
                     <span><?= esc(nombreEmpresa()) ?></span>
@@ -49,7 +49,7 @@
                             Sin Apartamento Asignado
                         <?php endif; ?>
                         <!-- ↓↓↓ BOTÓN DE CERRAR SESIÓN ↓↓↓ -->
-                        <a href="<?= site_url('auth/logout') ?>"
+                        <a href="<?= base_url('auth/logout') ?>"
                             class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
                             <i class="bi bi-box-arrow-right me-1"></i> Salir
                         </a>

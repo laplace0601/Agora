@@ -110,11 +110,7 @@ class FinanzasController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Se requiere rol de administrador.',
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado. Se requiere rol de administrador.', 403, [], 'login');
         }
 
         $condominioId = (int) $this->request->getPost('condominio_id');
@@ -124,22 +120,14 @@ class FinanzasController extends BaseController
         $descripcion  = trim((string) $this->request->getPost('descripcion'));
 
         if ($condominioId <= 0 || $montoGlobal <= 0 || $mes <= 0 || $mes > 12 || $anio <= 2000 || empty($descripcion)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Datos inválidos. Verifique el condominio, monto, mes (1-12), año y la descripción del cobro (obligatoria).',
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(400);
+            return $this->responder('error', 'Datos inválidos. Verifique el condominio, monto, mes (1-12), año y la descripción del cobro (obligatoria).', 400, [], 'admin/finanzas/cobro');
         }
 
         $apartamentoModel = new ApartamentoModel();
         $apartamentos = $apartamentoModel->where('condominio_id', $condominioId)->findAll();
 
         if (empty($apartamentos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'No se encontraron apartamentos registrados para este condominio.',
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(404);
+            return $this->responder('error', 'No se encontraron apartamentos registrados para este condominio.', 404, [], 'admin/finanzas/cobro');
         }
 
         // 1. Filtrar los apartamentos ocupados antes de entrar al bucle
@@ -151,11 +139,7 @@ class FinanzasController extends BaseController
 
         // 2. Validación y cálculo de la distribución exacta
         if ($totalOcupados === 0) {
-            return $this->response->setJSON([
-                'status'  => 'error', 
-                'message' => 'No hay apartamentos con residentes asignados para facturar en este condominio.',
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(400);
+            return $this->responder('error', 'No hay apartamentos con residentes asignados para facturar en este condominio.', 400, [], 'admin/finanzas/cobro');
         }
 
         $montoIndividual = $montoGlobal / $totalOcupados;
@@ -199,11 +183,7 @@ class FinanzasController extends BaseController
 
         // Si todos los recibos ya habían sido facturados en este periodo
         if (empty($recibosBatch)) {
-            return $this->response->setJSON([
-                'status'  => 'warning',
-                'message' => "No se generaron recibos. Los {$yaExistentes} apartamentos ya estaban facturados en este mes y año.",
-                'csrf'    => csrf_hash(),
-            ]);
+            return $this->responder('error', "No se generaron recibos. Los {$yaExistentes} apartamentos ya estaban facturados en este mes y año.", 200, [], 'admin/finanzas/cobro');
         }
 
         // ---------------------------------------------------------------
@@ -214,36 +194,25 @@ class FinanzasController extends BaseController
 
         try {
             $reciboModel->insertBatch($recibosBatch);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $db->transRollback();
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Fallo crítico en la base de datos al generar facturas. Ningún recibo fue emitido por seguridad.',
-                'error'   => $e->getMessage(),
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(500);
+            return $this->responder('error', 'Fallo crítico en la base de datos al generar facturas: ' . $e->getMessage(), 500, ['error' => $e->getMessage()], 'admin/finanzas/cobro');
         }
 
         $db->transComplete();
 
         if ($db->transStatus() === false) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'La transacción falló y ha sido revertida de forma segura por el motor de base de datos.',
-                'csrf'    => csrf_hash(),
-            ])->setStatusCode(500);
+            return $this->responder('error', 'La transacción falló y ha sido revertida de forma segura por el motor de base de datos.', 500, [], 'admin/finanzas/cobro');
         }
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => "Creación de recibos exitosa: " . count($recibosBatch) . " recibos emitidos.",
-            'csrf'    => csrf_hash(),
-            'data'    => [
+        $msg = "Creación de recibos exitosa: " . count($recibosBatch) . " recibos emitidos.";
+        return $this->responder('success', $msg, 200, [
+            'data' => [
                 'recibos_emitidos'    => count($recibosBatch),
                 'recibos_ya_existian' => $yaExistentes,
                 'total_apartamentos'  => count($apartamentos),
             ],
-        ]);
+        ], 'admin/finanzas/cobro');
     }
 
     /**
@@ -257,54 +226,47 @@ class FinanzasController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los residentes pueden registrar pagos.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado. Solo los residentes pueden registrar pagos.', 403, [], 'auth/login');
         }
 
-        $metodoInput = trim($this->request->getPost('metodo_pago') ?? '');
-        $metodoPago  = formatearMetodoPago($metodoInput);
-        $referencia  = trim($this->request->getPost('referencia_transaccion') ?? '');
+        try {
+            $metodoInput = trim($this->request->getPost('metodo_pago') ?? '');
+            $metodoPago  = formatearMetodoPago($metodoInput);
+            $referencia  = trim($this->request->getPost('referencia_transaccion') ?? '');
 
-        if ($metodoPago === 'Efectivo' && empty($referencia)) {
-            $referencia = 'Efectivo / Sin referencia';
+            if ($metodoPago === 'Efectivo' && empty($referencia)) {
+                $referencia = 'Efectivo / Sin referencia';
+            }
+
+            $datos = [
+                'recibo_mensual_id'      => (int) $this->request->getPost('recibo_mensual_id'),
+                'monto_pagado'           => (float) $this->request->getPost('monto_pagado'),
+                'metodo_pago'            => $metodoPago,
+                'referencia_transaccion' => $referencia,
+                'comprobante_url'        => trim($this->request->getPost('comprobante_url') ?? ''),
+                'fecha_registro'         => date('Y-m-d H:i:s'),
+                'estado_validacion'      => 'Por Validar',
+            ];
+
+            if ($datos['recibo_mensual_id'] <= 0 || $datos['monto_pagado'] <= 0) {
+                return $this->responder('error', 'El recibo y el monto pagado son obligatorios.', 400, [], 'residente/pago');
+            }
+
+            $pagoModel = new PagoModel();
+
+            if (! $pagoModel->insert($datos)) {
+                return $this->responder('error', 'Error de validación al registrar el pago.', 422, ['errors' => $pagoModel->errors()], 'residente/pago');
+            }
+
+            return $this->responder('success', 'Pago registrado exitosamente. Queda pendiente de validación por el administrador.', 200, [
+                'data' => [
+                    'pago_id' => $pagoModel->getInsertID(),
+                ],
+            ], 'residente/pago');
+        } catch (\Throwable $e) {
+            log_message('error', '[FinanzasController::registrarPago] ' . $e->getMessage());
+            return $this->responder('error', 'Error al registrar el pago: ' . $e->getMessage(), 500, [], 'residente/pago');
         }
-
-        $datos = [
-            'recibo_mensual_id'      => (int) $this->request->getPost('recibo_mensual_id'),
-            'monto_pagado'           => (float) $this->request->getPost('monto_pagado'),
-            'metodo_pago'            => $metodoPago,
-            'referencia_transaccion' => $referencia,
-            'comprobante_url'        => trim($this->request->getPost('comprobante_url') ?? ''),
-            'fecha_registro'         => date('Y-m-d H:i:s'),
-            'estado_validacion'      => 'Por Validar',
-        ];
-
-        if ($datos['recibo_mensual_id'] <= 0 || $datos['monto_pagado'] <= 0) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'El recibo y el monto pagado son obligatorios.',
-            ])->setStatusCode(400);
-        }
-
-        $pagoModel = new PagoModel();
-
-        if (! $pagoModel->insert($datos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Error de validación al registrar el pago.',
-                'errors'  => $pagoModel->errors(),
-            ])->setStatusCode(422);
-        }
-
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Pago registrado exitosamente. Queda pendiente de validación por el administrador.',
-            'data'    => [
-                'pago_id' => $pagoModel->getInsertID(),
-            ],
-        ]);
     }
 
     /**
@@ -320,51 +282,27 @@ class FinanzasController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Acceso denegado. Solo los administradores pueden validar pagos.',
-                ])->setStatusCode(403);
-            }
-            return redirect()->back()->with('error', 'Acceso denegado. Solo los administradores pueden validar pagos.');
+            return $this->responder('error', 'Acceso denegado. Solo los administradores pueden validar pagos.', 403, [], 'auth/login');
         }
 
         $pagoId = (int) $this->request->getPost('pago_id');
         $accion = trim($this->request->getPost('accion') ?? '');
 
         if ($pagoId <= 0 || ! in_array($accion, ['aprobar', 'rechazar'], true)) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).',
-                ])->setStatusCode(400);
-            }
-            return redirect()->back()->with('error', 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).');
+            return $this->responder('error', 'Debe indicar un pago_id válido y una acción (aprobar o rechazar).', 400, [], 'admin/finanzas/pagos');
         }
 
         // Validar que el motivo sea obligatorio al rechazar
         $motivoRechazo = trim($this->request->getPost('motivo_rechazo') ?? '');
         if ($accion === 'rechazar' && $motivoRechazo === '') {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Debe ingresar el motivo del rechazo.',
-                ])->setStatusCode(422);
-            }
-            return redirect()->back()->with('error', 'El motivo de rechazo es obligatorio para rechazar un pago.');
+            return $this->responder('error', 'El motivo de rechazo es obligatorio para rechazar un pago.', 422, [], 'admin/finanzas/pagos');
         }
 
         $pagoModel = new PagoModel();
         $pago      = $pagoModel->obtenerConRecibo($pagoId);
 
         if (! $pago) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'El pago indicado no existe.',
-                ])->setStatusCode(404);
-            }
-            return redirect()->back()->with('error', 'El pago indicado no existe.');
+            return $this->responder('error', 'El pago indicado no existe.', 404, [], 'admin/finanzas/pagos');
         }
 
         $reciboModel = new ReciboModel();
@@ -386,38 +324,19 @@ class FinanzasController extends BaseController
                 $pagoModel->actualizarValidacion($pagoId, 'Rechazado', $motivoRechazo);
                 $mensajeExito = 'Pago rechazado. El recibo mensual permanece como Pendiente.';
             }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return $this->responder('error', 'La transacción contable falló y fue revertida por seguridad.', 500, [], 'admin/finanzas/pagos');
+            }
+
+            return $this->responder('success', $mensajeExito, 200, [], 'admin/finanzas/pagos');
         } catch (\Throwable $e) {
             $db->transRollback();
             log_message('critical', '[FinanzasController::validarPago] Error transaccional: ' . $e->getMessage());
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Ocurrió un error en la base de datos al procesar el pago.',
-                ])->setStatusCode(500);
-            }
-            return redirect()->back()->with('error', 'Ocurrió un error en la base de datos al procesar el pago.');
+            return $this->responder('error', 'Ocurrió un error en la base de datos al procesar el pago: ' . $e->getMessage(), 500, [], 'admin/finanzas/pagos');
         }
-
-        $db->transComplete();
-
-        if ($db->transStatus() === false) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'La transacción contable falló y fue revertida por seguridad.',
-                ])->setStatusCode(500);
-            }
-            return redirect()->back()->with('error', 'La transacción contable falló y fue revertida por seguridad.');
-        }
-
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => $mensajeExito,
-            ]);
-        }
-
-        return redirect()->back()->with('success', $mensajeExito);
     }
 
     /**
@@ -515,7 +434,7 @@ class FinanzasController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn')) {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión.');
+            return redirect()->to(base_url('auth/login'))->with('error', 'Debes iniciar sesión.');
         }
 
         $rol       = $session->get('rol');

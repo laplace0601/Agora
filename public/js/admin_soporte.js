@@ -3,6 +3,7 @@
  * @description Interactividad para la vista de tickets de soporte del admin.
  * - Auto-dismiss de alertas flash.
  * - Confirmación visual al cambiar estado de un ticket a "Resuelto".
+ * - Prevención de doble clic en botones de guardar.
  */
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -15,13 +16,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 4000);
     });
 
-    // Confirmación antes de marcar como Resuelto
+    // Confirmación antes de marcar como Resuelto + indicador de guardado
     document.querySelectorAll('form[action*="soporte/validar"]').forEach(form => {
         form.addEventListener('submit', function (e) {
             const select = this.querySelector('select[name="estado"]');
             if (select && select.value === 'Resuelto') {
                 const ok = confirm('¿Marcar este ticket como Resuelto? Esta acción registrará la fecha de resolución.');
-                if (!ok) e.preventDefault();
+                if (!ok) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
             }
         });
     });

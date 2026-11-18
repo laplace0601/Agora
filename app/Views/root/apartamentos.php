@@ -147,15 +147,16 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                 <h5 class="modal-title fw-bold text-dark" id="McondominiotorreLabel">Nuevo Registro de Condominio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('super/apartamentos/registrar-condominio') ?>" method="POST">
+            <form action="" method="POST" id="form-registrar-condominio">
                 <?= csrf_field() ?>
+                <input type="hidden" name="accion" value="registrar_condominio">
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="condo-name" name="nombre_condo" required placeholder="Nombre">
                         <label for="condo-name">Nombre del Condominio / Torre *</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="condo-rif" name="rif_jurisdiccion" placeholder="RIF">
+                        <input type="text" class="form-control" id="condo-rif" name="rif_jurisdiccion" maxlength="20" placeholder="RIF">
                         <label for="condo-rif">RIF de Jurisdicción (opcional)</label>
                     </div>
 
@@ -166,7 +167,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
+                    <button type="submit" id="btn-guardar-condo" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-cloud-arrow-up me-1"></i> Guardar Condominio
                     </button>
                 </div>
@@ -182,8 +183,9 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                 <h5 class="modal-title fw-bold text-dark" id="MbloqueapartamentoLabel">Nuevo Registro de Apartamento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('super/apartamentos/registrar-apartamento') ?>" method="POST">
+            <form action="" method="POST" id="form-registrar-apartamento">
                 <?= csrf_field() ?>
+                <input type="hidden" name="accion" value="registrar_apartamento">
                 <div class="modal-body px-4">
 
                     <!-- 1. Condominio -->
@@ -238,7 +240,7 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
 
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
+                    <button type="submit" id="btn-guardar-apto" class="btn btn-success text-white w-100 py-3 rounded-3 fw-bold shadow-sm" style="background-color: #198754; border-color: #198754;">
                         <i class="bi bi-cloud-arrow-up me-1"></i> Guardar Apartamento
                     </button>
                 </div>
@@ -310,59 +312,19 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                             // Retornar false previene que el modal se cierre
                             return false;
                         } else {
-                            // Paso 5: Ejecutar la petición
+                            // Paso 5: Ejecutar la petición tradicional POST
                             Swal.showLoading();
-                            const formData = new FormData();
-                            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-
-                            try {
-                                const response = await fetch(`<?= site_url('super/apartamentos/condominios/delete/') ?>${id}`, {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                });
-
-                                const result = await response.json();
-
-                                if (response.ok && result.status === 'success') {
-                                    return true; // Cierra el modal y pasa al .then
-                                } else {
-                                    Swal.showValidationMessage(result.error || "Error de seguridad al eliminar el condominio.");
-                                    return false;
-                                }
-                            } catch (e) {
-                                Swal.showValidationMessage("Error de red al intentar conectar con el servidor.");
-                                return false;
-                            }
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Mostrar Toast de éxito
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true
-                        });
-
-                        Toast.fire({
-                            icon: 'success',
-                            title: 'Condominio eliminado correctamente'
-                        });
-
-                        // Eliminar la tarjeta del DOM con una transición suave
-                        const card = btn.closest('.col-12.col-md-6.col-lg-4');
-                        if (card) {
-                            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                            card.style.opacity = '0';
-                            card.style.transform = 'scale(0.9)';
-                            setTimeout(() => card.remove(), 500);
-                        } else {
-                            window.location.reload();
+                            const f = document.createElement('form');
+                            f.method = 'POST';
+                            f.action = `<?= base_url('super/apartamentos/condominios/delete/') ?>${id}`;
+                            const csrf = document.createElement('input');
+                            csrf.type = 'hidden';
+                            csrf.name = '<?= csrf_token() ?>';
+                            csrf.value = '<?= csrf_hash() ?>';
+                            f.appendChild(csrf);
+                            document.body.appendChild(f);
+                            f.submit();
+                            return true;
                         }
                     }
                 });

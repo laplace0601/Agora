@@ -11,20 +11,24 @@ use CodeIgniter\Router\RouteCollection;
 // Rutas Públicas (sin autenticación)
 // ---------------------------------------------------------------
 
-// Ruta principal: carga directamente el Login
-$routes->get('/', 'AuthController::login');
-// el landing sigue en los archivos pero la ruta esta desactivada
-// Login — GET muestra el formulario, POST lo procesa
-$routes->get('login',              'AuthController::login');
-$routes->get('auth/login',         'AuthController::login');
+// Ruta principal: carga directamente el Login (GET) o procesa credenciales (POST)
+$routes->get('/',                    'AuthController::login');
+$routes->post('/',                   'AuthController::processLogin');
+
+// Login: GET muestra el formulario, POST procesa
+$routes->get('login',                'AuthController::login');
+$routes->post('login',               'AuthController::processLogin');
+
+$routes->get('auth/login',           'AuthController::login');
+$routes->post('auth/login',          'AuthController::processLogin');
+
+// Ruta tradicional de procesamiento de login
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
+// GET /auth/procesar-login — Respaldo si alguien llega por GET (anti-bot o enlace directo)
+// Redirige limpiamente a /login en lugar de dejar la URL con parámetros en el navegador
+$routes->get('auth/procesar-login',  'AuthController::redirectLogin');
 
-// GET /auth/procesar-login — Respaldo para redirecciones del anti-bot de InfinityFree (?i=1)
-// Cuando el hosting redirige un POST a GET con la cookie de seguridad, esto evita el 404
-// y lleva al usuario de vuelta al formulario de login.
-$routes->get('auth/procesar-login', 'AuthController::login');
-
-$routes->get('auth/logout',        'AuthController::logout');
+$routes->get('auth/logout',          'AuthController::logout');
 // ---------------------------------------------------------------
 // Panel Super-Admin (rol: root)
 // ---------------------------------------------------------------
@@ -32,28 +36,40 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->get('panel', 'SuperController::panel');
 
     // Inmuebles / Apartamentos (ahora exclusivos de root)
-    $routes->get('apartamentos',          'SuperController::apartamentos');
-    $routes->post('apartamentos/registrar-condominio',  'SuperController::registrarCondominio');
+    $routes->get('apartamentos',                           'SuperController::apartamentos');
+    $routes->post('apartamentos',                          'SuperController::procesarInmuebles');
+    $routes->post('apartamentos/registrar-condominio',     'SuperController::registrarCondominio');
+    $routes->get('apartamentos/registrar-condominio',      'SuperController::apartamentos');
     $routes->post('apartamentos/condominios/delete/(:num)', 'SuperController::deleteCondominio/$1');
-    $routes->post('apartamentos/registrar-apartamento', 'SuperController::registrarApartamento');
+    $routes->get('apartamentos/condominios/delete/(:num)',  'SuperController::apartamentos');
+    $routes->post('apartamentos/registrar-apartamento',    'SuperController::registrarApartamento');
+    $routes->get('apartamentos/registrar-apartamento',     'SuperController::apartamentos');
 
     // Gestión de usuarios
     $routes->get('crear-usuario', 'UsuarioController::crearUsuario');
+    $routes->post('crear-usuario', 'UsuarioController::crearYGuardar');
     $routes->post('guardar-residente', 'UsuarioController::guardarResidente');
+    $routes->get('guardar-residente', 'UsuarioController::crearUsuario');
     $routes->post('guardar-admin', 'UsuarioController::guardarAdmin');
+    $routes->get('guardar-admin', 'UsuarioController::crearUsuario');
     $routes->post('guardar-super', 'UsuarioController::guardarSuper');
+    $routes->get('guardar-super', 'UsuarioController::crearUsuario');
 
     $routes->get('marca-blanca', 'SuperController::marcaBlanca');
     $routes->post('marca-blanca/guardar', 'SuperController::guardarMarcaBlanca');
+    $routes->get('marca-blanca/guardar', 'SuperController::marcaBlanca');
 
     $routes->get('planes', 'SuperController::planes');
     $routes->post('planes/cambiar', 'SuperController::cambiarPlan');
+    $routes->get('planes/cambiar', 'SuperController::planes');
 
     // Gestión integral de usuarios (Ver, Editar, Eliminar)
     $routes->get('gestion_usuarios', 'UsuarioController::usuarios');
     $routes->get('api/usuarios', 'GestionUsuariosRootController::index');
     $routes->post('api/usuarios/update/(:num)', 'GestionUsuariosRootController::update/$1');
+    $routes->get('api/usuarios/update/(:num)', 'UsuarioController::usuarios');
     $routes->post('api/usuarios/delete/(:num)', 'GestionUsuariosRootController::delete/$1');
+    $routes->get('api/usuarios/delete/(:num)', 'UsuarioController::usuarios');
 });
 
 // ---------------------------------------------------------------
@@ -72,11 +88,17 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     $routes->get('soporte',               'AdminController::soporte');
 
     // Handlers POST — Delegados a controladores especializados
-    $routes->post('soporte/validar',       'ComunidadController::responderTicket');  // ex AdminController::validarTicket
-    $routes->post('finanzas/facturar',     'FinanzasController::emitirRecibos');     // ex AdminController::emitirRecibos (BUGFIX)
-    $routes->post('finanzas/validar-pago', 'FinanzasController::validarPago');       // ex AdminController::validarPago
-    $routes->post('cartelera/publicar',    'ComunidadController::crearComunicado'); // ex AdminController::publicarAnuncio
+    $routes->post('soporte/validar',       'ComunidadController::responderTicket');
+    $routes->get('soporte/validar',        'AdminController::soporte');
+    $routes->post('finanzas/facturar',     'FinanzasController::emitirRecibos');
+    $routes->get('finanzas/facturar',      'AdminController::finanzasCobro');
+    $routes->post('finanzas/validar-pago', 'FinanzasController::validarPago');
+    $routes->get('finanzas/validar-pago',  'AdminController::finanzasPagos');
+    $routes->post('cartelera/publicar',    'ComunidadController::crearComunicado');
+    $routes->get('cartelera/publicar',     'AdminController::cartelera');
     $routes->post('cartelera/eliminar/(:num)', 'AdminController::eliminarAnuncio/$1');
+    $routes->get('cartelera/eliminar/(:num)',  'AdminController::cartelera');
+    $routes->get('cartelera/eliminar',         'AdminController::cartelera');
 
     // Morosidad / Estado de cuentas
     $routes->get('finanzas/morosidad',             'AdminController::morosidad');
@@ -89,12 +111,16 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     // ---------------------------------------------------------------
     $routes->get('apartamento/(:num)/habitantes',  'HabitantesController::listar/$1');
     $routes->post('habitantes/guardar',            'HabitantesController::guardar');
+    $routes->get('habitantes/guardar',             'AdminController::residentes');
     $routes->post('habitantes/eliminar',           'HabitantesController::eliminar');
+    $routes->get('habitantes/eliminar',            'AdminController::residentes');
     $routes->get('habitantes/obtener/(:num)',      'HabitantesController::obtener/$1');
 
     // Aprobación / Rechazo de solicitudes de habitantes
     $routes->post('habitantes/aprobar',            'HabitantesController::aprobar');
+    $routes->get('habitantes/aprobar',             'AdminController::residentes');
     $routes->post('habitantes/rechazar',           'HabitantesController::rechazar');
+    $routes->get('habitantes/rechazar',            'AdminController::residentes');
     $routes->get('habitantes/pendientes',          'HabitantesController::pendientes');
 
     // ---------------------------------------------------------------
@@ -102,13 +128,17 @@ $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
     // ---------------------------------------------------------------
     $routes->get('areas-comunes',                    'AreasReservasController::areasComunes');
     $routes->post('areas-comunes/guardar',           'AreasReservasController::guardarArea');
+    $routes->get('areas-comunes/guardar',            'AreasReservasController::areasComunes');
     $routes->post('areas-comunes/cambiar-estado',    'AreasReservasController::cambiarEstado');
+    $routes->get('areas-comunes/cambiar-estado',     'AreasReservasController::areasComunes');
     $routes->get('areas-comunes/eliminar/(:num)',    'AreasReservasController::eliminarArea/$1');
 
     $routes->get('reservas',                         'AreasReservasController::listarReservas');
     $routes->get('reservas/nueva',                   'AreasReservasController::formularioReserva');
     $routes->post('reservas/crear',                  'AreasReservasController::crearReserva');
+    $routes->get('reservas/crear',                   'AreasReservasController::listarReservas');
     $routes->post('reservas/cancelar',               'AreasReservasController::cancelarReserva');
+    $routes->get('reservas/cancelar',                'AreasReservasController::listarReservas');
 });
 
 // ---------------------------------------------------------------
@@ -118,19 +148,23 @@ $routes->group('residente', ['filter' => 'auth:residente'], function ($routes) {
     $routes->get('dashboard',     'ResidenteController::dashboard');
     $routes->get('pago',          'ResidenteController::reportarPago');
     $routes->post('pago/enviar',  'ResidenteController::enviarPago');
+    $routes->get('pago/enviar',   'ResidenteController::reportarPago');
     $routes->get('soporte',       'ResidenteController::soporte');
     $routes->post('soporte/abrir', 'ResidenteController::abrirTicket');
+    $routes->get('soporte/abrir',  'ResidenteController::soporte');
     $routes->get('finanzas',      'ResidenteController::finanzas');
     $routes->get('recibo/pdf/(:num)', 'ResidenteController::descargarRecibo/$1');
 
     // ETAPA 3: Reservas para residentes
     $routes->get('reservas',           'AreasReservasController::formularioReserva');
     $routes->post('reservas/crear',    'AreasReservasController::crearReserva');
+    $routes->get('reservas/crear',     'AreasReservasController::formularioReserva');
 
     // Censo de habitantes (residente solicita, admin aprueba)
     $routes->get('habitantes',              'ResidenteController::habitantes');
     $routes->get('habitantes/listar',       'HabitantesController::listarMisHabitantes');
     $routes->post('habitantes/solicitar',   'HabitantesController::solicitar');
+    $routes->get('habitantes/solicitar',    'ResidenteController::habitantes');
 });
 
 // ---------------------------------------------------------------
@@ -145,19 +179,27 @@ $routes->get('api/reservas/disponibilidad', 'AreasReservasController::disponibil
 
 // Gestión de Apartamentos
 $routes->post('crm/apartamentos/registrar', 'LicenciaController::registrarApartamento');
+$routes->get('crm/apartamentos/registrar',  'SuperController::apartamentos');
 
 // Gestión de Licencias
 $routes->post('crm/licencia/activar', 'LicenciaController::activarLicencia');
+$routes->get('crm/licencia/activar',  'SuperController::planes');
 
 // Finanzas
 $routes->post('crm/finanzas/facturar',         'FinanzasController::emitirRecibos');
+$routes->get('crm/finanzas/facturar',          'AdminController::finanzasCobro');
 $routes->post('crm/finanzas/pagar',            'FinanzasController::registrarPago');
+$routes->get('crm/finanzas/pagar',             'AdminController::finanzasPagos');
 $routes->post('crm/finanzas/validar-pago',     'FinanzasController::validarPago');
+$routes->get('crm/finanzas/validar-pago',      'AdminController::finanzasPagos');
 $routes->get('crm/finanzas/solvencia/(:num)',  'FinanzasController::procesarSolvencia/$1');
 $routes->get('crm/finanzas/pagos-pendientes',  'FinanzasController::listarPagosPendientes');
 
 // Comunidad
 $routes->post('crm/comunidad/comunicado',         'ComunidadController::crearComunicado');
+$routes->get('crm/comunidad/comunicado',          'AdminController::cartelera');
 $routes->get('crm/comunidad/bitacora',            'ComunidadController::listarComunicados');
 $routes->post('crm/comunidad/ticket',             'ComunidadController::abrirTicket');
+$routes->get('crm/comunidad/ticket',              'ResidenteController::soporte');
 $routes->post('crm/comunidad/ticket/gestionar',   'ComunidadController::responderTicket');
+$routes->get('crm/comunidad/ticket/gestionar',    'AdminController::soporte');

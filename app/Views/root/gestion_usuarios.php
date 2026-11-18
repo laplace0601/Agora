@@ -13,13 +13,25 @@
             <p class="text-secondary small">Administración integral de cuentas de la plataforma Ágora.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="<?= site_url('super/crear-usuario') ?>" class="btn btn-success text-white rounded-pill px-4 py-2 shadow-sm fw-bold">
+            <a href="<?= base_url('super/crear-usuario') ?>" class="btn btn-success text-white rounded-pill px-4 py-2 shadow-sm fw-bold">
                 <i class="bi bi-person-plus-fill me-1"></i> Crear Usuario
             </a>
         </div>
     </div>
 
-    <!-- Alertas -->
+    <!-- Alertas Flashdata y Dinámicas -->
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
     <div id="alert-container"></div>
 
     <div class="card card-agora-form border-0 shadow-sm rounded-4">
@@ -37,7 +49,41 @@
                         </tr>
                     </thead>
                     <tbody id="tbody-usuarios">
-                        <tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Cargando usuarios...</td></tr>
+                        <?php if (empty($usuarios)): ?>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No hay usuarios registrados.</td></tr>
+                        <?php else: ?>
+                            <?php 
+                            $currentUserId = session()->get('usuario_id') ?? 0;
+                            foreach ($usuarios as $u): 
+                                $rolBadge = 'bg-secondary';
+                                if ($u['rol'] === 'root') $rolBadge = 'bg-danger';
+                                elseif ($u['rol'] === 'admin') $rolBadge = 'bg-primary';
+                                elseif ($u['rol'] === 'residente') $rolBadge = 'bg-success';
+
+                                $estadoBadge = ($u['estado'] === 'activo') ? 'bg-success' : 'bg-warning text-dark';
+                                $isSelf = ((int)$u['id'] === (int)$currentUserId);
+                            ?>
+                                <tr>
+                                    <td class="fw-bold text-muted">#<?= esc($u['id']) ?></td>
+                                    <td class="fw-medium">@<?= esc($u['nombre_usuario'] ?? 'N/A') ?></td>
+                                    <td><?= esc($u['correo']) ?></td>
+                                    <td><span class="badge <?= $rolBadge ?> rounded-pill text-uppercase" style="font-size:0.75rem;"><?= esc($u['rol']) ?></span></td>
+                                    <td><span class="badge <?= $estadoBadge ?> rounded-pill text-uppercase" style="font-size:0.75rem;"><?= esc($u['estado']) ?></span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2 btn-editar" data-usuario='<?= json_encode($u, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>'>
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                        <?php if (!$isSelf): ?>
+                                            <button class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-eliminar" data-id="<?= esc($u['id']) ?>" data-nombre="<?= esc($u['nombre_usuario'] ?? $u['correo']) ?>">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <span class="badge bg-light text-muted border px-2 py-1">Tú</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -53,7 +99,8 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalEditarUsuarioLabel">Editar Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="form-editar-usuario">
+            <form id="form-editar-usuario" action="" method="POST">
+                <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <input type="hidden" id="edit-id" name="id">
                     
@@ -105,81 +152,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const tbody = document.getElementById('tbody-usuarios');
     const formEditar = document.getElementById('form-editar-usuario');
     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarUsuario'));
     const alertContainer = document.getElementById('alert-container');
-    
-    // Variables globales
+
+    // Variable global para identificar al usuario actual
     let currentUserId = <?= session()->get('usuario_id') ?? 0 ?>;
-    let csrfToken = '<?= csrf_hash() ?>';
 
-    // Cargar usuarios
-    async function loadUsuarios() {
-        try {
-            const response = await fetch('<?= site_url("super/api/usuarios") ?>');
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                renderTable(result.data);
-            } else {
-                showAlert('danger', 'Error al cargar usuarios.');
-            }
-        } catch (error) {
-            showAlert('danger', 'Error de conexión.');
-        }
-    }
-
-    // Renderizar tabla
-    function renderTable(usuarios) {
-        tbody.innerHTML = '';
-        if (usuarios.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No hay usuarios registrados.</td></tr>';
-            return;
-        }
-
-        usuarios.forEach(u => {
-            const tr = document.createElement('tr');
-            
-            // Badge color para el rol
-            let rolBadge = 'bg-secondary';
-            if (u.rol === 'root') rolBadge = 'bg-danger';
-            else if (u.rol === 'admin') rolBadge = 'bg-primary';
-            else if (u.rol === 'residente') rolBadge = 'bg-success';
-
-            // Badge color para el estado
-            let estadoBadge = u.estado === 'activo' ? 'bg-success' : 'bg-warning text-dark';
-
-            // Botones de acción
-            let botones = `
-                <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2 btn-editar" data-usuario='${JSON.stringify(u)}'>
-                    <i class="bi bi-pencil-square"></i> Editar
-                </button>
-            `;
-
-            // No permitir auto-eliminarse en la UI (aunque el backend ya lo protege)
-            if (parseInt(u.id) !== currentUserId) {
-                botones += `
-                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 btn-eliminar" data-id="${u.id}" data-nombre="${u.nombre_usuario || u.correo}">
-                        <i class="bi bi-trash3-fill"></i>
-                    </button>
-                `;
-            } else {
-                botones += `<span class="badge bg-light text-muted border px-2 py-1">Tú</span>`;
-            }
-
-            tr.innerHTML = `
-                <td class="fw-bold text-muted">#${u.id}</td>
-                <td class="fw-medium">@${u.nombre_usuario || 'N/A'}</td>
-                <td>${u.correo}</td>
-                <td><span class="badge ${rolBadge} rounded-pill text-uppercase" style="font-size:0.75rem;">${u.rol}</span></td>
-                <td><span class="badge ${estadoBadge} rounded-pill text-uppercase" style="font-size:0.75rem;">${u.estado}</span></td>
-                <td class="text-end">${botones}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        // Asignar eventos de edición y eliminación
+    function enlazarEventos() {
         document.querySelectorAll('.btn-editar').forEach(btn => {
             btn.addEventListener('click', function() {
                 const u = JSON.parse(this.getAttribute('data-usuario'));
@@ -200,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal de edición
     function abrirModalEdicion(usuario) {
+        formEditar.action = '<?= base_url("super/api/usuarios/update/") ?>' + usuario.id;
         document.getElementById('edit-id').value = usuario.id;
         document.getElementById('edit-correo').value = usuario.correo;
         document.getElementById('edit-rol').value = usuario.rol;
@@ -237,103 +218,44 @@ document.addEventListener('DOMContentLoaded', function() {
     editClave.addEventListener('input', validarClavesEdicion);
     editClaveConfirm.addEventListener('input', validarClavesEdicion);
 
-    // Guardar Edición
-    formEditar.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
+    // Guardar Edición (Envío Tradicional POST Nativo)
+    formEditar.addEventListener('submit', function(e) {
         const btnGuardar = document.getElementById('btn-guardar-edicion');
-        const id = document.getElementById('edit-id').value;
         const nuevaClave = document.getElementById('edit-clave').value;
         const nuevaClaveConfirm = document.getElementById('edit-clave-confirm').value;
 
         // Validar contraseña si se escribió en cualquiera de las casillas
         if (nuevaClave || nuevaClaveConfirm) {
             if (nuevaClave.length < 8) {
-                showAlert('danger', 'La nueva contraseña debe tener al menos 8 caracteres.');
+                e.preventDefault();
+                alert('La nueva contraseña debe tener al menos 8 caracteres.');
                 return;
             }
             if (nuevaClave !== nuevaClaveConfirm) {
-                showAlert('danger', 'Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.');
+                e.preventDefault();
+                alert('Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.');
                 return;
             }
         }
 
         btnGuardar.disabled = true;
         btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-
-        const formData = new FormData();
-        formData.append('correo', document.getElementById('edit-correo').value);
-        
-        // Si no está deshabilitado, capturar rol y estado
-        if (!document.getElementById('edit-rol').disabled) {
-            formData.append('rol', document.getElementById('edit-rol').value);
-            formData.append('estado', document.getElementById('edit-estado').value);
-        } else {
-            // Valores por defecto para él mismo para pasar validación backend
-            formData.append('rol', document.getElementById('edit-rol').value);
-            formData.append('estado', document.getElementById('edit-estado').value);
-        }
-
-        if (nuevaClave) {
-            formData.append('nueva_clave', nuevaClave);
-            formData.append('nueva_clave_confirm', nuevaClaveConfirm);
-        }
-
-        // Agregar Token CSRF
-        formData.append('<?= csrf_token() ?>', csrfToken);
-
-        try {
-            const response = await fetch(`<?= site_url("super/api/usuarios/update/") ?>${id}`, {
-                method: 'POST',
-                body: formData,
-                headers: { 
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            const result = await response.json();
-            if (result.csrf) csrfToken = result.csrf; // Actualizar token
-            
-            if (response.ok && result.status === 'success') {
-                modalEditar.hide();
-                showAlert('success', 'Usuario actualizado correctamente.');
-                loadUsuarios();
-            } else {
-                showAlert('danger', result.error || 'Error al actualizar el usuario.');
-            }
-        } catch (error) {
-            showAlert('danger', 'Error de red al actualizar.');
-        } finally {
-            btnGuardar.disabled = false;
-            btnGuardar.innerHTML = 'Guardar Cambios';
-        }
     });
 
-    // Eliminar Usuario
-    async function eliminarUsuario(id) {
-        const formData = new FormData();
-        formData.append('<?= csrf_token() ?>', csrfToken);
-
-        try {
-            const response = await fetch(`<?= site_url("super/api/usuarios/delete/") ?>${id}`, {
-                method: 'POST',
-                body: formData,
-                headers: { 
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            const result = await response.json();
-            if (result.csrf) csrfToken = result.csrf; // Actualizar token
-            
-            if (response.ok && result.status === 'success') {
-                showAlert('success', 'Usuario eliminado lógicamente.');
-                loadUsuarios();
-            } else {
-                showAlert('danger', result.error || 'Error al eliminar usuario.');
-            }
-        } catch (error) {
-            showAlert('danger', 'Error de red al eliminar.');
-        }
+    // Eliminar Usuario (Envío Tradicional POST Nativo)
+    function eliminarUsuario(id) {
+        const f = document.createElement('form');
+        f.method = 'POST';
+        f.action = '<?= base_url("super/api/usuarios/delete/") ?>' + id;
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = '<?= csrf_token() ?>';
+        csrf.value = '<?= csrf_hash() ?>';
+        f.appendChild(csrf);
+        
+        document.body.appendChild(f);
+        f.submit();
     }
 
     // Alertas dinámicas Bootstrap
@@ -355,9 +277,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 4000);
     }
 
-    // Inicializar
-    loadUsuarios();
+    // Inicializar eventos en la tabla renderizada por el servidor
+    enlazarEventos();
 });
 </script>
 
-<?php echo view('template/admin_footer'); ?>
+<?php echo view('template/super_footer', ['pagina_actual' => 'super_gestion_usuarios']); ?>

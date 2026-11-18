@@ -22,50 +22,56 @@ class ComunidadController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            return $this->responder('error', 'Acceso denegado. Solo los administradores pueden publicar comunicados.', 403);
+            return $this->responder('error', 'Acceso denegado. Solo los administradores pueden publicar comunicados.', 403, [], 'admin/cartelera');
         }
 
-        $titulo    = trim($this->request->getPost('titulo') ?? '');
-        $contenido = trim($this->request->getPost('contenido') ?? $this->request->getPost('descripcion') ?? '');
+        $titulo    = trim((string) ($this->request->getPost('titulo') ?? ''));
+        $contenido = trim((string) ($this->request->getPost('contenido') ?? $this->request->getPost('descripcion') ?? ''));
 
         if ($titulo === '' || $contenido === '') {
-            return $this->responder('error', 'El título y el contenido son obligatorios.', 400);
+            return $this->responder('error', 'El título y el contenido son obligatorios.', 400, [], 'admin/cartelera');
         }
 
-        // Procesamiento seguro de imagen adjunta vía FileUploadTrait
-        $subidaImg = $this->subirImagenSegura(
-            $this->request->getFile('imagen'),
-            'bitacora',
-            null,
-            2,
-            ['jpg', 'jpeg', 'png', 'webp']
-        );
+        try {
+            // Procesamiento seguro de imagen adjunta vía FileUploadTrait
+            $subidaImg = $this->subirImagenSegura(
+                $this->request->getFile('imagen'),
+                'bitacora',
+                null,
+                2,
+                ['jpg', 'jpeg', 'png', 'webp']
+            );
 
-        if (is_array($subidaImg) && isset($subidaImg['error'])) {
-            return $this->responder('error', $subidaImg['error'], 400);
+            if (is_array($subidaImg) && isset($subidaImg['error'])) {
+                return $this->responder('error', $subidaImg['error'], 400, [], 'admin/cartelera');
+            }
+
+            $comunicadoModel = new ComunicadoModel();
+
+            $datos = [
+                'autor_id'          => (int) $session->get('usuario_id'),
+                'titulo'            => $titulo,
+                'contenido'         => $contenido,
+                'imagen_url'        => $subidaImg,
+                'fecha_publicacion' => date('Y-m-d H:i:s'),
+            ];
+
+            if (! $comunicadoModel->insert($datos)) {
+                $errores = implode(', ', $comunicadoModel->errors());
+                return $this->responder('error', 'Error al publicar el comunicado: ' . $errores, 422, ['errors' => $comunicadoModel->errors()], 'admin/cartelera');
+            }
+
+            return $this->responder(
+                'success',
+                'Comunicado publicado exitosamente en la cartelera.',
+                200,
+                ['data' => ['comunicado_id' => $comunicadoModel->getInsertID()]],
+                'admin/cartelera'
+            );
+        } catch (\Throwable $e) {
+            log_message('error', '[ComunidadController::crearComunicado] Excepción: ' . $e->getMessage());
+            return $this->responder('error', 'Error inesperado al guardar el comunicado: ' . $e->getMessage(), 500, [], 'admin/cartelera');
         }
-
-        $comunicadoModel = new ComunicadoModel();
-
-        $datos = [
-            'autor_id'          => $session->get('usuario_id'),
-            'titulo'            => $titulo,
-            'contenido'         => $contenido,
-            'imagen_url'        => $subidaImg,
-            'fecha_publicacion' => date('Y-m-d H:i:s'),
-        ];
-
-        if (! $comunicadoModel->insert($datos)) {
-            return $this->responder('error', 'Error al publicar el comunicado.', 422, ['errors' => $comunicadoModel->errors()]);
-        }
-
-        return $this->responder(
-            'success',
-            'Comunicado publicado exitosamente.',
-            200,
-            ['data' => ['comunicado_id' => $comunicadoModel->getInsertID()]],
-            'admin/cartelera'
-        );
     }
 
     /**
@@ -85,17 +91,25 @@ class ComunidadController extends BaseController
             ])->setStatusCode(401);
         }
 
-        $comunicadoModel = new ComunicadoModel();
-        $comunicados     = $comunicadoModel->listarConAutor();
+        try {
+            $comunicadoModel = new ComunicadoModel();
+            $comunicados     = $comunicadoModel->listarConAutor();
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data'   => $comunicados,
-        ]);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data'   => $comunicados,
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', '[ComunidadController::listarComunicados] Excepción: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Error al obtener los comunicados.',
+            ])->setStatusCode(500);
+        }
     }
 
     /**
-     * POST /crm/comunidad/ticket
+     * POST /crm/comunidad/ticket  o  POST /residente/soporte/abrir
      *
      * El residente abre un ticket de soporte/queja.
      * Solo para rol 'residente'.
@@ -105,109 +119,85 @@ class ComunidadController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Acceso denegado. Solo los residentes pueden abrir tickets de soporte.',
-            ])->setStatusCode(403);
+            return $this->responder('error', 'Acceso denegado. Solo los residentes pueden abrir tickets de soporte.', 403, [], 'residente/soporte');
         }
 
-        $categoria = trim($this->request->getPost('categoria') ?? '');
-        $asunto    = trim($this->request->getPost('asunto') ?? '');
-        $detalle   = trim($this->request->getPost('detalle') ?? '');
+        $categoria = trim((string) ($this->request->getPost('categoria') ?? ''));
+        $asunto    = trim((string) ($this->request->getPost('asunto') ?? ''));
+        $detalle   = trim((string) ($this->request->getPost('detalle') ?? $this->request->getPost('descripcion') ?? ''));
 
         if ($categoria === '' || $asunto === '' || $detalle === '') {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'La categoría, el asunto y el detalle son obligatorios.',
-            ])->setStatusCode(400);
+            return $this->responder('error', 'La categoría, el asunto y el detalle son obligatorios.', 400, [], 'residente/soporte');
         }
 
-        $ticketModel = new TicketModel();
+        try {
+            $ticketModel = new TicketModel();
 
-        $datos = [
-            'usuario_id'     => $session->get('usuario_id'),
-            'categoria'      => $categoria,
-            'asunto'         => $asunto,
-            'detalle'        => $detalle,
-            'estado'         => 'Abierto',
-            'fecha_creacion' => date('Y-m-d H:i:s'),
-        ];
+            $datos = [
+                'usuario_id'     => (int) $session->get('usuario_id'),
+                'categoria'      => $categoria,
+                'asunto'         => $asunto,
+                'detalle'        => $detalle,
+                'estado'         => 'Abierto',
+                'fecha_creacion' => date('Y-m-d H:i:s'),
+            ];
 
-        if (! $ticketModel->insert($datos)) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Error al abrir el ticket.',
-                'errors'  => $ticketModel->errors(),
-            ])->setStatusCode(422);
+            if (! $ticketModel->insert($datos)) {
+                $errores = implode(', ', $ticketModel->errors());
+                return $this->responder('error', 'Error al abrir el ticket: ' . $errores, 422, ['errors' => $ticketModel->errors()], 'residente/soporte');
+            }
+
+            return $this->responder(
+                'success',
+                'Ticket de soporte creado exitosamente.',
+                200,
+                ['data' => ['ticket_id' => $ticketModel->getInsertID()]],
+                'residente/soporte'
+            );
+        } catch (\Throwable $e) {
+            log_message('error', '[ComunidadController::abrirTicket] Excepción: ' . $e->getMessage());
+            return $this->responder('error', 'Error inesperado al registrar el ticket: ' . $e->getMessage(), 500, [], 'residente/soporte');
         }
-
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Ticket de soporte creado exitosamente.',
-            'data'    => [
-                'ticket_id' => $ticketModel->getInsertID(),
-            ],
-        ]);
     }
 
     /**
-     * POST /crm/comunidad/ticket/gestionar
+     * POST /crm/comunidad/ticket/gestionar  o  POST /admin/soporte/validar
      *
-     * El admin cambia el estado de un ticket: 'En Proceso' o 'Resuelto'.
+     * El admin cambia el estado de un ticket: 'Abierto', 'En Proceso' o 'Resuelto'.
      * Si es 'Resuelto', se registra automáticamente la fecha_resolucion.
-     * Solo para rol 'admin'.
+     * Solo para rol 'admin' o 'root'.
      */
     public function responderTicket()
     {
         $session = session();
 
-        if (! $session->get('isLoggedIn') || $session->get('rol') !== 'admin') {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Acceso denegado. Solo los administradores pueden gestionar tickets.',
-                ])->setStatusCode(403);
-            }
-            return redirect()->back()->with('error', 'Acceso denegado. Solo los administradores pueden gestionar tickets.');
+        if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'], true)) {
+            return $this->responder('error', 'Acceso denegado. Solo los administradores pueden gestionar tickets.', 403, [], 'admin/soporte');
         }
 
         $ticketId    = (int) $this->request->getPost('ticket_id');
-        $nuevoEstado = trim($this->request->getPost('nuevo_estado') ?? $this->request->getPost('estado') ?? '');
+        $nuevoEstado = trim((string) ($this->request->getPost('nuevo_estado') ?? $this->request->getPost('estado') ?? ''));
 
-        if ($ticketId <= 0 || ! in_array($nuevoEstado, ['En Proceso', 'Resuelto'], true)) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Debe indicar un ticket_id válido y un estado (En Proceso o Resuelto).',
-                ])->setStatusCode(400);
+        if ($ticketId <= 0 || ! in_array($nuevoEstado, ['Abierto', 'En Proceso', 'Resuelto'], true)) {
+            return $this->responder('error', 'Debe indicar un ticket válido y un estado válido (Abierto, En Proceso o Resuelto).', 400, [], 'admin/soporte');
+        }
+
+        try {
+            $ticketModel = new TicketModel();
+            $ticket      = $ticketModel->find($ticketId);
+
+            if (! $ticket) {
+                return $this->responder('error', 'El ticket indicado no existe.', 404, [], 'admin/soporte');
             }
-            return redirect()->back()->with('error', 'Debe indicar un ticket_id válido y un estado (En Proceso o Resuelto).');
+
+            // actualizarEstado() registra fecha_resolucion automáticamente si es 'Resuelto'
+            $ticketModel->actualizarEstado($ticketId, $nuevoEstado);
+            $mensajeExito = "Ticket #{$ticketId} actualizado a: {$nuevoEstado}.";
+
+            return $this->responder('success', $mensajeExito, 200, [], 'admin/soporte');
+        } catch (\Throwable $e) {
+            log_message('error', '[ComunidadController::responderTicket] Excepción: ' . $e->getMessage());
+            return $this->responder('error', 'Error inesperado al actualizar el ticket: ' . $e->getMessage(), 500, [], 'admin/soporte');
         }
-
-        $ticketModel = new TicketModel();
-        $ticket      = $ticketModel->find($ticketId);
-
-        if (! $ticket) {
-            if ($this->request->isAJAX()) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'El ticket indicado no existe.',
-                ])->setStatusCode(404);
-            }
-            return redirect()->back()->with('error', 'El ticket indicado no existe.');
-        }
-
-        // actualizarEstado() registra fecha_resolucion automáticamente si es 'Resuelto'
-        $ticketModel->actualizarEstado($ticketId, $nuevoEstado);
-        $mensajeExito = "Ticket #{$ticketId} actualizado a: {$nuevoEstado}.";
-
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => $mensajeExito,
-            ]);
-        }
-
-        return redirect()->back()->with('success', $mensajeExito);
     }
 }

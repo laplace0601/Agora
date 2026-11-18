@@ -35,12 +35,36 @@ class UsuarioController extends BaseController
 
     public function usuarios()
     {
-        return view('root/gestion_usuarios');
+        $usuarioModel = new UsuarioModel();
+        $usuarios = $usuarioModel->where('estado !=', 'eliminado')->findAll();
+
+        foreach ($usuarios as &$u) {
+            unset($u['clave']);
+        }
+
+        return view('root/gestion_usuarios', ['usuarios' => $usuarios]);
     }
 
     // ---------------------------------------------------------------
     // Creación de Usuarios
     // ---------------------------------------------------------------
+
+    public function crearYGuardar()
+    {
+        $tipoUsuario = $this->request->getPost('tipo_usuario');
+
+        switch ($tipoUsuario) {
+            case 'residente':
+                return $this->guardarResidente();
+            case 'admin':
+                return $this->guardarAdmin();
+            case 'super':
+                return $this->guardarSuper();
+            default:
+                return redirect()->to(base_url('super/crear-usuario'))
+                    ->with('error', 'Tipo de usuario no especificado o inválido.');
+        }
+    }
 
     public function guardarResidente()
     {
@@ -56,31 +80,31 @@ class UsuarioController extends BaseController
         $apartamentoId = $this->request->getPost('apartamento_id');
 
         if (empty($nombre) || empty($cedula) || empty($correo) || empty($apartamentoId) || empty($clave) || empty($claveConfirm)) {
-            return redirect()->back()->with('error', 'Faltan campos obligatorios para registrar el residente.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Faltan campos obligatorios para registrar el residente.');
         }
 
         if (strlen($clave) < 8) {
-            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
         }
 
         if ($clave !== $claveConfirm) {
-            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Verificar que el apartamento NO esté ya asignado a otro residente
         $apartamentoModel = new ApartamentoModel();
         $apartamento = $apartamentoModel->find($apartamentoId);
         if (!$apartamento) {
-            return redirect()->back()->with('error', 'El apartamento seleccionado no existe.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'El apartamento seleccionado no existe.');
         }
         if (!empty($apartamento['residente_id'])) {
-            return redirect()->back()->with('error', 'El apartamento seleccionado ya tiene un residente asignado. Selecciona otro apartamento disponible.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'El apartamento seleccionado ya tiene un residente asignado. Selecciona otro apartamento disponible.');
         }
 
         // VALIDACIÓN ESTRICTA DE ROLES (Cruce de Roles Crítico)
         $usuarioExistente = $usuarioModel->where('correo', $correo)->first();
         if ($usuarioExistente && in_array($usuarioExistente['rol'], ['admin', 'root'])) {
-            return redirect()->back()->with('error', 'No se puede registrar este correo como residente porque pertenece a un administrador del sistema.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'No se puede registrar este correo como residente porque pertenece a un administrador del sistema.');
         }
 
         $datosUsuario = [
@@ -106,10 +130,10 @@ class UsuarioController extends BaseController
         $errores = [];
         if (!$residenteModel->crearResidenteCompleto($datosTransaccion, $errores)) {
             $msjError = !empty($errores) ? implode(', ', $errores) : 'Error desconocido.';
-            return redirect()->back()->with('error', 'Error al crear residente: ' . $msjError);
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Error al crear residente: ' . $msjError);
         }
 
-        return redirect()->to(site_url('super/crear-usuario'))->with('success', '¡Se ha creado el usuario con éxito! El residente ha sido dado de alta y asignado al apartamento.');
+        return redirect()->to(base_url('super/crear-usuario'))->with('success', '¡Se ha creado el usuario con éxito! El residente ha sido dado de alta y asignado al apartamento.');
     }
 
     public function guardarAdmin()
@@ -123,20 +147,20 @@ class UsuarioController extends BaseController
 
         // Validación de campos obligatorios
         if (empty($correo) || empty($nombreUsuario) || empty($clave) || empty($claveConfirm)) {
-            return redirect()->back()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
         }
 
         if (strlen($clave) < 8) {
-            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
         }
 
         if ($clave !== $claveConfirm) {
-            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Prevención de correos duplicados
         if ($usuarioModel->where('correo', $correo)->first()) {
-            return redirect()->back()->with('error', "El correo '{$correo}' ya está registrado en el sistema.");
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', "El correo '{$correo}' ya está registrado en el sistema.");
         }
 
         $datosUsuario = [
@@ -148,19 +172,19 @@ class UsuarioController extends BaseController
         ];
 
         if (! $usuarioModel->insert($datosUsuario)) {
-            return redirect()->back()->with('error', 'Error al crear el administrador: ' . implode(', ', $usuarioModel->errors()));
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Error al crear el administrador: ' . implode(', ', $usuarioModel->errors()));
         }
 
         log_message('info', "[UsuarioController] Admin creado: correo={$correo}, nombre_usuario={$nombreUsuario}");
 
-        return redirect()->to(site_url('super/crear-usuario'))
+        return redirect()->to(base_url('super/crear-usuario'))
             ->with('success', "¡Se ha creado el usuario con éxito! Administrador '{$nombreUsuario}' dado de alta.");
     }
 
     public function guardarSuper()
     {
         if (session()->get('rol') !== 'root') {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Acceso denegado. Solo un root puede crear otro súper usuario.');
+            return redirect()->to(base_url('auth/login'))->with('error', 'Acceso denegado. Solo un root puede crear otro súper usuario.');
         }
 
         $usuarioModel = new UsuarioModel();
@@ -171,20 +195,20 @@ class UsuarioController extends BaseController
         $claveConfirm  = (string) $this->request->getPost('clave_confirm');
 
         if (empty($correo) || empty($nombreUsuario) || empty($clave) || empty($claveConfirm)) {
-            return redirect()->back()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'El correo, nombre de usuario y ambas casillas de contraseña son obligatorios.');
         }
 
         if (strlen($clave) < 8) {
-            return redirect()->back()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'La contraseña debe tener al menos 8 caracteres.');
         }
 
         if ($clave !== $claveConfirm) {
-            return redirect()->back()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Las contraseñas no coinciden. Por favor verifíquelas.');
         }
 
         // Prevención de correos duplicados
         if ($usuarioModel->where('correo', $correo)->first()) {
-            return redirect()->back()->with('error', "El correo '{$correo}' ya está registrado en el sistema.");
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', "El correo '{$correo}' ya está registrado en el sistema.");
         }
 
         $datosUsuario = [
@@ -196,12 +220,12 @@ class UsuarioController extends BaseController
         ];
 
         if (! $usuarioModel->insert($datosUsuario)) {
-            return redirect()->back()->with('error', 'Error al registrar el súper usuario: ' . implode(', ', $usuarioModel->errors()));
+            return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Error al registrar el súper usuario: ' . implode(', ', $usuarioModel->errors()));
         }
 
         log_message('info', "[UsuarioController] Nuevo root creado: correo={$correo}, nombre_usuario={$nombreUsuario}");
 
-        return redirect()->to(site_url('super/crear-usuario'))
+        return redirect()->to(base_url('super/crear-usuario'))
             ->with('success', "¡Se ha creado el usuario con éxito! Súper Usuario '{$nombreUsuario}' registrado.");
     }
 }

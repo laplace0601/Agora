@@ -49,51 +49,56 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->responder('error', 'Acceso denegado.', 403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $habitanteModel = new HabitanteModel();
+        try {
+            $habitanteModel = new HabitanteModel();
 
-        $id = $this->request->getPost('id');
-        $apartamentoId = (int) $this->request->getPost('apartamento_id');
+            $id = $this->request->getPost('id');
+            $apartamentoId = (int) $this->request->getPost('apartamento_id');
 
-        // Validar que el apartamento existe
-        $apartamentoModel = new ApartamentoModel();
-        if (! $apartamentoModel->find($apartamentoId)) {
-            return $this->responder('error', 'El apartamento indicado no existe.', 404);
-        }
-
-        $datos = [
-            'apartamento_id'   => $apartamentoId,
-            'nombre'           => trim($this->request->getPost('nombre') ?? ''),
-            'apellido'         => trim($this->request->getPost('apellido') ?? ''),
-            'cedula_identidad' => trim($this->request->getPost('cedula_identidad') ?? ''),
-            'telefono'         => trim($this->request->getPost('telefono') ?? ''),
-            'tipo_habitante'   => $this->request->getPost('tipo_habitante') ?? 'Inquilino',
-            'es_principal'     => $this->request->getPost('es_principal') ? 1 : 0,
-            'estado'           => 'aprobado', // Admin crea directamente como aprobado
-        ];
-
-        // Si se marca como principal, quitar el flag a los demás del mismo apartamento
-        if ($datos['es_principal']) {
-            $habitanteModel->desmarcarPrincipal($apartamentoId);
-        }
-
-        if ($id) {
-            // Editar
-            if (! $habitanteModel->update($id, $datos)) {
-                return $this->responder('error', 'Error al actualizar el habitante.', 422, ['errors' => $habitanteModel->errors()]);
+            // Validar que el apartamento existe
+            $apartamentoModel = new ApartamentoModel();
+            if (! $apartamentoModel->find($apartamentoId)) {
+                return $this->responder('error', 'El apartamento indicado no existe.', 404, [], 'admin/residentes');
             }
 
-            return $this->responder('success', 'Habitante actualizado correctamente.');
-        }
+            $datos = [
+                'apartamento_id'   => $apartamentoId,
+                'nombre'           => trim($this->request->getPost('nombre') ?? ''),
+                'apellido'         => trim($this->request->getPost('apellido') ?? ''),
+                'cedula_identidad' => trim($this->request->getPost('cedula_identidad') ?? ''),
+                'telefono'         => trim($this->request->getPost('telefono') ?? ''),
+                'tipo_habitante'   => $this->request->getPost('tipo_habitante') ?? 'Inquilino',
+                'es_principal'     => $this->request->getPost('es_principal') ? 1 : 0,
+                'estado'           => 'aprobado', // Admin crea directamente como aprobado
+            ];
 
-        // Crear
-        if (! $habitanteModel->insert($datos)) {
-            return $this->responder('error', 'Error al registrar el habitante.', 422, ['errors' => $habitanteModel->errors()]);
-        }
+            // Si se marca como principal, quitar el flag a los demás del mismo apartamento
+            if ($datos['es_principal']) {
+                $habitanteModel->desmarcarPrincipal($apartamentoId);
+            }
 
-        return $this->responder('success', 'Habitante registrado correctamente.', 200, ['data' => ['id' => $habitanteModel->getInsertID()]]);
+            if ($id) {
+                // Editar
+                if (! $habitanteModel->update($id, $datos)) {
+                    return $this->responder('error', 'Error al actualizar el habitante: ' . implode(', ', $habitanteModel->errors()), 422, ['errors' => $habitanteModel->errors()], 'admin/residentes');
+                }
+
+                return $this->responder('success', 'Habitante actualizado correctamente.', 200, [], 'admin/residentes');
+            }
+
+            // Crear
+            if (! $habitanteModel->insert($datos)) {
+                return $this->responder('error', 'Error al registrar el habitante: ' . implode(', ', $habitanteModel->errors()), 422, ['errors' => $habitanteModel->errors()], 'admin/residentes');
+            }
+
+            return $this->responder('success', 'Habitante registrado correctamente.', 200, ['data' => ['id' => $habitanteModel->getInsertID()]], 'admin/residentes');
+        } catch (\Throwable $e) {
+            log_message('error', '[HabitantesController::guardar] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al procesar el habitante: ' . $e->getMessage(), 500, [], 'admin/residentes');
+        }
     }
 
     /**
@@ -106,24 +111,29 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->responder('error', 'Acceso denegado.', 403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $id = (int) $this->request->getPost('id');
+        try {
+            $id = (int) $this->request->getPost('id');
 
-        if ($id <= 0) {
-            return $this->responder('error', 'ID de habitante inválido.', 400);
+            if ($id <= 0) {
+                return $this->responder('error', 'ID de habitante inválido.', 400, [], 'admin/residentes');
+            }
+
+            $habitanteModel = new HabitanteModel();
+
+            if (! $habitanteModel->find($id)) {
+                return $this->responder('error', 'El habitante no existe.', 404, [], 'admin/residentes');
+            }
+
+            $habitanteModel->delete($id);
+
+            return $this->responder('success', 'Habitante eliminado correctamente.', 200, [], 'admin/residentes');
+        } catch (\Throwable $e) {
+            log_message('error', '[HabitantesController::eliminar] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al eliminar el habitante: ' . $e->getMessage(), 500, [], 'admin/residentes');
         }
-
-        $habitanteModel = new HabitanteModel();
-
-        if (! $habitanteModel->find($id)) {
-            return $this->responder('error', 'El habitante no existe.', 404);
-        }
-
-        $habitanteModel->delete($id);
-
-        return $this->responder('success', 'Habitante eliminado correctamente.');
     }
 
     /**
@@ -158,47 +168,52 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente') {
-            return $this->responder('error', 'Acceso denegado.', 403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $usuarioId = $session->get('usuario_id');
+        try {
+            $usuarioId = $session->get('usuario_id');
 
-        // Obtener apartamento(s) del residente
-        $apartamentoModel = new ApartamentoModel();
-        $apartamentos = $apartamentoModel->obtenerPorUsuario($usuarioId);
+            // Obtener apartamento(s) del residente
+            $apartamentoModel = new ApartamentoModel();
+            $apartamentos = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
-        if (empty($apartamentos)) {
-            return $this->responder('error', 'No tienes un apartamento asignado.', 400);
+            if (empty($apartamentos)) {
+                return $this->responder('error', 'No tienes un apartamento asignado.', 400, [], 'residente/habitantes');
+            }
+
+            $apartamentosValidos = array_column($apartamentos, 'id');
+            $postAptoId = (int) $this->request->getPost('apartamento_id');
+
+            // Si se envió un apartamento_id, verificar que pertenezca al usuario; de lo contrario, usar el primero
+            if ($postAptoId > 0 && in_array($postAptoId, $apartamentosValidos, true)) {
+                $apartamentoId = $postAptoId;
+            } else {
+                $apartamentoId = (int) $apartamentos[0]['id'];
+            }
+
+            $datos = [
+                'apartamento_id'   => $apartamentoId,
+                'nombre'           => trim($this->request->getPost('nombre') ?? ''),
+                'apellido'         => trim($this->request->getPost('apellido') ?? ''),
+                'cedula_identidad' => trim($this->request->getPost('cedula_identidad') ?? ''),
+                'telefono'         => trim($this->request->getPost('telefono') ?? ''),
+                'tipo_habitante'   => $this->request->getPost('tipo_habitante') ?? 'Familiar',
+                'es_principal'     => 0, // Residente no puede asignar principal
+                'estado'           => 'pendiente', // Requiere aprobación del admin
+            ];
+
+            $habitanteModel = new HabitanteModel();
+
+            if (! $habitanteModel->insert($datos)) {
+                return $this->responder('error', 'Error al enviar la solicitud: ' . implode(', ', $habitanteModel->errors()), 422, ['errors' => $habitanteModel->errors()], 'residente/habitantes');
+            }
+
+            return $this->responder('success', 'Solicitud enviada. El administrador debe aprobar al nuevo habitante.', 200, [], 'residente/habitantes');
+        } catch (\Throwable $e) {
+            log_message('error', '[HabitantesController::solicitar] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al registrar la solicitud: ' . $e->getMessage(), 500, [], 'residente/habitantes');
         }
-
-        $apartamentosValidos = array_column($apartamentos, 'id');
-        $postAptoId = (int) $this->request->getPost('apartamento_id');
-
-        // Si se envió un apartamento_id, verificar que pertenezca al usuario; de lo contrario, usar el primero
-        if ($postAptoId > 0 && in_array($postAptoId, $apartamentosValidos, true)) {
-            $apartamentoId = $postAptoId;
-        } else {
-            $apartamentoId = (int) $apartamentos[0]['id'];
-        }
-
-        $datos = [
-            'apartamento_id'   => $apartamentoId,
-            'nombre'           => trim($this->request->getPost('nombre') ?? ''),
-            'apellido'         => trim($this->request->getPost('apellido') ?? ''),
-            'cedula_identidad' => trim($this->request->getPost('cedula_identidad') ?? ''),
-            'telefono'         => trim($this->request->getPost('telefono') ?? ''),
-            'tipo_habitante'   => $this->request->getPost('tipo_habitante') ?? 'Familiar',
-            'es_principal'     => 0, // Residente no puede asignar principal
-            'estado'           => 'pendiente', // Requiere aprobación del admin
-        ];
-
-        $habitanteModel = new HabitanteModel();
-
-        if (! $habitanteModel->insert($datos)) {
-            return $this->responder('error', 'Error al enviar la solicitud.', 422, ['errors' => $habitanteModel->errors()]);
-        }
-
-        return $this->responder('success', 'Solicitud enviada. El administrador debe aprobar al nuevo habitante.');
     }
 
     /**
@@ -216,13 +231,13 @@ class HabitantesController extends BaseController
         $apartamentos = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
         if (empty($apartamentos)) {
-            return $this->responder('success', 'OK', 200, ['data' => []]);
+            return $this->responder('success', 'OK', 200, ['data' => []], 'residente/habitantes');
         }
 
         $habitanteModel = new HabitanteModel();
         $habitantes = $habitanteModel->listarTodosPorApartamento($apartamentos[0]['id']);
 
-        return $this->responder('success', 'OK', 200, ['data' => $habitantes]);
+        return $this->responder('success', 'OK', 200, ['data' => $habitantes], 'residente/habitantes');
     }
 
     // ---------------------------------------------------------------
@@ -239,24 +254,29 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->responder('error', 'Acceso denegado.', 403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $id = (int) $this->request->getPost('id');
-        $habitanteModel = new HabitanteModel();
-        $habitante = $habitanteModel->find($id);
+        try {
+            $id = (int) $this->request->getPost('id');
+            $habitanteModel = new HabitanteModel();
+            $habitante = $habitanteModel->find($id);
 
-        if (! $habitante) {
-            return $this->responder('error', 'Habitante no encontrado.', 404);
+            if (! $habitante) {
+                return $this->responder('error', 'Habitante no encontrado.', 404, [], 'admin/residentes');
+            }
+
+            if ($habitante['estado'] !== 'pendiente') {
+                return $this->responder('error', 'Esta solicitud ya fue procesada.', 400, [], 'admin/residentes');
+            }
+
+            $habitanteModel->update($id, ['estado' => 'aprobado']);
+
+            return $this->responder('success', 'Habitante aprobado exitosamente.', 200, [], 'admin/residentes');
+        } catch (\Throwable $e) {
+            log_message('error', '[HabitantesController::aprobar] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al aprobar el habitante: ' . $e->getMessage(), 500, [], 'admin/residentes');
         }
-
-        if ($habitante['estado'] !== 'pendiente') {
-            return $this->responder('error', 'Esta solicitud ya fue procesada.', 400);
-        }
-
-        $habitanteModel->update($id, ['estado' => 'aprobado']);
-
-        return $this->responder('success', 'Habitante aprobado exitosamente.');
     }
 
     /**
@@ -269,24 +289,29 @@ class HabitantesController extends BaseController
         $session = session();
 
         if (! $session->get('isLoggedIn') || ! in_array($session->get('rol'), ['admin', 'root'])) {
-            return $this->responder('error', 'Acceso denegado.', 403);
+            return $this->responder('error', 'Acceso denegado.', 403, [], 'auth/login');
         }
 
-        $id = (int) $this->request->getPost('id');
-        $habitanteModel = new HabitanteModel();
-        $habitante = $habitanteModel->find($id);
+        try {
+            $id = (int) $this->request->getPost('id');
+            $habitanteModel = new HabitanteModel();
+            $habitante = $habitanteModel->find($id);
 
-        if (! $habitante) {
-            return $this->responder('error', 'Habitante no encontrado.', 404);
+            if (! $habitante) {
+                return $this->responder('error', 'Habitante no encontrado.', 404, [], 'admin/residentes');
+            }
+
+            if ($habitante['estado'] !== 'pendiente') {
+                return $this->responder('error', 'Esta solicitud ya fue procesada.', 400, [], 'admin/residentes');
+            }
+
+            $habitanteModel->update($id, ['estado' => 'rechazado']);
+
+            return $this->responder('success', 'Solicitud rechazada.', 200, [], 'admin/residentes');
+        } catch (\Throwable $e) {
+            log_message('error', '[HabitantesController::rechazar] ' . $e->getMessage());
+            return $this->responder('error', 'Error del servidor al rechazar el habitante: ' . $e->getMessage(), 500, [], 'admin/residentes');
         }
-
-        if ($habitante['estado'] !== 'pendiente') {
-            return $this->responder('error', 'Esta solicitud ya fue procesada.', 400);
-        }
-
-        $habitanteModel->update($id, ['estado' => 'rechazado']);
-
-        return $this->responder('success', 'Solicitud rechazada.');
     }
 
     /**

@@ -45,7 +45,7 @@
         ?>
             <div class="col-12 col-md-6 col-lg-4">
                 <article class="card h-100 anuncio-card border-0 border-start border-warning border-3 shadow-sm bg-white rounded-4 overflow-hidden position-relative">
-                    <form action="<?= site_url('admin/cartelera/eliminar/' . $anuncio['id']) ?>" 
+                    <form action="<?= base_url('admin/cartelera/eliminar/' . $anuncio['id']) ?>" 
                           method="POST" 
                           class="position-absolute top-0 end-0 m-2 z-2" 
                           onsubmit="return confirm('¿Seguro que deseas eliminar este anuncio?');">
@@ -119,7 +119,7 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalNuevoAnuncioLabel">Publicar Nuevo Anuncio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/cartelera/publicar') ?>" method="POST" enctype="multipart/form-data">
+            <form id="formPublicarAnuncio" action="<?= base_url('admin/cartelera/publicar') ?>" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
@@ -146,8 +146,9 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-success text-white w-100 py-2.5 rounded-3 fw-medium" style="background-color: #198754; border-color: #198754;">
-                        <i class="bi bi-send me-1"></i> Publicar en Cartelera
+                    <button type="submit" id="btnPublicarAnuncio" class="btn btn-success text-white w-100 py-2.5 rounded-3 fw-medium" style="background-color: #198754; border-color: #198754;">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerPublicar" role="status" aria-hidden="true"></span>
+                        <i class="bi bi-send me-1" id="iconoPublicar"></i> <span id="textoPublicar">Publicar en Cartelera</span>
                     </button>
                 </div>
             </form>

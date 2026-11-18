@@ -1,18 +1,23 @@
 # =====================================================================
-# .htaccess RAÍZ — Redirige todo al directorio public/
+# .htaccess RAÍZ (htdocs/) — Ágora CRM en Servidor Compartido / InfinityFree
 # =====================================================================
-# En InfinityFree, se copia el CONTENIDO de public/ directamente en
-# htdocs/ y los demás directorios (app/, system/, vendor/, writable/)
-# van un nivel ARRIBA o se protegen con sus propios .htaccess.
-#
-# Este archivo solo es útil si despliegas la estructura COMPLETA
-# del proyecto en htdocs (no recomendado pero funcional).
-# =====================================================================
+Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
-    # Si el archivo o directorio existe en public/, servir directamente
-    RewriteCond %{REQUEST_URI} !^/public/
+    # 1. Cortar bucles infinitos: si la petición ya fue reescrita internamente, detener el motor (evita Error 403)
+    RewriteCond %{ENV:REDIRECT_STATUS} !^$
+    RewriteRule ^ - [L]
+
+    # 2. Bloquear acceso HTTP directo a carpetas sensibles del backend
+    RewriteRule ^(app|system|writable|tests|\.env)/ - [F,L,NC]
+
+    # 3. Si la petición ya incluye /public/, no volver a reescribir
+    RewriteCond %{REQUEST_URI} ^/public/ [NC]
+    RewriteRule ^ - [L]
+
+    # 4. Redirigir todo el tráfico entrante a la carpeta public/
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>

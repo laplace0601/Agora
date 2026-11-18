@@ -6,7 +6,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
 <main class="container my-5" role="main">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8">
-            <a href="<?= site_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center mb-4">
+            <a href="<?= base_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center mb-4">
                 <i class="bi bi-arrow-left me-2"></i> Volver al Dashboard
             </a>
 
@@ -166,12 +166,8 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                     <i class="bi bi-pencil-square me-2" style="color: var(--agora-primary, #007bff);"></i>Registrar Datos de tu Transacción
                 </h5>
 
-                <div id="alertaErrorPago" class="alert alert-danger alert-dismissible fade show border-0 rounded-4 shadow-sm mb-4 d-none" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i><span id="mensajeErrorPago"></span>
-                    <button type="button" class="btn-close" onclick="document.getElementById('alertaErrorPago').classList.add('d-none')"></button>
-                </div>
 
-                <form id="formReportarPago" action="<?= site_url('residente/pago/enviar') ?>" method="POST" enctype="multipart/form-data">
+                <form id="formReportarPago" action="<?= base_url('residente/pago/enviar') ?>" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
@@ -231,71 +227,6 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
     </div>
 </main>
 
-<!-- ======================================================== -->
-<!-- MODAL: MINI VENTANA DE CONFIRMACIÓN DE PAGO REPORTADO    -->
-<!-- ======================================================== -->
-<div class="modal fade" id="modalPagoReportado" tabindex="-1" aria-labelledby="modalPagoReportadoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden text-center p-3 p-md-4 position-relative">
-            
-            <!-- Icono circular animado superior -->
-            <div class="mx-auto mb-3 mt-2 rounded-circle d-flex align-items-center justify-content-center shadow-sm" 
-                 style="width: 72px; height: 72px; background: rgba(25, 135, 84, 0.12); color: #198754;">
-                <i class="bi bi-clock-history fs-1"></i>
-            </div>
-
-            <!-- Título y Subtítulo -->
-            <h4 class="fw-bold text-dark mb-1" id="modalPagoReportadoLabel">¡Pago Reportado!</h4>
-            <p class="text-secondary small mb-3">Tu notificación de pago ha sido registrada correctamente.</p>
-
-            <!-- Mini Alerta de Espera de Confirmación -->
-            <div class="alert alert-warning border-0 rounded-3 p-3 mb-3 text-start d-flex align-items-start gap-2 shadow-sm" style="background-color: #fff9e6; color: #856404;">
-                <i class="bi bi-hourglass-split fs-5 flex-shrink-0 mt-0.5 text-warning"></i>
-                <div class="small">
-                    <strong>Por favor, espera la confirmación:</strong><br>
-                    La administración revisará y validará tu comprobante en breve. Una vez verificado el depósito, tu recibo pasará automáticamente a estado <strong>Solvente</strong>.
-                </div>
-            </div>
-
-            <!-- Resumen de Datos del Pago -->
-            <div class="bg-light rounded-3 p-3 mb-4 text-start small border">
-                <div class="d-flex justify-content-between mb-1.5">
-                    <span class="text-muted">N° Recibo:</span>
-                    <strong class="text-dark" id="modalConfirmRecibo">—</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-1.5">
-                    <span class="text-muted">Método de Pago:</span>
-                    <span class="text-dark fw-semibold" id="modalConfirmBanco">—</span>
-                </div>
-                <div class="d-flex justify-content-between mb-1.5">
-                    <span class="text-muted">Referencia:</span>
-                    <span class="text-dark font-monospace fw-bold" id="modalConfirmRef">—</span>
-                </div>
-                <div class="d-flex justify-content-between mb-1.5">
-                    <span class="text-muted">Monto Reportado:</span>
-                    <strong class="text-success fs-6" id="modalConfirmMonto">$0.00</strong>
-                </div>
-                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                    <span class="text-muted">Estatus Actual:</span>
-                    <span class="badge rounded-pill px-2.5 py-1 text-uppercase fw-semibold" style="background: rgba(255, 193, 7, 0.2); color: #997404;">
-                        <i class="bi bi-hourglass-split me-1"></i>Por Validar
-                    </span>
-                </div>
-            </div>
-
-            <!-- Botones de Acción -->
-            <div class="d-flex flex-column gap-2">
-                <a href="<?= site_url('residente/finanzas') ?>" class="btn btn-success text-white rounded-pill py-2.5 fw-bold shadow-sm" style="background-color: #198754; border: none;">
-                    <i class="bi bi-wallet2 me-1"></i> Ir a Mis Recibos y Solvencia
-                </a>
-                <a href="<?= site_url('residente/dashboard') ?>" class="btn btn-link text-secondary text-decoration-none small py-1">
-                    Volver al Dashboard
-                </a>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 <script>
 function copiarDato(elementId, btn) {
@@ -370,88 +301,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Interceptar envío del formulario para mostrar la mini ventana de confirmación
+    // Validación y envío nativo del formulario de reporte de pago
     if (formReportar) {
-        formReportar.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (alertaError) alertaError.classList.add('d-none');
-
-            const esEfectivo = (bancoOrigen.value === 'Efectivo');
+        formReportar.addEventListener('submit', function(e) {
+            const esEfectivo = bancoOrigen && (bancoOrigen.value === 'Efectivo');
 
             if (!reciboSelect.value || !montoInput.value || !bancoOrigen.value) {
-                if (alertaError && mensajeError) {
-                    mensajeError.textContent = 'Por favor completa todos los campos obligatorios antes de enviar.';
-                    alertaError.classList.remove('d-none');
-                }
+                e.preventDefault();
+                alert('Por favor completa todos los campos obligatorios antes de enviar.');
                 return;
             }
 
-            if (!esEfectivo && !numReferencia.value.trim()) {
-                if (alertaError && mensajeError) {
-                    mensajeError.textContent = 'El número de referencia es obligatorio para pagos por Pago Móvil.';
-                    alertaError.classList.remove('d-none');
-                }
+            if (!esEfectivo && numReferencia && !numReferencia.value.trim()) {
+                e.preventDefault();
+                alert('El número de referencia es obligatorio para pagos por Pago Móvil.');
                 numReferencia.focus();
                 return;
             }
 
-            const originalBtnHtml = btnEnviar.innerHTML;
-            btnEnviar.disabled = true;
-            btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registrando pago...';
-
-            try {
-                const formData = new FormData(formReportar);
-                const resp = await fetch(formReportar.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const result = await resp.json();
-
-                if (result.status === 'success') {
-                    // Refrescar token CSRF si la respuesta lo suministra
-                    if (result.csrf) {
-                        const csrfInput = formReportar.querySelector('input[name="<?= csrf_token() ?>"]');
-                        if (csrfInput) csrfInput.value = result.csrf;
-                    }
-
-                    // Llenar datos en el modal de confirmación
-                    const payload = result.data || {};
-                    const metodoFinal = payload.metodo || bancoOrigen.value;
-                    const refFinal = payload.referencia || (numReferencia.value.trim() ? numReferencia.value.trim() : (esEfectivo ? 'Efectivo / Sin referencia' : '—'));
-
-                    document.getElementById('modalConfirmRecibo').textContent = '#' + (payload.recibo_id || reciboSelect.value);
-                    document.getElementById('modalConfirmBanco').textContent = metodoFinal;
-                    document.getElementById('modalConfirmRef').textContent = refFinal;
-                    document.getElementById('modalConfirmMonto').textContent = '$' + (payload.monto || parseFloat(montoInput.value).toFixed(2));
-
-                    // Desplegar mini ventana de confirmación
-                    const modalEl = document.getElementById('modalPagoReportado');
-                    const modal = new bootstrap.Modal(modalEl);
-                    modal.show();
-
-                    // Limpiar formulario para evitar envíos duplicados si se cierra
-                    formReportar.reset();
-                    alternarMetodoPago();
-                    btnEnviar.disabled = false;
-                    btnEnviar.innerHTML = originalBtnHtml;
-                } else {
-                    if (alertaError && mensajeError) {
-                        mensajeError.textContent = result.message || 'Error al procesar el reporte de pago.';
-                        alertaError.classList.remove('d-none');
-                    }
-                    btnEnviar.disabled = false;
-                    btnEnviar.innerHTML = originalBtnHtml;
-                }
-            } catch (err) {
-                console.warn('Fallo en solicitud AJAX, enviando por flujo estándar:', err);
-                // Si la conexión AJAX falla, se envía por el método tradicional del navegador
-                formReportar.submit();
+            if (btnEnviar) {
+                btnEnviar.disabled = true;
+                btnEnviar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registrando pago...';
             }
         });
     }

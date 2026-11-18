@@ -71,29 +71,29 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
             <h2 id="titulo-accesos" class="fw-bold h4 text-dark mb-4">Trámites y Consultas</h2>
 
             <div class="d-flex flex-column gap-3">
-                <a href="<?= site_url('residente/pago') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                <a href="<?= base_url('residente/pago') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-cash-coin me-2 text-warning"></i> Reportar un Pago</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
 
-                <a href="<?= site_url('residente/soporte') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                <a href="<?= base_url('residente/soporte') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-exclamation-triangle me-2 text-danger"></i> Crear Ticket de Soporte</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
 
-                <a href="<?= site_url('residente/finanzas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                <a href="<?= base_url('residente/finanzas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-file-earmark-text me-2 text-info"></i> Mis Recibos y Solvencias</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
 
                 <!-- Censo de habitantes -->
-                <a href="<?= site_url('residente/habitantes') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                <a href="<?= base_url('residente/habitantes') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-people-fill me-2 text-primary"></i> Mi Censo de Habitantes</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>
 
                 <!-- ETAPA 3: Acceso rápido a reservas -->
-                <a href="<?= site_url('residente/reservas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
+                <a href="<?= base_url('residente/reservas') ?>" class="btn-acceso-rapido text-decoration-none d-flex align-items-center justify-content-between">
                     <span><i class="bi bi-calendar-check me-2 text-success"></i> Reservar Área Común</span>
                     <i class="bi bi-chevron-right small text-muted"></i>
                 </a>

@@ -30,7 +30,7 @@
             <button type="button" class="btn btn-primary text-white rounded-pill px-4 py-2 small shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaArea">
                 <i class="bi bi-plus-lg me-1"></i> Registrar Área
             </button>
-            <a href="<?= site_url('admin/reservas') ?>" class="btn btn-outline-success rounded-pill px-4 py-2 small">
+            <a href="<?= base_url('admin/reservas') ?>" class="btn btn-outline-success rounded-pill px-4 py-2 small">
                 <i class="bi bi-calendar-check me-1"></i> Ver Reservas
             </a>
         </div>
@@ -85,7 +85,7 @@
                                 <ul class="dropdown-menu shadow-sm border-0 rounded-3">
                                     <li><h6 class="dropdown-header small text-uppercase text-muted">Seleccionar Estado</h6></li>
                                     <li>
-                                        <form action="<?= site_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0">
+                                        <form action="<?= base_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0 form-cambiar-estado">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="id" value="<?= $area['id'] ?>">
                                             <input type="hidden" name="estado" value="Activo">
@@ -95,7 +95,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form action="<?= site_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0">
+                                        <form action="<?= base_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0 form-cambiar-estado">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="id" value="<?= $area['id'] ?>">
                                             <input type="hidden" name="estado" value="Mantenimiento">
@@ -105,7 +105,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form action="<?= site_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0">
+                                        <form action="<?= base_url('admin/areas-comunes/cambiar-estado') ?>" method="POST" class="m-0 form-cambiar-estado">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="id" value="<?= $area['id'] ?>">
                                             <input type="hidden" name="estado" value="Inactivo">
@@ -155,7 +155,7 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalNuevaAreaLabel">Registrar Área Común</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/areas-comunes/guardar') ?>" method="POST">
+            <form action="<?= base_url('admin/areas-comunes/guardar') ?>" method="POST" id="formNuevaArea">
                 <?= csrf_field() ?>
                 <div class="modal-body px-4">
                     <div class="form-floating mb-3">
@@ -186,7 +186,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-primary text-white w-100 py-2.5 rounded-3 fw-medium">
+                    <button type="submit" class="btn btn-primary text-white w-100 py-2.5 rounded-3 fw-medium" id="btnGuardarNuevaArea">
                         <i class="bi bi-cloud-arrow-up me-1"></i> Guardar Área Común
                     </button>
                 </div>
@@ -203,7 +203,7 @@
                 <h5 class="modal-title fw-bold text-dark" id="modalEditarAreaLabel">Editar Área Común</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= site_url('admin/areas-comunes/guardar') ?>" method="POST">
+            <form action="<?= base_url('admin/areas-comunes/guardar') ?>" method="POST" id="formEditarArea">
                 <?= csrf_field() ?>
                 <input type="hidden" id="edit-area-id" name="id">
                 <div class="modal-body px-4">
@@ -235,7 +235,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="submit" class="btn btn-primary text-white w-100 py-2.5 rounded-3 fw-medium">
+                    <button type="submit" class="btn btn-primary text-white w-100 py-2.5 rounded-3 fw-medium" id="btnGuardarEditarArea">
                         <i class="bi bi-check-circle me-1"></i> Actualizar Área Común
                     </button>
                 </div>
@@ -259,6 +259,25 @@ document.addEventListener('DOMContentLoaded', function () {
             modalEditar.show();
         });
     });
+
+    // Anti-doble clic en formularios de modales
+    const fNueva = document.getElementById('formNuevaArea');
+    const bNueva = document.getElementById('btnGuardarNuevaArea');
+    if (fNueva && bNueva) {
+        fNueva.addEventListener('submit', function () {
+            bNueva.disabled = true;
+            bNueva.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Guardando...';
+        });
+    }
+
+    const fEditar = document.getElementById('formEditarArea');
+    const bEditar = document.getElementById('btnGuardarEditarArea');
+    if (fEditar && bEditar) {
+        fEditar.addEventListener('submit', function () {
+            bEditar.disabled = true;
+            bEditar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Actualizando...';
+        });
+    }
 });
 </script>
 

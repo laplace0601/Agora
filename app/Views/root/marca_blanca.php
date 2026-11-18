@@ -35,7 +35,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                 <div class="card-body">
                     <h2 class="h5 fw-bold text-dark mb-4"><i class="bi bi-sliders me-2 text-agora-teal"></i>Ajustes de Identidad</h2>
 
-                    <form action="<?= site_url('super/marca-blanca/guardar') ?>" method="POST" enctype="multipart/form-data">
+                    <form action="<?= base_url('super/marca-blanca/guardar') ?>" method="POST" enctype="multipart/form-data">
                         <?= csrf_field() ?>
 
                         <!-- Nombre Comercial -->

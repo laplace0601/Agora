@@ -52,7 +52,7 @@ abstract class BaseController extends Controller
      * @param string      $mensaje     Texto descriptivo para el usuario
      * @param int         $statusCode  Código de respuesta HTTP (200, 400, 403, 404, 422, etc.)
      * @param array       $extraData   Datos adicionales para el payload JSON
-     * @param string|null $redirectUrl Ruta relativa a site_url() para redirección estándar (null = back)
+     * @param string|null $redirectUrl Ruta relativa a base_url() para redirección estándar (null = home)
      */
     protected function responder(
         string $status,
@@ -75,7 +75,7 @@ abstract class BaseController extends Controller
         }
 
         $flashKey = in_array($status, ['success', 'ok'], true) ? 'success' : 'error';
-        $redirect = $redirectUrl ? redirect()->to(site_url($redirectUrl)) : redirect()->back();
+        $redirect = $redirectUrl ? redirect()->to(base_url($redirectUrl)) : redirect()->to(base_url());
 
         return $redirect->with($flashKey, $mensaje);
     }

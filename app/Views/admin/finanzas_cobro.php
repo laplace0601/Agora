@@ -24,37 +24,17 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
             <?php endif; ?>
 
             <div class="card border-0 shadow-sm rounded-4 bg-white">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 px-md-5">
-                    <ul class="nav nav-tabs card-header-tabs" id="cobroTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-semibold text-dark" id="form-tab" data-bs-toggle="tab" data-bs-target="#form-pane" type="button" role="tab" aria-controls="form-pane" aria-selected="true">
-                                <i class="bi bi-file-earmark-text me-2"></i>Formulario
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-semibold text-success d-none" id="success-tab" data-bs-toggle="tab" data-bs-target="#success-pane" type="button" role="tab" aria-controls="success-pane" aria-selected="false">
-                                <i class="bi bi-check-circle me-2"></i>Éxito
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-semibold text-danger d-none" id="error-tab" data-bs-toggle="tab" data-bs-target="#error-pane" type="button" role="tab" aria-controls="error-pane" aria-selected="false">
-                                <i class="bi bi-exclamation-triangle me-2"></i>Error
-                            </button>
-                        </li>
-                    </ul>
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 px-md-5">
                 </div>
 
                 <div class="card-body p-4 p-md-5">
-                    <div class="tab-content" id="cobroTabsContent">
+                    <!-- FORMULARIO -->
+                    <div class="text-center mb-4">
+                        <h1 class="fw-bold h3 text-dark mb-2">Generar Cobro</h1>
+                        <p class="text-secondary small">Rellene los datos para efectuar la creación de recibos del mes.</p>
+                    </div>
 
-                        <!-- PESTAÑA: FORMULARIO -->
-                        <div class="tab-pane fade show active" id="form-pane" role="tabpanel" aria-labelledby="form-tab">
-                            <div class="text-center mb-4">
-                                <h1 class="fw-bold h3 text-dark mb-2">Generar Cobro</h1>
-                                <p class="text-secondary small">Rellene los datos para efectuar la creación de recibos del mes.</p>
-                            </div>
-
-                            <form id="formFacturacion" action="<?= site_url('admin/finanzas/facturar') ?>" method="POST">
+                            <form id="formFacturacion" action="<?= base_url('admin/finanzas/facturar') ?>" method="POST">
                                 <?= csrf_field() ?>
 
                                 <!-- Selector de Condominio (datos reales desde BD) -->
@@ -118,39 +98,6 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
                                     <i class="bi bi-wallet2 me-2" id="btnIcon"></i> <span id="btnText">Generar Recibos</span>
                                 </button>
                             </form>
-                        </div>
-
-                        <!-- PESTAÑA: ÉXITO -->
-                        <div class="tab-pane fade text-center py-4" id="success-pane" role="tabpanel" aria-labelledby="success-tab">
-                            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                            <h3 class="mt-3 text-dark fw-bold" id="successTitle">Creación de recibos exitosa</h3>
-                            <p class="text-secondary" id="successMessage"></p>
-
-                            <div class="bg-light rounded-3 p-3 mt-4 text-start">
-                                <ul class="list-unstyled mb-0">
-                                    <li class="mb-2"><i class="bi bi-receipt me-2 text-primary"></i> <strong id="successEmitidos">0</strong> recibos generados</li>
-                                    <li class="mb-2"><i class="bi bi-building me-2 text-primary"></i> <strong id="successTotal">0</strong> apartamentos evaluados</li>
-                                    <li><i class="bi bi-info-circle me-2 text-primary"></i> <strong id="successExistentes">0</strong> recibos ya existían y fueron omitidos</li>
-                                </ul>
-                            </div>
-
-                            <button type="button" class="btn btn-outline-success mt-4 px-4 py-2 rounded-pill" onclick="resetForm()">
-                                <i class="bi bi-arrow-repeat me-2"></i>Realizar otro cobro
-                            </button>
-                        </div>
-
-                        <!-- PESTAÑA: ERROR -->
-                        <div class="tab-pane fade text-center py-4" id="error-pane" role="tabpanel" aria-labelledby="error-tab">
-                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
-                            <h3 class="mt-3 text-dark fw-bold">Error en la creación de recibos</h3>
-                            <p class="text-danger mt-3 fw-medium p-3 bg-danger bg-opacity-10 rounded-3" id="errorMessage"></p>
-
-                            <button type="button" class="btn btn-outline-danger mt-3 px-4 py-2 rounded-pill" onclick="resetForm()">
-                                <i class="bi bi-arrow-left me-2"></i>Volver al formulario
-                            </button>
-                        </div>
-
-                    </div>
                 </div>
             </div>
 
@@ -166,135 +113,14 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
         const btnIcon = document.getElementById('btnIcon');
         const btnText = document.getElementById('btnText');
 
-        // Control centralizado del token CSRF para peticiones asíncronas
-        let currentCsrfToken = document.querySelector('input[name="<?= csrf_token() ?>"]')?.value || '<?= csrf_hash() ?>';
-
-        function actualizarCsrf(nuevoHash) {
-            if (!nuevoHash) return;
-            currentCsrfToken = nuevoHash;
-            const csrfInput = form.querySelector('input[name="<?= csrf_token() ?>"]');
-            if (csrfInput) {
-                csrfInput.value = nuevoHash;
-            }
+        if (form && btnSubmit) {
+            form.addEventListener('submit', function() {
+                if (btnSpinner) btnSpinner.classList.remove('d-none');
+                if (btnIcon) btnIcon.classList.add('d-none');
+                if (btnText) btnText.textContent = 'Procesando...';
+                btnSubmit.disabled = true;
+            });
         }
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Estado de carga
-            btnSpinner.classList.remove('d-none');
-            btnIcon.classList.add('d-none');
-            btnText.textContent = 'Procesando...';
-            btnSubmit.disabled = true;
-
-            const formData = new FormData(form);
-            // Asegurar que el token enviado sea siempre el más actualizado
-            formData.set('<?= csrf_token() ?>', currentCsrfToken);
-
-            fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': currentCsrfToken
-                    }
-                })
-                .then(async response => {
-                    const contentType = response.headers.get("content-type");
-                    let data = null;
-
-                    if (contentType && contentType.includes("application/json")) {
-                        data = await response.json();
-                    } else {
-                        const rawText = await response.text();
-                        if (response.status === 403) {
-                            throw new Error('Token CSRF o sesión no autorizada (403). Por favor recargue la página.');
-                        }
-                        throw new Error('Respuesta no esperada del servidor (' + response.status + ').');
-                    }
-
-                    return data;
-                })
-                .then(data => {
-                    // Restaurar botón
-                    btnSpinner.classList.add('d-none');
-                    btnIcon.classList.remove('d-none');
-                    btnText.textContent = 'Generar Recibos';
-                    btnSubmit.disabled = false;
-
-                    // Actualizar token CSRF si vino en la respuesta
-                    if (data && data.csrf) {
-                        actualizarCsrf(data.csrf);
-                    }
-
-                    if (data.status === 'success') {
-                        // Mostrar resultados con texto adaptado
-                        let mensajeExito = data.message || 'Creación de recibos exitosa.';
-                        mensajeExito = mensajeExito.replace(/Facturación masiva/gi, 'Creación de recibos')
-                                                   .replace(/facturación/gi, 'creación de recibos');
-                        document.getElementById('successMessage').textContent = mensajeExito;
-                        if (data.data) {
-                            document.getElementById('successEmitidos').textContent = data.data.recibos_emitidos || 0;
-                            document.getElementById('successTotal').textContent = data.data.total_apartamentos || 0;
-                            document.getElementById('successExistentes').textContent = data.data.recibos_ya_existian || 0;
-                        }
-
-                        // Cambiar a pestaña de éxito
-                        const tab = new bootstrap.Tab(document.getElementById('success-tab'));
-                        document.getElementById('success-tab').classList.remove('d-none');
-                        document.getElementById('error-tab').classList.add('d-none');
-                        document.getElementById('form-tab').classList.add('d-none');
-                        tab.show();
-
-                    } else if (data.status === 'warning') {
-                        // Advertencia: todos los recibos ya existían
-                        document.getElementById('errorMessage').textContent = data.message;
-                        const tab = new bootstrap.Tab(document.getElementById('error-tab'));
-                        document.getElementById('error-tab').classList.remove('d-none');
-                        document.getElementById('success-tab').classList.add('d-none');
-                        document.getElementById('form-tab').classList.add('d-none');
-                        tab.show();
-
-                    } else {
-                        // Error de validación o lógica
-                        document.getElementById('errorMessage').textContent = data.message || 'Error en la creación de recibos.';
-                        const tab = new bootstrap.Tab(document.getElementById('error-tab'));
-                        document.getElementById('error-tab').classList.remove('d-none');
-                        document.getElementById('success-tab').classList.add('d-none');
-                        document.getElementById('form-tab').classList.add('d-none');
-                        tab.show();
-                    }
-                })
-                .catch(error => {
-                    // Restaurar botón
-                    btnSpinner.classList.add('d-none');
-                    btnIcon.classList.remove('d-none');
-                    btnText.textContent = 'Generar Recibos';
-                    btnSubmit.disabled = false;
-
-                    document.getElementById('errorMessage').textContent = error.message || 'Error de conexión con el servidor.';
-                    const tab = new bootstrap.Tab(document.getElementById('error-tab'));
-                    document.getElementById('error-tab').classList.remove('d-none');
-                    document.getElementById('success-tab').classList.add('d-none');
-                    document.getElementById('form-tab').classList.add('d-none');
-                    tab.show();
-                });
-        });
-
-        window.resetForm = function() {
-            const tab = new bootstrap.Tab(document.getElementById('form-tab'));
-            document.getElementById('form-tab').classList.remove('d-none');
-            document.getElementById('success-tab').classList.add('d-none');
-            document.getElementById('error-tab').classList.add('d-none');
-
-            // Preservar el token CSRF activo para que no se restablezca a un token obsoleto
-            const tokenGuardado = currentCsrfToken;
-            form.reset();
-            actualizarCsrf(tokenGuardado);
-
-            tab.show();
-        };
     });
 </script>
 

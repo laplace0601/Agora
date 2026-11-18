@@ -232,10 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---------------------------------------------------------------
     // Cargar conteo de pendientes al inicio
     // ---------------------------------------------------------------
+    async function safeFetchJson(url, options = {}) {
+        const resp = await fetch(url, options);
+        const ct = resp.headers.get('content-type');
+        if (!ct || !ct.includes('application/json')) {
+            throw new Error('Respuesta no esperada del servidor (posible firewall o sesión expirada).');
+        }
+        return await resp.json();
+    }
+
     async function cargarConteoPendientes() {
         try {
-            const resp = await fetch('<?= site_url('admin/habitantes/pendientes') ?>');
-            const result = await resp.json();
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/pendientes') ?>');
             if (result.status === 'success' && result.total > 0) {
                 badgePendientes.textContent = result.total;
                 badgePendientes.classList.remove('d-none');
@@ -261,8 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarDetalleApto(aptoId) {
         try {
-            const resp = await fetch(`<?= site_url('admin/apartamento/') ?>${aptoId}/detalle`);
-            const result = await resp.json();
+            const result = await safeFetchJson(`<?= base_url('admin/apartamento/') ?>${aptoId}/detalle`);
 
             if (result.status === 'success') {
                 const d = result.data;
@@ -381,8 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-warning" role="status"></div><p class="text-muted mt-2">Cargando solicitudes...</p></div>';
 
         try {
-            const resp = await fetch('<?= site_url('admin/habitantes/pendientes') ?>');
-            const result = await resp.json();
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/pendientes') ?>');
 
             if (result.status === 'success') {
                 if (result.data.length === 0) {
@@ -442,12 +448,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const formData = new FormData(formAgregar);
-            const resp = await fetch('<?= site_url('admin/habitantes/guardar') ?>', {
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/guardar') ?>', {
                 method: 'POST',
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            const result = await resp.json();
 
             if (result.status === 'success') {
                 bootstrap.Modal.getInstance(document.getElementById('modalAgregarHabitante')).hide();
@@ -483,8 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData();
             formData.append('id', id);
             formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            const resp = await fetch('<?= site_url('admin/habitantes/aprobar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-            const result = await resp.json();
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/aprobar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             if (result.status === 'success') {
                 // Recargar la vista actual
                 if (currentAptoId) await cargarDetalleApto(currentAptoId);
@@ -497,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert(result.message || 'Error al aprobar.');
             }
-        } catch(err) { alert('Error de conexión.'); console.error(err); }
+        } catch(err) { alert(err.message || 'Error de conexión.'); console.error(err); }
     };
 
     window.rechazarHabitante = async function(id) {
@@ -506,8 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData();
             formData.append('id', id);
             formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            const resp = await fetch('<?= site_url('admin/habitantes/rechazar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-            const result = await resp.json();
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/rechazar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             if (result.status === 'success') {
                 if (currentAptoId) await cargarDetalleApto(currentAptoId);
                 cargarConteoPendientes();
@@ -518,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 alert(result.message || 'Error al rechazar.');
             }
-        } catch(err) { alert('Error de conexión.'); console.error(err); }
+        } catch(err) { alert(err.message || 'Error de conexión.'); console.error(err); }
     };
 
     window.eliminarHabitante = async function(id) {
@@ -527,14 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData();
             formData.append('id', id);
             formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
-            const resp = await fetch('<?= site_url('admin/habitantes/eliminar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-            const result = await resp.json();
+            const result = await safeFetchJson('<?= base_url('admin/habitantes/eliminar') ?>', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             if (result.status === 'success') {
                 if (currentAptoId) await cargarDetalleApto(currentAptoId);
             } else {
                 alert(result.message || 'Error al eliminar.');
             }
-        } catch(err) { alert('Error de conexión.'); console.error(err); }
+        } catch(err) { alert(err.message || 'Error de conexión.'); console.error(err); }
     };
 });
 </script>

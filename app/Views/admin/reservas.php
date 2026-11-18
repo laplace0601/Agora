@@ -25,10 +25,10 @@
             <p class="text-secondary small mb-0">Visualiza y gestiona todas las reservas del condominio.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="<?= site_url('admin/reservas/nueva') ?>" class="btn btn-primary text-white rounded-pill px-4 py-2 small shadow-sm">
+            <a href="<?= base_url('admin/reservas/nueva') ?>" class="btn btn-primary text-white rounded-pill px-4 py-2 small shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Nueva Reserva
             </a>
-            <a href="<?= site_url('admin/areas-comunes') ?>" class="btn btn-outline-secondary rounded-pill px-4 py-2 small">
+            <a href="<?= base_url('admin/areas-comunes') ?>" class="btn btn-outline-secondary rounded-pill px-4 py-2 small">
                 <i class="bi bi-tree me-1"></i> Áreas Comunes
             </a>
         </div>
@@ -74,8 +74,8 @@
                                 <td><span class="badge rounded-pill <?= $badgeEstado ?> px-3 py-1 small fw-semibold"><?= $reserva['estado'] ?></span></td>
                                 <td class="text-end">
                                     <?php if ($reserva['estado'] !== 'Cancelada'): ?>
-                                        <form action="<?= site_url('admin/reservas/cancelar') ?>" method="POST" class="d-inline"
-                                              onsubmit="return confirm('¿Cancelar esta reserva?');">
+                                        <form action="<?= base_url('admin/reservas/cancelar') ?>" method="POST" class="d-inline"
+                                              onsubmit="if(!confirm('¿Cancelar esta reserva?')) return false; const btn=this.querySelector('button'); btn.disabled=true; btn.innerHTML='<span class=\'spinner-border spinner-border-sm\'></span>'; return true;">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="reserva_id" value="<?= $reserva['id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">

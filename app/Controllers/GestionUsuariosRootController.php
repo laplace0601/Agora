@@ -60,19 +60,19 @@ class GestionUsuariosRootController extends BaseController
     public function update($id = null)
     {
         if (!$id) {
-            return $this->response->setStatusCode(400)->setJSON(['error' => 'ID de usuario requerido.']);
+            return $this->responder('error', 'ID de usuario requerido.', 400, [], 'super/gestion_usuarios');
         }
 
         // PREVENCIÓN DE AUTO-EDICIÓN: El Root no puede modificar sus propios privilegios accidentalmente
         if (session()->get('usuario_id') == $id) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'Acción denegada: No puedes auto-editarte desde este panel.']);
+            return $this->responder('error', 'Acción denegada: No puedes auto-editarte desde este panel.', 403, [], 'super/gestion_usuarios');
         }
 
         $usuarioModel = new UsuarioModel();
         $usuario = $usuarioModel->find($id);
 
         if (!$usuario || $usuario['estado'] === 'eliminado') {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado.']);
+            return $this->responder('error', 'Usuario no encontrado.', 404, [], 'super/gestion_usuarios');
         }
 
         // --- Recoger datos del POST ---
@@ -86,10 +86,7 @@ class GestionUsuariosRootController extends BaseController
 
         // Validar correo obligatorio y formato
         if (empty($correo) || ! filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-            return $this->response->setStatusCode(422)->setJSON([
-                'error'  => 'Debe ingresar un correo electrónico válido.',
-                'csrf'   => csrf_hash(),
-            ]);
+            return $this->responder('error', 'Debe ingresar un correo electrónico válido.', 422, [], 'super/gestion_usuarios');
         }
 
         // Validar unicidad del correo (excluyendo al usuario actual)
@@ -98,42 +95,27 @@ class GestionUsuariosRootController extends BaseController
                                       ->where('id !=', $id)
                                       ->first();
             if ($existente) {
-                return $this->response->setStatusCode(422)->setJSON([
-                    'error'  => "El correo '{$correo}' ya está registrado en otro usuario.",
-                    'csrf'   => csrf_hash(),
-                ]);
+                return $this->responder('error', "El correo '{$correo}' ya está registrado en otro usuario.", 422, [], 'super/gestion_usuarios');
             }
         }
 
         // Validar rol
         if (! in_array($rol, ['root', 'admin', 'residente'])) {
-            return $this->response->setStatusCode(422)->setJSON([
-                'error'  => 'El rol seleccionado no es válido.',
-                'csrf'   => csrf_hash(),
-            ]);
+            return $this->responder('error', 'El rol seleccionado no es válido.', 422, [], 'super/gestion_usuarios');
         }
 
         // Validar estado
         if (! in_array($estado, ['activo', 'inactivo'])) {
-            return $this->response->setStatusCode(422)->setJSON([
-                'error'  => 'El estado seleccionado no es válido.',
-                'csrf'   => csrf_hash(),
-            ]);
+            return $this->responder('error', 'El estado seleccionado no es válido.', 422, [], 'super/gestion_usuarios');
         }
 
         // Validar contraseña si se proporcionó en cualquiera de las 2 casillas
         if (!empty($nuevaClave) || !empty($nuevaClaveConfirm)) {
             if (strlen((string) $nuevaClave) < 8) {
-                return $this->response->setStatusCode(422)->setJSON([
-                    'error'  => 'La nueva contraseña debe tener al menos 8 caracteres.',
-                    'csrf'   => csrf_hash(),
-                ]);
+                return $this->responder('error', 'La nueva contraseña debe tener al menos 8 caracteres.', 422, [], 'super/gestion_usuarios');
             }
             if ($nuevaClave !== $nuevaClaveConfirm) {
-                return $this->response->setStatusCode(422)->setJSON([
-                    'error'  => 'Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.',
-                    'csrf'   => csrf_hash(),
-                ]);
+                return $this->responder('error', 'Las contraseñas no coinciden. Por favor verifíquelas en ambas casillas.', 422, [], 'super/gestion_usuarios');
             }
         }
 
@@ -155,39 +137,32 @@ class GestionUsuariosRootController extends BaseController
         $usuarioModel->skipValidation(true);
         
         if (!$usuarioModel->protect(false)->update($id, $data)) {
-            return $this->response->setStatusCode(500)->setJSON([
-                'error' => 'Error interno al actualizar el usuario.',
-                'csrf'  => csrf_hash(),
-            ]);
+            return $this->responder('error', 'Error interno al actualizar el usuario.', 500, [], 'super/gestion_usuarios');
         }
 
         $usuarioModel->protect(true);
 
         log_message('info', "[GestionUsuariosRoot] Usuario #{$id} actualizado por root #" . session()->get('usuario_id'));
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Usuario actualizado exitosamente.',
-            'csrf'    => csrf_hash(),
-        ]);
+        return $this->responder('success', 'Usuario actualizado exitosamente.', 200, [], 'super/gestion_usuarios');
     }
 
     public function delete($id = null)
     {
         if (!$id) {
-            return $this->response->setStatusCode(400)->setJSON(['error' => 'ID de usuario requerido.', 'csrf' => csrf_hash()]);
+            return $this->responder('error', 'ID de usuario requerido.', 400, [], 'super/gestion_usuarios');
         }
 
         // PREVENCIÓN DE AUTO-ELIMINACIÓN: Evitar que el Root se bloquee a sí mismo fuera del sistema
         if (session()->get('usuario_id') == $id) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'Acción crítica denegada: No puedes auto-eliminarte.', 'csrf' => csrf_hash()]);
+            return $this->responder('error', 'Acción crítica denegada: No puedes auto-eliminarte.', 403, [], 'super/gestion_usuarios');
         }
 
         $usuarioModel = new UsuarioModel();
         $usuario = $usuarioModel->find($id);
 
         if (!$usuario || $usuario['estado'] === 'eliminado') {
-            return $this->response->setStatusCode(404)->setJSON(['error' => 'Usuario no encontrado o ya ha sido eliminado.', 'csrf' => csrf_hash()]);
+            return $this->responder('error', 'Usuario no encontrado o ya ha sido eliminado.', 404, [], 'super/gestion_usuarios');
         }
 
         // LÓGICA DE ELIMINACIÓN SEGURA: Si es residente, desvincular de apartamentos
@@ -207,11 +182,11 @@ class GestionUsuariosRootController extends BaseController
         // ELIMINACIÓN LÓGICA (Soft Delete Manual) y prevención de login
         $usuarioModel->skipValidation(true);
         if (!$usuarioModel->update($id, ['estado' => 'eliminado'])) {
-            return $this->response->setStatusCode(500)->setJSON(['error' => 'Error del servidor al intentar eliminar el usuario.', 'csrf' => csrf_hash()]);
+            return $this->responder('error', 'Error del servidor al intentar eliminar el usuario.', 500, [], 'super/gestion_usuarios');
         }
 
         log_message('info', "[GestionUsuariosRoot] Usuario #{$id} eliminado lógicamente por root #" . session()->get('usuario_id'));
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Usuario eliminado lógicamente de la plataforma.', 'csrf' => csrf_hash()]);
+        return $this->responder('success', 'Usuario eliminado lógicamente de la plataforma.', 200, [], 'super/gestion_usuarios');
     }
 }

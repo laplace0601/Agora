@@ -148,10 +148,7 @@ class LicenciaController extends BaseController
         $marca      = $marcaModel->first();
 
         if (! $marca) {
-            return $this->response->setStatusCode(404)->setJSON([
-                'error' => 'No se encontró la configuración de marca.',
-                'csrf'  => csrf_hash(),
-            ]);
+            return $this->responder('error', 'No se encontró la configuración de marca.', 404, [], 'super/planes');
         }
 
         // ── 4. Buscar el plan cuya llave coincide (flujo unificado) ────────
@@ -179,17 +176,14 @@ class LicenciaController extends BaseController
         // === DEBUG END =======================================================
 
         if ($planEncontrado === null) {
-            $response = [
-                'error' => 'Llave de activación inválida.',
-                'csrf'  => csrf_hash(),
-            ];
+            $extra = [];
             if ($isDev) {
-                $response['debug_info'] = [
+                $extra['debug_info'] = [
                     'recibido_len' => mb_strlen($codigoActivacion),
                     'recibido_hex' => bin2hex($codigoActivacion),
                 ];
             }
-            return $this->response->setStatusCode(400)->setJSON($response);
+            return $this->responder('error', 'Llave de activación inválida.', 400, $extra, 'super/planes');
         }
 
         // ── 5. Persistir el cambio de licencia ────────────────────────────
@@ -202,11 +196,9 @@ class LicenciaController extends BaseController
 
         log_message('info', "[LicenciaController] Licencia actualizada a nivel '{$planEncontrado['nivel']}' para marca ID {$marca['id']}.");
 
-        return $this->response->setStatusCode(200)->setJSON([
+        return $this->responder('success', "Licencia actualizada exitosamente a nivel {$planEncontrado['nivel']}.", 200, [
             'success' => true,
-            'message' => "Licencia actualizada exitosamente a nivel {$planEncontrado['nivel']}.",
-            'csrf'    => csrf_hash(),
-        ]);
+        ], 'super/planes');
     }
 }
 

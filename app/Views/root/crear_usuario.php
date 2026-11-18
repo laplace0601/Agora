@@ -55,8 +55,9 @@ echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
         <div class="tab-pane fade show active" id="panel-residente" role="tabpanel">
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Datos Personales y de Vivienda</h2>
-                <form action="<?= site_url('super/guardar-residente') ?>" method="POST">
+                <form action="" method="POST">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="tipo_usuario" value="residente">
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required><label class="ms-2">Nombres y Apellidos *</label></div>
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
@@ -109,8 +110,9 @@ echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
         <div class="tab-pane fade" id="panel-admin" role="tabpanel">
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Datos Generales y Suscripción del Condominio</h2>
-                <form action="<?= site_url('super/guardar-admin') ?>" method="POST">
+                <form action="" method="POST">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="tipo_usuario" value="admin">
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
@@ -126,8 +128,9 @@ echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
         <div class="tab-pane fade" id="panel-super" role="tabpanel">
             <div class="card card-agora-form p-4 p-md-5 shadow-sm border-0">
                 <h2 class="h5 fw-bold text-dark mb-4 border-bottom pb-2">Credenciales del Equipo <?= esc(nombreEmpresa()) ?></h2>
-                <form action="<?= site_url('super/guardar-super') ?>" method="POST">
+                <form action="" method="POST">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="tipo_usuario" value="super">
                     <div class="row g-4">
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="nombre_usuario" placeholder="Nombre de Usuario" required><label class="ms-2">Nombre de Usuario *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>

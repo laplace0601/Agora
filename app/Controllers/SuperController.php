@@ -11,7 +11,7 @@ class SuperController extends BaseController
 
     public function panel()
     {
-        return view('super/welcome_message');
+        return redirect()->to(base_url('super/apartamentos'));
     }
 
 
@@ -39,6 +39,18 @@ class SuperController extends BaseController
     }
 
     /**
+     * Dispatcher para solicitudes POST a super/apartamentos
+     */
+    public function procesarInmuebles()
+    {
+        $accion = $this->request->getPost('accion');
+        if ($accion === 'registrar_apartamento') {
+            return $this->registrarApartamento();
+        }
+        return $this->registrarCondominio();
+    }
+
+    /**
      * POST /super/apartamentos/registrar-condominio
      */
     public function registrarCondominio()
@@ -51,20 +63,59 @@ class SuperController extends BaseController
 
         // Validación de seguridad backend: metros no puede ser 0 ni negativo
         if (empty($nombre)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error' => 'El nombre del condominio es obligatorio.',
-                'csrf' => csrf_hash()
-            ]);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'error'  => 'El nombre del condominio es obligatorio.',
+                    'csrf'   => csrf_hash()
+                ]);
+            }
+            return redirect()->to(base_url('super/apartamentos'))->with('error', 'El nombre del condominio es obligatorio.')->withInput();
         }
 
         $metrosFloat = $this->sanitizarDecimal($metros);
         if ($metrosFloat <= 0) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error' => 'El total de metros cuadrados debe ser mayor a 0.',
-                'csrf' => csrf_hash()
-            ]);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'error'  => 'El total de metros cuadrados debe ser mayor a 0.',
+                    'csrf'   => csrf_hash()
+                ]);
+            }
+            return redirect()->to(base_url('super/apartamentos'))->with('error', 'El total de metros cuadrados debe ser mayor a 0.')->withInput();
+        }
+
+        // Asegurar que la configuración de marca (id=1) exista para no violar la FK
+        try {
+            $db = \Config\Database::connect();
+            $marcaExiste = $db->table('configuracion_marca')->where('id', 1)->countAllResults();
+            if ($marcaExiste === 0) {
+                $db->table('configuracion_marca')->insert([
+                    'id'                  => 1,
+                    'nombre_empresa'      => 'Mi Administradora Base',
+                    'color_primario'      => '#007bff',
+                    'correo_contacto'     => 'contacto@agora.com',
+                    'nivel_licencia'      => 'Bronce',
+                    'limite_apartamentos' => 100,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', '[SuperController] Error verificando configuracion_marca: ' . $e->getMessage());
+        }
+
+        // Manejo seguro del RIF (en MySQL tiene constraint UNIQUE y máx 20 caracteres)
+        if (empty($rif)) {
+            $rif = 'SR-' . substr(str_replace('.', '', uniqid('', true)), 0, 16);
+        } else {
+            $rif = substr($rif, 0, 20);
+            $condoExistente = $condominioModel->where('rif_jurisdiccion', $rif)->first();
+            if ($condoExistente) {
+                $msgError = "Ya existe un condominio con el RIF '{$rif}'.";
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON(['status' => 'error', 'error' => $msgError, 'csrf' => csrf_hash()]);
+                }
+                return redirect()->to(base_url('super/apartamentos'))->with('error', $msgError)->withInput();
+            }
         }
 
         $datos = [
@@ -74,22 +125,42 @@ class SuperController extends BaseController
             'marca_id'               => 1,
         ];
 
-        if (! $condominioModel->insert($datos)) {
-            $errores = implode(', ', $condominioModel->errors());
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error' => 'Error al registrar: ' . $errores,
-                'csrf' => csrf_hash()
-            ]);
+        try {
+            if (! $condominioModel->insert($datos)) {
+                $errores = implode(', ', $condominioModel->errors());
+                if ($this->request->isAJAX()) {
+                    return $this->response->setJSON([
+                        'status' => 'error',
+                        'error'  => 'Error al registrar: ' . $errores,
+                        'csrf'   => csrf_hash()
+                    ]);
+                }
+                return redirect()->to(base_url('super/apartamentos'))->with('error', 'Error al registrar: ' . $errores)->withInput();
+            }
+        } catch (\Throwable $e) {
+            log_message('error', '[SuperController::registrarCondominio] ' . $e->getMessage());
+            $errorMsg = 'Error en base de datos al registrar condominio: ' . $e->getMessage();
+            if ($this->request->isAJAX()) {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error',
+                    'error'  => $errorMsg,
+                    'csrf'   => csrf_hash()
+                ]);
+            }
+            return redirect()->to(base_url('super/apartamentos'))->with('error', $errorMsg)->withInput();
         }
 
         session()->setFlashdata('success', 'Condominio registrado exitosamente.');
 
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Condominio registrado exitosamente.',
-            'csrf' => csrf_hash()
-        ]);
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Condominio registrado exitosamente.',
+                'csrf'    => csrf_hash()
+            ]);
+        }
+
+        return redirect()->to(base_url('super/apartamentos'));
     }
 
     /**
@@ -98,16 +169,16 @@ class SuperController extends BaseController
     public function deleteCondominio($id = null)
     {
         if (!$id) {
-            return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'error' => 'ID requerido.']);
+            return $this->responder('error', 'ID requerido.', 400, [], 'super/apartamentos');
         }
 
         $condominioModel = new \App\Models\CondominioModel();
 
         if ($condominioModel->delete($id)) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Condominio eliminado correctamente.']);
+            return $this->responder('success', 'Condominio eliminado correctamente.', 200, [], 'super/apartamentos');
         }
 
-        return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'error' => 'Error al eliminar el condominio.']);
+        return $this->responder('error', 'Error al eliminar el condominio.', 500, [], 'super/apartamentos');
     }
 
     /**
@@ -125,36 +196,39 @@ class SuperController extends BaseController
         $metrosAptoStr = $this->request->getPost('metros_cuadrados_apto');
         $metrosApto    = $this->sanitizarDecimal($metrosAptoStr);
 
-        // Helper: respuesta JSON de error unificada
-        $jsonError = function (string $mensaje, int $code = 400, string $tipo = 'error') {
-            return $this->response->setStatusCode($code)->setJSON([
-                'status'     => 'error',
-                'error_type' => $tipo,
-                'error'      => $mensaje,
-                'csrf'       => csrf_hash()
-            ]);
+        // Helper: respuesta unificada de error (AJAX o Redirect)
+        $responderError = function (string $mensaje, int $code = 400, string $tipo = 'error') {
+            if ($this->request->isAJAX()) {
+                return $this->response->setStatusCode($code)->setJSON([
+                    'status'     => 'error',
+                    'error_type' => $tipo,
+                    'error'      => $mensaje,
+                    'csrf'       => csrf_hash()
+                ]);
+            }
+            return redirect()->to(base_url('super/apartamentos'))->with('error', $mensaje)->withInput();
         };
 
         // Validaciones básicas
         if ($condominioId <= 0) {
-            return $jsonError('Debe seleccionar un condominio válido.');
+            return $responderError('Debe seleccionar un condominio válido.');
         }
         if ($numeroInicial <= 0 || $cantidad <= 0) {
-            return $jsonError('El número inicial y la cantidad deben ser mayores a 0.');
+            return $responderError('El número inicial y la cantidad deben ser mayores a 0.');
         }
         if ($metrosApto <= 0) {
-            return $jsonError('Los metros cuadrados por apartamento deben ser mayor a 0.');
+            return $responderError('Los metros cuadrados por apartamento deben ser mayor a 0.');
         }
 
         // Obtener el condominio
         $condominio = $condominioModel->find($condominioId);
         if (! $condominio) {
-            return $jsonError('El condominio seleccionado no existe.');
+            return $responderError('El condominio seleccionado no existe.');
         }
 
         $totalMetrosCondominio = (float) ($condominio['total_metros_cuadrados'] ?? 0);
         if ($totalMetrosCondominio <= 0) {
-            return $jsonError('El condominio no tiene metros cuadrados registrados.');
+            return $responderError('El condominio no tiene metros cuadrados registrados.');
         }
 
         // ── Validación 0: Límite Global del Plan (tenant-level) ────────────────
@@ -175,7 +249,7 @@ class SuperController extends BaseController
 
         if ($limitePlan > 0 && ($totalGlobal + $cantidad) > $limitePlan) {
             $disponibles = max(0, $limitePlan - $totalGlobal);
-            return $jsonError(
+            return $responderError(
                 "Tu plan \u00abNivel: {$nivelPlan}\u00bb permite un m\u00e1ximo de {$limitePlan} apartamentos en total. "
                     . "Ya tienes {$totalGlobal} registrados e intentas crear {$cantidad} m\u00e1s. "
                     . "Puedes agregar como m\u00e1ximo {$disponibles} apartamento(s).",
@@ -191,7 +265,7 @@ class SuperController extends BaseController
         $metrosRegistrados    = array_reduce($apartamentosActuales, fn($c, $a) => $c + (float)$a['metros_cuadrados'], 0.0);
 
         if (($metrosRegistrados + $totalMetrosNuevos) > $totalMetrosCondominio) {
-            return $jsonError(
+            return $responderError(
                 'El metraje total excede la capacidad del condominio. '
                     . '(Disponibles: ' . number_format($totalMetrosCondominio - $metrosRegistrados, 2) . ' m\u00b2)'
             );
@@ -222,27 +296,36 @@ class SuperController extends BaseController
 
         if (!empty($duplicados)) {
             $lista = implode(', ', array_column($duplicados, 'nro_apartamento'));
-            return $jsonError("Los siguientes apartamentos ya est\u00e1n registrados en este condominio: {$lista}");
+            return $responderError("Los siguientes apartamentos ya est\u00e1n registrados en este condominio: {$lista}");
         }
 
         // Inserción masiva dentro de una transacción
         // $db ya fue instanciado arriba.
-        $db->transStart();
-        $apartamentoModel->insertBatch($nuevosApartamentos);
-        (new \App\Services\CondominioService())->recalcularAlicuotas($condominioId);
-        $db->transComplete();
+        try {
+            $db->transStart();
+            $apartamentoModel->insertBatch($nuevosApartamentos);
+            (new \App\Services\CondominioService())->recalcularAlicuotas($condominioId);
+            $db->transComplete();
 
-        if ($db->transStatus() === false) {
-            return $jsonError('Error interno al guardar los apartamentos.', 500);
+            if ($db->transStatus() === false) {
+                return $responderError('Error interno al guardar los apartamentos.', 500);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', '[SuperController::registrarApartamento] ' . $e->getMessage());
+            return $responderError('Error en base de datos al guardar los apartamentos: ' . $e->getMessage(), 500);
         }
 
         session()->setFlashdata('success', "Se han registrado exitosamente {$cantidad} apartamentos.");
 
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => "Se han registrado exitosamente {$cantidad} apartamentos.",
-            'csrf'    => csrf_hash()
-        ]);
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => "Se han registrado exitosamente {$cantidad} apartamentos.",
+                'csrf'    => csrf_hash()
+            ]);
+        }
+
+        return redirect()->to(base_url('super/apartamentos'));
     }
 
     // ---------------------------------------------------------------
@@ -290,7 +373,7 @@ class SuperController extends BaseController
             );
 
             if (is_array($subidaLogo) && isset($subidaLogo['error'])) {
-                return redirect()->to(site_url('super/marca-blanca'))
+                return redirect()->to(base_url('super/marca-blanca'))
                     ->with('error', $subidaLogo['error']);
             }
 
@@ -314,7 +397,7 @@ class SuperController extends BaseController
             );
 
             if (is_array($subidaBg) && isset($subidaBg['error'])) {
-                return redirect()->to(site_url('super/marca-blanca'))
+                return redirect()->to(base_url('super/marca-blanca'))
                     ->with('error', $subidaBg['error']);
             }
 
@@ -333,11 +416,11 @@ class SuperController extends BaseController
             }
 
             log_message('info', '[Auditoría] Usuario ID ' . (session()->get('usuario_id') ?? session()->get('id_usuario')) . ' actualizó la configuración de marca blanca.');
-            return redirect()->to(site_url('super/marca-blanca'))
+            return redirect()->to(base_url('super/marca-blanca'))
                 ->with('success', 'Identidad de marca actualizada correctamente.');
         } catch (\Exception $e) {
             log_message('error', '[MarcaBlanca] Error al guardar: ' . $e->getMessage());
-            return redirect()->to(site_url('super/marca-blanca'))
+            return redirect()->to(base_url('super/marca-blanca'))
                 ->with('error', 'Ocurrió un error al guardar la configuración de marca: ' . $e->getMessage());
         }
     }
@@ -346,14 +429,17 @@ class SuperController extends BaseController
 
     public function planes()
     {
-        return view('root/planes');
+        $marcaModel = new \App\Models\MarcaModel();
+        $marca = $marcaModel->first();
+        $planActual = $marca['nivel_licencia'] ?? 'Bronce';
+        return view('root/planes', ['plan_actual' => $planActual]);
     }
 
     public function cambiarPlan()
     {
         // TODO: Solicitar cambio de plan
         $nuevoPlan = $this->request->getPost('nuevo_plan');
-        return redirect()->to(site_url('super/planes'))->with('success', "Solicitud para el plan $nuevoPlan enviada exitosamente.");
+        return redirect()->to(base_url('super/planes'))->with('success', "Solicitud para el plan $nuevoPlan enviada exitosamente.");
     }
 
 

@@ -126,7 +126,7 @@ class AdminController extends BaseController
      */
     public function finanzas()
     {
-        return redirect()->to(site_url('admin/finanzas/cobro'));
+        return redirect()->to(base_url('admin/finanzas/cobro'));
     }
 
     /**
@@ -311,7 +311,7 @@ class AdminController extends BaseController
             ]);
         }
 
-        return redirect()->to(site_url('admin/cartelera'))
+        return redirect()->to(base_url('admin/cartelera'))
             ->with('success', 'Anuncio eliminado correctamente.');
     }
 }

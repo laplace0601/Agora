@@ -4,6 +4,19 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
 <main class="container my-5" role="main">
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
             <div>
@@ -77,7 +90,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
 
                                     <!-- Acciones -->
                                     <div class="col-12 col-md-3 text-md-end">
-                                        <form action="<?= site_url('admin/soporte/validar') ?>" method="POST" class="d-inline-flex flex-column align-items-md-end w-100">
+                                        <form action="<?= base_url('admin/soporte/validar') ?>" method="POST" class="d-inline-flex flex-column align-items-md-end w-100">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="ticket_id" value="<?= $ticket['id'] ?>">
 

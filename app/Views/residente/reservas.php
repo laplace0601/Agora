@@ -23,7 +23,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
 
     <div class="row mb-4">
         <div class="col-12">
-            <a href="<?= site_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small">
+            <a href="<?= base_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small">
                 <i class="bi bi-arrow-left me-1"></i> Volver al Dashboard
             </a>
             <h1 class="fw-bold h3 text-dark mt-3 mb-1"><i class="bi bi-calendar-check me-2 text-success"></i>Reservar Área Común</h1>
@@ -35,7 +35,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
         <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
-                    <form action="<?= site_url('residente/reservas/crear') ?>" method="POST" id="formReserva">
+                    <form action="<?= base_url('residente/reservas/crear') ?>" method="POST" id="formReserva">
                         <?= csrf_field() ?>
 
                         <div class="row g-3 mb-3">
@@ -115,7 +115,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-medium shadow-sm"
+                        <button type="submit" class="btn btn-success text-white w-100 py-3 rounded-3 fw-medium shadow-sm" id="btnConfirmarReserva"
                                 <?= empty($apartamentos) ? 'disabled' : '' ?>>
                             <i class="bi bi-calendar-check me-1"></i> Confirmar Reserva
                         </button>
@@ -133,6 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const fechaInput  = document.getElementById('fecha_reserva');
     const panel       = document.getElementById('panelDisponibilidad');
     const lista       = document.getElementById('listaReservas');
+    const formReserva = document.getElementById('formReserva');
+    const btnSubmit   = document.getElementById('btnConfirmarReserva');
+
+    if (formReserva && btnSubmit) {
+        formReserva.addEventListener('submit', function () {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando Reserva...';
+        });
+    }
 
     async function consultarDisponibilidad() {
         const areaId = areaSelect.value;
@@ -144,7 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const resp = await fetch(`<?= site_url('api/reservas/disponibilidad') ?>?area_id=${areaId}&fecha=${fecha}`);
+            const resp = await fetch(`<?= base_url('api/reservas/disponibilidad') ?>?area_id=${areaId}&fecha=${fecha}`);
+            const contentType = resp.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return;
+            }
             const data = await resp.json();
 
             if (data.status === 'success' && data.data.length > 0) {

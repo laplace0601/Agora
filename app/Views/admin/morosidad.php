@@ -30,7 +30,7 @@
     <!-- Filtros -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-3">
-            <form method="GET" action="<?= site_url('admin/finanzas/morosidad') ?>" class="row g-3 align-items-end">
+            <form method="GET" action="<?= base_url('admin/finanzas/morosidad') ?>" class="row g-3 align-items-end">
                 <div class="col-auto">
                     <label class="form-label small text-secondary fw-medium">Año</label>
                     <select name="anio" class="form-select form-select-sm">
@@ -54,7 +54,7 @@
                     </button>
                 </div>
                 <div class="col-auto">
-                    <a href="<?= site_url('admin/finanzas/morosidad') ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                    <a href="<?= base_url('admin/finanzas/morosidad') ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
                         <i class="bi bi-x-circle me-1"></i> Limpiar
                     </a>
                 </div>

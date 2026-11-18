@@ -81,7 +81,7 @@
                     </div>
                   <?php endif; ?>
 
-                  <form action="<?= site_url('auth/procesar-login') ?>" method="POST" class="needs-validation" novalidate>
+                  <form action="" method="POST" class="needs-validation" novalidate>
                     <?= csrf_field() ?>
                     <div class="row gy-3 overflow-hidden">
 

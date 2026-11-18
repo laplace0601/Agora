@@ -4,9 +4,22 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
 ?>
 
 <main class="container my-5" role="main"> 
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <!-- Botón Volver al Dashboard fuera de las columnas para que no rompa el diseño -->
     <div class="mb-4">
-        <a href="<?= site_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center">
+        <a href="<?= base_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center">
             <i class="bi bi-arrow-left me-2"></i> Volver al Dashboard
         </a>
     </div>
@@ -18,7 +31,7 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
         <section class="col-12 col-lg-4" aria-labelledby="crear-ticket">
             <div class="card-agora-form p-4">
                 <h2 id="crear-ticket" class="fw-bold h4 text-dark mb-3">Reportar Incidencia</h2>
-                <form action="<?= site_url('residente/soporte/abrir') ?>" method="POST">
+                <form id="formReportarIncidencia" action="<?= base_url('residente/soporte/abrir') ?>" method="POST">
                     <?= csrf_field() ?>
                     <div class="form-floating mb-3">
                         <select class="form-select" id="categoriaIncidencia" name="categoria" required>
@@ -39,8 +52,9 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual]);
                         <textarea class="form-control" id="detallesTicket" name="descripcion" placeholder="Detalles" style="height: 120px" required></textarea>
                         <label for="detallesTicket">Descripción Detallada</label>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 py-2.5 rounded-3">
-                        Abrir Ticket
+                    <button type="submit" id="btnAbrirTicket" class="btn btn-success w-100 py-2.5 rounded-3">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerTicket" role="status" aria-hidden="true"></span>
+                        <span id="textoTicket">Abrir Ticket</span>
                     </button>
                 </form>
             </div>

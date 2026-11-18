@@ -121,7 +121,7 @@ class ResidenteController extends BaseController
         $metodoPago  = formatearMetodoPago($metodoInput);
 
         if ($reciboId <= 0 || $montoPagado <= 0) {
-            return $this->responder('error', 'El recibo y el monto son obligatorios.', 400);
+            return $this->responder('error', 'El recibo y el monto son obligatorios.', 400, [], 'residente/pago');
         }
 
         // Si es Efectivo, la referencia es opcional (si está vacía, se autocompleta para el modelo)
@@ -131,7 +131,7 @@ class ResidenteController extends BaseController
 
         // Si es Pago Móvil, la referencia es estrictamente obligatoria
         if ($metodoPago === 'Pago Móvil' && empty($referencia)) {
-            return $this->responder('error', 'El número de referencia de la transacción es obligatorio para Pago Móvil.', 400);
+            return $this->responder('error', 'El número de referencia de la transacción es obligatorio para Pago Móvil.', 400, [], 'residente/pago');
         }
 
         // SEGURIDAD: Verificar que el recibo pertenece a alguno de los apartamentos del residente
@@ -140,7 +140,7 @@ class ResidenteController extends BaseController
         $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
         if (empty($apartamentos)) {
-            return $this->responder('error', 'No tienes un apartamento asignado.', 400);
+            return $this->responder('error', 'No tienes un apartamento asignado.', 400, [], 'residente/pago');
         }
 
         $idsApartamentos = array_column($apartamentos, 'id');
@@ -151,7 +151,7 @@ class ResidenteController extends BaseController
                                    ->first();
 
         if (! $recibo) {
-            return $this->responder('error', 'El recibo indicado no existe o no pertenece a tus apartamentos.', 404);
+            return $this->responder('error', 'El recibo indicado no existe o no pertenece a tus apartamentos.', 404, [], 'residente/pago');
         }
 
         $datos = [
@@ -167,7 +167,7 @@ class ResidenteController extends BaseController
         $pagoModel = new PagoModel();
 
         if (! $pagoModel->insert($datos)) {
-            return $this->responder('error', 'Error al registrar el pago: ' . implode(', ', $pagoModel->errors()), 422);
+            return $this->responder('error', 'Error al registrar el pago: ' . implode(', ', $pagoModel->errors()), 422, [], 'residente/pago');
         }
 
         $pagoId = $pagoModel->getInsertID();
@@ -230,7 +230,7 @@ class ResidenteController extends BaseController
 
         // Guardia de sesión: solo residentes autenticados
         if (! $session->get('isLoggedIn') || $session->get('rol') !== 'residente' || ! $usuarioId) {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión para abrir un ticket.');
+            return redirect()->to(base_url('auth/login'))->with('error', 'Debes iniciar sesión para abrir un ticket.');
         }
 
         $datos = [
@@ -243,17 +243,17 @@ class ResidenteController extends BaseController
         ];
 
         if (empty($datos['categoria']) || empty($datos['asunto']) || empty($datos['detalle'])) {
-            return redirect()->back()->with('error', 'Todos los campos del ticket son obligatorios.');
+            return redirect()->to(base_url('residente/soporte'))->with('error', 'Todos los campos del ticket son obligatorios.');
         }
 
         $ticketModel = new TicketModel();
 
         if (! $ticketModel->insert($datos)) {
-            return redirect()->back()
+            return redirect()->to(base_url('residente/soporte'))
                              ->with('error', 'Error al crear el ticket: ' . implode(', ', $ticketModel->errors()));
         }
 
-        return redirect()->to(site_url('residente/soporte'))
+        return redirect()->to(base_url('residente/soporte'))
                          ->with('success', 'Ticket de soporte abierto exitosamente. Te contactaremos pronto.');
     }
 
@@ -333,8 +333,15 @@ class ResidenteController extends BaseController
         $apartamentoModel = new ApartamentoModel();
         $apartamentos     = $apartamentoModel->obtenerPorUsuario($usuarioId);
 
+        $habitantes = [];
+        if (! empty($apartamentos)) {
+            $habitanteModel = new \App\Models\HabitanteModel();
+            $habitantes     = $habitanteModel->listarTodosPorApartamento($apartamentos[0]['id']);
+        }
+
         return view('residente/habitantes', [
             'apartamentos' => $apartamentos,
+            'habitantes'   => $habitantes,
         ]);
     }
 
@@ -349,7 +356,7 @@ class ResidenteController extends BaseController
     {
         $session = session();
         if (! $session->get('isLoggedIn')) {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Debes iniciar sesión para consultar el recibo.');
+            return redirect()->to(base_url('auth/login'))->with('error', 'Debes iniciar sesión para consultar el recibo.');
         }
 
         $rol       = $session->get('rol');
@@ -368,7 +375,7 @@ class ResidenteController extends BaseController
             ->first();
 
         if (! $recibo) {
-            return redirect()->back()->with('error', 'El recibo solicitado no existe.');
+            return redirect()->to(base_url('residente/finanzas'))->with('error', 'El recibo solicitado no existe.');
         }
 
         // Validación de pertenencia para el residente
@@ -378,15 +385,15 @@ class ResidenteController extends BaseController
             $idsApartamentos       = array_column($apartamentosResidente, 'id');
 
             if (! in_array($recibo['apartamento_id'], $idsApartamentos)) {
-                return redirect()->back()->with('error', 'Acceso denegado: este recibo no pertenece a tu apartamento.');
+                return redirect()->to(base_url('residente/finanzas'))->with('error', 'Acceso denegado: este recibo no pertenece a tu apartamento.');
             }
         } elseif (! in_array($rol, ['admin', 'root'], true)) {
-            return redirect()->back()->with('error', 'No tienes permisos para consultar este recibo.');
+            return redirect()->to(base_url('residente/finanzas'))->with('error', 'No tienes permisos para consultar este recibo.');
         }
 
         // Validar que el estatus sea "Pagado"
         if (($recibo['estado_pago'] ?? '') !== 'Pagado') {
-            return redirect()->back()->with('error', 'El comprobante solo está disponible para recibos con estatus Pagado.');
+            return redirect()->to(base_url('residente/finanzas'))->with('error', 'El comprobante solo está disponible para recibos con estatus Pagado.');
         }
 
         // Obtener el pago aprobado asociado

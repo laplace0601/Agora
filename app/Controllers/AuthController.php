@@ -66,6 +66,20 @@ class AuthController extends BaseController
     }
 
     /**
+     * GET /auth/procesar-login
+     * Respaldo por si InfinityFree o el navegador accede por GET.
+     * Redirige limpiamente a /login en lugar de mostrar la vista con la URL con parámetros (?i=1).
+     */
+    public function redirectLogin()
+    {
+        if (session()->get('isLoggedIn')) {
+            return $this->_redirigirPorRol(session()->get('rol'));
+        }
+
+        return redirect()->to(base_url('login'));
+    }
+
+    /**
      * GET /auth/logout
      */
     public function logout()
@@ -73,7 +87,7 @@ class AuthController extends BaseController
         // Limpiar datos de autenticación del usuario sin invalidar el token CSRF de la navegación
         session()->remove(['usuario_id', 'nombre_usuario', 'correo', 'rol', 'isLoggedIn', 'session_start_time']);
         session()->regenerate(true);
-        return redirect()->to(site_url('auth/login'));
+        return redirect()->to(base_url('auth/login'));
     }
 
     // ---------------------------------------------------------------
@@ -87,14 +101,14 @@ class AuthController extends BaseController
     {
         switch ($rol) {
             case 'root':
-                return redirect()->to(site_url('super/apartamentos'));
+                return redirect()->to(base_url('super/apartamentos'));
             case 'admin':
-                return redirect()->to(site_url('admin/cartelera'));
+                return redirect()->to(base_url('admin/cartelera'));
             case 'residente':
-                return redirect()->to(site_url('residente/dashboard'));
+                return redirect()->to(base_url('residente/dashboard'));
             default:
                 session()->destroy();
-                return redirect()->to(site_url('auth/login'))
+                return redirect()->to(base_url('auth/login'))
                     ->with('error', 'Rol no reconocido. Contacte al administrador.');
         }
     }
