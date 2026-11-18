@@ -1,0 +1,18 @@
+# =====================================================================
+# .htaccess RAÍZ — Redirige todo al directorio public/
+# =====================================================================
+# En InfinityFree, se copia el CONTENIDO de public/ directamente en
+# htdocs/ y los demás directorios (app/, system/, vendor/, writable/)
+# van un nivel ARRIBA o se protegen con sus propios .htaccess.
+#
+# Este archivo solo es útil si despliegas la estructura COMPLETA
+# del proyecto en htdocs (no recomendado pero funcional).
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Si el archivo o directorio existe en public/, servir directamente
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

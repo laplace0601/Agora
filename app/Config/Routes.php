@@ -18,6 +18,12 @@ $routes->get('/', 'AuthController::login');
 $routes->get('login',              'AuthController::login');
 $routes->get('auth/login',         'AuthController::login');
 $routes->post('auth/procesar-login', 'AuthController::processLogin');
+
+// GET /auth/procesar-login — Respaldo para redirecciones del anti-bot de InfinityFree (?i=1)
+// Cuando el hosting redirige un POST a GET con la cookie de seguridad, esto evita el 404
+// y lleva al usuario de vuelta al formulario de login.
+$routes->get('auth/procesar-login', 'AuthController::login');
+
 $routes->get('auth/logout',        'AuthController::logout');
 // ---------------------------------------------------------------
 // Panel Super-Admin (rol: root)

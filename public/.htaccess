@@ -5,8 +5,6 @@ Options -Indexes
 # Rewrite engine
 # ----------------------------------------------------------------------
 
-# Turning on the rewrite engine is necessary for the following rules and features.
-# FollowSymLinks must be enabled for this to work.
 <IfModule mod_rewrite.c>
 	Options +FollowSymlinks
 	RewriteEngine On
@@ -25,6 +23,13 @@ Options -Indexes
 	RewriteCond %{HTTPS} !=on
 	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
 	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+	# ------------------------------------------------------------------
+	# InfinityFree Anti-Bot Cookie (?i=1)
+	# Cuando el hosting redirige con ?i=1 para setear la cookie anti-bot,
+	# permitimos que el query string pase transparentemente a CI4.
+	# No se necesita regla especial: QSA ya lo maneja.
+	# ------------------------------------------------------------------
 
 	# Checks to see if the user is attempting to access a valid file,
 	# such as an image or css document, if this isn't true it sends the
