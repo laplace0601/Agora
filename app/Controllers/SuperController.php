@@ -202,25 +202,52 @@ class SuperController extends BaseController
             $db = \Config\Database::connect();
             $db->transStart();
 
-            // Limpieza preventiva de tablas dependientes
-            $db->table('recibos_mensuales')->where('apartamento_id', $id)->delete();
-            $db->table('solvencias')->where('apartamento_id', $id)->delete();
-            $db->table('habitantes')->where('apartamento_id', $id)->delete();
-            $db->table('reservas_areas_comunes')->where('apartamento_id', $id)->delete();
+            // 1. Eliminar pagos recibidos asociados a recibos de este apartamento
+            $recibos = $db->table('recibos_mensuales')
+                ->select('id')
+                ->where('apartamento_id', $id)
+                ->get()
+                ->getResultArray();
 
+            if (! empty($recibos)) {
+                $recibosIds = array_column($recibos, 'id');
+                if ($db->tableExists('pagos_recibidos')) {
+                    $db->table('pagos_recibidos')->whereIn('recibo_mensual_id', $recibosIds)->delete();
+                }
+                $db->table('recibos_mensuales')->whereIn('id', $recibosIds)->delete();
+            }
+
+            // 2. Limpieza de recibos de solvencia
+            if ($db->tableExists('recibos_solvencia')) {
+                $db->table('recibos_solvencia')->where('apartamento_id', $id)->delete();
+            }
+
+            // 3. Limpieza de habitantes
+            if ($db->tableExists('habitantes')) {
+                $db->table('habitantes')->where('apartamento_id', $id)->delete();
+            }
+
+            // 4. Limpieza de reservas de áreas comunes
+            if ($db->tableExists('reservas_areas')) {
+                $db->table('reservas_areas')->where('apartamento_id', $id)->delete();
+            }
+
+            // 5. Eliminar el registro del apartamento
             $apartamentoModel->delete($id);
 
             $db->transComplete();
 
             if ($db->transStatus() === false) {
-                return $this->responder('error', 'No se pudo eliminar el apartamento por una restricción de integridad.', 500, [], 'super/apartamentos');
+                $dbError = $db->error();
+                log_message('error', '[SuperController::deleteApartamento] Error BD: ' . json_encode($dbError));
+                return $this->responder('error', 'No se pudo eliminar el apartamento: ' . ($dbError['message'] ?? 'Error de base de datos.'), 500, [], 'super/apartamentos');
             }
 
             $nro = $apto['nro_apartamento'] ?? "#{$id}";
             return $this->responder('success', "Apartamento {$nro} eliminado exitosamente.", 200, [], 'super/apartamentos');
 
         } catch (\Throwable $e) {
-            log_message('error', '[SuperController::deleteApartamento] ' . $e->getMessage());
+            log_message('error', '[SuperController::deleteApartamento] Excepción: ' . $e->getMessage());
             return $this->responder('error', 'Error al eliminar el apartamento: ' . $e->getMessage(), 500, [], 'super/apartamentos');
         }
     }
@@ -245,25 +272,53 @@ class SuperController extends BaseController
             $db = \Config\Database::connect();
             $db->transStart();
 
-            $db->table('recibos_mensuales')->whereIn('apartamento_id', $ids)->delete();
-            $db->table('solvencias')->whereIn('apartamento_id', $ids)->delete();
-            $db->table('habitantes')->whereIn('apartamento_id', $ids)->delete();
-            $db->table('reservas_areas_comunes')->whereIn('apartamento_id', $ids)->delete();
+            // 1. Eliminar pagos y recibos de todos los apartamentos seleccionados
+            $recibos = $db->table('recibos_mensuales')
+                ->select('id')
+                ->whereIn('apartamento_id', $ids)
+                ->get()
+                ->getResultArray();
 
+            if (! empty($recibos)) {
+                $recibosIds = array_column($recibos, 'id');
+                if ($db->tableExists('pagos_recibidos')) {
+                    $db->table('pagos_recibidos')->whereIn('recibo_mensual_id', $recibosIds)->delete();
+                }
+                $db->table('recibos_mensuales')->whereIn('id', $recibosIds)->delete();
+            }
+
+            // 2. Limpieza de recibos de solvencia
+            if ($db->tableExists('recibos_solvencia')) {
+                $db->table('recibos_solvencia')->whereIn('apartamento_id', $ids)->delete();
+            }
+
+            // 3. Limpieza de habitantes
+            if ($db->tableExists('habitantes')) {
+                $db->table('habitantes')->whereIn('apartamento_id', $ids)->delete();
+            }
+
+            // 4. Limpieza de reservas de áreas comunes
+            if ($db->tableExists('reservas_areas')) {
+                $db->table('reservas_areas')->whereIn('apartamento_id', $ids)->delete();
+            }
+
+            // 5. Eliminar apartamentos seleccionados
             $apartamentoModel = new \App\Models\ApartamentoModel();
             $apartamentoModel->whereIn('id', $ids)->delete();
 
             $db->transComplete();
 
             if ($db->transStatus() === false) {
-                return $this->responder('error', 'No se pudieron eliminar los apartamentos seleccionados.', 500, [], 'super/apartamentos');
+                $dbError = $db->error();
+                log_message('error', '[SuperController::deleteApartamentosBatch] Error BD: ' . json_encode($dbError));
+                return $this->responder('error', 'No se pudieron eliminar los apartamentos: ' . ($dbError['message'] ?? 'Error de base de datos.'), 500, [], 'super/apartamentos');
             }
 
             $total = count($ids);
             return $this->responder('success', "Se eliminaron {$total} apartamento(s) exitosamente.", 200, [], 'super/apartamentos');
 
         } catch (\Throwable $e) {
-            log_message('error', '[SuperController::deleteApartamentosBatch] ' . $e->getMessage());
+            log_message('error', '[SuperController::deleteApartamentosBatch] Excepción: ' . $e->getMessage());
             return $this->responder('error', 'Error al eliminar apartamentos: ' . $e->getMessage(), 500, [], 'super/apartamentos');
         }
     }

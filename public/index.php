@@ -17,6 +17,15 @@ if (
     $_SERVER['SERVER_PORT'] = '443';
 }
 
+// ---------------------------------------------------------------
+// Normalizar case en Windows para subcarpetas (evita 404 si se entra con /agora/ en lugar de /Agora/)
+// ---------------------------------------------------------------
+if (isset($_SERVER['REQUEST_URI'], $_SERVER['SCRIPT_NAME'])) {
+    if (str_starts_with(strtolower($_SERVER['REQUEST_URI']), '/agora/')) {
+        $_SERVER['SCRIPT_NAME'] = preg_replace('#^/[^/]+#i', '/' . explode('/', trim($_SERVER['REQUEST_URI'], '/'))[0], $_SERVER['SCRIPT_NAME']);
+    }
+}
+
 use CodeIgniter\Boot;
 use Config\Paths;
 

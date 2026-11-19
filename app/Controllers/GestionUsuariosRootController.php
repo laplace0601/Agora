@@ -161,32 +161,90 @@ class GestionUsuariosRootController extends BaseController
         $usuarioModel = new UsuarioModel();
         $usuario = $usuarioModel->find($id);
 
-        if (!$usuario || $usuario['estado'] === 'eliminado') {
-            return $this->responder('error', 'Usuario no encontrado o ya ha sido eliminado.', 404, [], 'super/gestion_usuarios');
+        if (!$usuario) {
+            return $this->responder('error', 'Usuario no encontrado.', 404, [], 'super/gestion_usuarios');
         }
 
-        // LÓGICA DE ELIMINACIÓN SEGURA: Si es residente, desvincular de apartamentos
-        if ($usuario['rol'] === 'residente') {
-            $residenteModel = new \App\Models\ResidenteModel();
-            $apartamentoModel = new \App\Models\ApartamentoModel();
-            
-            $residente = $residenteModel->obtenerPorUsuario($id);
-            if ($residente) {
-                // Liberar el apartamento asignado a este residente
-                $apartamentoModel->where('residente_id', $residente['id'])
-                                 ->set(['residente_id' => null])
-                                 ->update();
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            // Si es residente, eliminar en cascada todas sus relaciones
+            if ($usuario['rol'] === 'residente') {
+                $residenteModel    = new \App\Models\ResidenteModel();
+                $apartamentoModel  = new \App\Models\ApartamentoModel();
+
+                $residente = $residenteModel->obtenerPorUsuario((int)$id);
+
+                if ($residente) {
+                    $residenteId = $residente['id'];
+
+                    // 1. Liberar apartamento(s) asignado(s) a este residente
+                    $db->table('apartamentos')
+                       ->where('residente_id', $residenteId)
+                       ->update(['residente_id' => null]);
+
+                    // 2. Eliminar pagos recibidos relacionados (FK a recibos_mensuales)
+                    $reciboIds = $db->table('recibos_mensuales')
+                                   ->select('id')
+                                   ->where('residente_id', $residenteId)
+                                   ->get()->getResultArray();
+
+                    if (!empty($reciboIds)) {
+                        $ids = array_column($reciboIds, 'id');
+                        $db->table('pagos_recibidos')
+                           ->whereIn('recibo_mensual_id', $ids)
+                           ->delete();
+                    }
+
+                    // 3. Eliminar recibos mensuales del residente
+                    $db->table('recibos_mensuales')
+                       ->where('residente_id', $residenteId)
+                       ->delete();
+
+                    // 4. Eliminar recibos de solvencia del residente
+                    $db->table('recibos_solvencia')
+                       ->where('residente_id', $residenteId)
+                       ->delete();
+
+                    // 5. Eliminar reservas de áreas comunes del residente
+                    $db->table('reservas_areas')
+                       ->where('residente_id', $residenteId)
+                       ->delete();
+
+                    // 6. Eliminar tickets / comunicados del residente (si existen)
+                    if ($db->tableExists('tickets')) {
+                        $db->table('tickets')
+                           ->where('residente_id', $residenteId)
+                           ->delete();
+                    }
+
+                    // 7. Eliminar el registro de residente
+                    $db->table('residentes')
+                       ->where('id', $residenteId)
+                       ->delete();
+                }
             }
+
+            // Hard-delete definitivo del usuario
+            $db->table('usuarios')
+               ->where('id', $id)
+               ->delete();
+
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', "[GestionUsuariosRoot] Error al eliminar usuario #{$id}: " . $e->getMessage());
+            return $this->responder('error', 'Error interno al eliminar el usuario. Inténtalo de nuevo.', 500, [], 'super/gestion_usuarios');
         }
 
-        // ELIMINACIÓN LÓGICA (Soft Delete Manual) y prevención de login
-        $usuarioModel->skipValidation(true);
-        if (!$usuarioModel->update($id, ['estado' => 'eliminado'])) {
-            return $this->responder('error', 'Error del servidor al intentar eliminar el usuario.', 500, [], 'super/gestion_usuarios');
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->responder('error', 'La operación falló a nivel de base de datos. No se eliminó el usuario.', 500, [], 'super/gestion_usuarios');
         }
 
-        log_message('info', "[GestionUsuariosRoot] Usuario #{$id} eliminado lógicamente por root #" . session()->get('usuario_id'));
+        log_message('info', "[GestionUsuariosRoot] Usuario #{$id} (rol: {$usuario['rol']}) ELIMINADO PERMANENTEMENTE por root #" . session()->get('usuario_id'));
 
-        return $this->responder('success', 'Usuario eliminado lógicamente de la plataforma.', 200, [], 'super/gestion_usuarios');
+        return $this->responder('success', 'Usuario eliminado permanentemente de la plataforma.', 200, [], 'super/gestion_usuarios');
     }
 }

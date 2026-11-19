@@ -1,11 +1,11 @@
 # =====================================================================
-# .htaccess PÚBLICO (htdocs/public/) — CodeIgniter 4
+# .htaccess PÚBLICO (public/) — CodeIgniter 4
+# Compatible con subcarpetas (XAMPP /Agora/) y dominio raíz (InfinityFree)
 # =====================================================================
 Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /public/
 
     # Servir archivos o carpetas físicos existentes directamente (css, js, imágenes)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -13,8 +13,7 @@ Options -Indexes
     RewriteRule ^ - [L]
 
     # Enrutar cualquier otra solicitud hacia el Front-Controller index.php
-    # Usamos "index.php" (sin /$1) para evitar el error 404 en servidores con AcceptPathInfo desactivado
-    RewriteRule ^ index.php [L,QSA]
+    RewriteRule ^(.*)$ index.php/$1 [L]
 
     # Asegurar que los encabezados de autorización HTTP se transmitan a PHP
     RewriteCond %{HTTP:Authorization} .

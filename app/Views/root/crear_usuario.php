@@ -28,7 +28,7 @@ echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="fw-bold h3 text-dark"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Registro Central de Usuarios</h1>
-            <p class="text-secondary small">Alta global de cuentas en la plataforma Ágora. Selecciona el tipo de rol correspondiente para desplegar sus parámetros específicos.</p>
+            <p class="text-secondary small">panel global de cuentas en la plataforma Ágora. Selecciona el tipo de rol correspondiente para desplegar sus parámetros específicos.</p>
         </div>
     </div>
 

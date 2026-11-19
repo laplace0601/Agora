@@ -133,7 +133,7 @@ class UsuarioController extends BaseController
             return redirect()->to(base_url('super/crear-usuario'))->withInput()->with('error', 'Error al crear residente: ' . $msjError);
         }
 
-        return redirect()->to(base_url('super/crear-usuario'))->with('success', '¡Se ha creado el usuario con éxito! El residente ha sido dado de alta y asignado al apartamento.');
+        return redirect()->to(base_url('super/crear-usuario'))->with('success', '¡Se ha creado el usuario con éxito!  el residente fue asignado al apartamento.');
     }
 
     public function guardarAdmin()

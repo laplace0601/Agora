@@ -1,21 +1,21 @@
 # =====================================================================
-# .htaccess RAÍZ (htdocs/) — Ágora CRM en Servidor Compartido / InfinityFree
+# .htaccess RAÍZ — Ágora CRM
+# Compatible tanto con subcarpeta (XAMPP /Agora/) como con raíz (InfinityFree)
 # =====================================================================
 Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
 
-    # 1. Cortar bucles infinitos: si la petición ya fue reescrita internamente, detener el motor (evita Error 403)
+    # 1. Cortar bucles infinitos: si la petición ya fue reescrita internamente, detener el motor
     RewriteCond %{ENV:REDIRECT_STATUS} !^$
     RewriteRule ^ - [L]
 
     # 2. Bloquear acceso HTTP directo a carpetas sensibles del backend
-    RewriteRule ^(app|system|writable|tests|\.env)/ - [F,L,NC]
+    RewriteRule ^(app|system|writable|tests|\.env) - [F,L,NC]
 
-    # 3. Si la petición ya incluye /public/, no volver a reescribir
-    RewriteCond %{REQUEST_URI} ^/public/ [NC]
+    # 3. Si la petición ya incluye public/, no volver a reescribir (evita bucle infinito)
+    RewriteCond %{REQUEST_URI} public(/|$) [NC]
     RewriteRule ^ - [L]
 
     # 4. Redirigir todo el tráfico entrante a la carpeta public/
