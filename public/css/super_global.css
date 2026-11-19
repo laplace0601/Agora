@@ -90,3 +90,24 @@ body {
 .fila-ticket[data-plan="bronce"] {
     border-left: 5px solid #CD7F32 !important; /* Borde Bronce */
 }
+
+/* Clases de compatibilidad modal y badges */
+.text-bg-agora {
+    background-color: #0F172A !important;
+    color: #ffffff !important;
+}
+
+.modal-header-custom {
+    background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
+}
+
+.btn-outline-agora-admin {
+    border: 2px solid #0F172A !important;
+    color: #0F172A !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-outline-agora-admin:hover {
+    background-color: #0F172A !important;
+    color: #ffffff !important;
+}

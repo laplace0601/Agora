@@ -176,31 +176,38 @@ echo view('template/super_header', ['pagina_actual' => 'admin_planes']);
 
 <div class="modal fade" id="modalCambioPlan" tabindex="-1" aria-labelledby="modalCambioPlanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg">
-            <div class="modal-header border-bottom-0 pt-4 px-4 modal-header-custom text-white rounded-top-4">
-                <h5 class="modal-title fw-bold" id="modalCambioPlanLabel">🔄 Confirmar Solicitud de Cambio</h5>
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header border-bottom-0 pt-4 px-4 modal-header-custom text-white">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2" id="modalCambioPlanLabel">
+                    <i class="bi bi-arrow-repeat"></i> Confirmar Solicitud de Cambio
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formActivarLicencia" action="<?= base_url('crm/licencia/activar') ?>" method="POST">
                 <?= csrf_field() ?>
+                <input type="hidden" name="plan_destino" id="input_plan_destino" value="">
                 <div class="modal-body px-4 pt-4">
-                    <p class="text-dark small lh-base">Introduce la clave de activación para hacer Upgrade al nivel de licencia de la plataforma Ágora.</p>
+                    <p class="text-secondary small lh-base mb-3">Introduce la clave de activación correspondiente al plan seleccionado para actualizar la plataforma Ágora.</p>
 
-                    <div class="bg-light p-3 rounded-3 border mb-3 text-center d-flex align-items-center justify-content-center gap-3">
+                    <div class="bg-light p-3 rounded-4 border mb-3 text-center d-flex align-items-center justify-content-center gap-3">
                         <div>
-                            <span class="text-secondary small d-block">Plan Actual</span>
-                            <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 fw-bold rounded-pill"><?= $plan_actual ?></span>
+                            <span class="text-secondary small d-block mb-1 fw-semibold">Plan Actual</span>
+                            <span id="badge_plan_actual" class="badge px-3 py-2 fw-bold rounded-pill text-white shadow-sm" style="<?= ($plan_actual === 'Bronce') ? 'background-color: #CD7F32;' : (($plan_actual === 'Oro') ? 'background-color: #B45309;' : 'background-color: #475569;') ?>">
+                                Plan <?= esc($plan_actual) ?>
+                            </span>
                         </div>
                         <i class="bi bi-arrow-right text-muted fs-4"></i>
                         <div>
-                            <span class="text-secondary small d-block">Upgrade Solicitado</span>
-                            <span id="label_plan_destino" class="badge text-bg-agora px-3 py-1.5 fw-bold rounded-pill">---</span>
+                            <span class="text-secondary small d-block mb-1 fw-semibold">Upgrade Solicitado</span>
+                            <span id="label_plan_destino" class="badge px-3 py-2 fw-bold rounded-pill text-white shadow-sm" style="background-color: #0F172A;">
+                                ---
+                            </span>
                         </div>
                     </div>
 
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" id="codigo_activacion" name="codigo_activacion" required placeholder="Clave de Activación">
-                        <label for="codigo_activacion">Clave de Activación *</label>
+                        <label for="codigo_activacion" class="text-secondary">Clave de Activación *</label>
                     </div>
 
                     <div id="licencia-alert" class="alert d-none small mb-0"></div>
@@ -236,7 +243,24 @@ echo view('template/super_footer', ['pagina_actual' => 'admin_planes']);
         window.setPlanDestino = function(planLabel) {
             planDestinoActual = planLabel;
             const labelEl = document.getElementById('label_plan_destino');
-            if (labelEl) labelEl.textContent = planLabel;
+            if (labelEl) {
+                labelEl.textContent = 'Plan ' + planLabel;
+                const p = planLabel.toLowerCase();
+                if (p === 'bronce') {
+                    labelEl.style.backgroundColor = '#CD7F32';
+                } else if (p === 'plata') {
+                    labelEl.style.backgroundColor = '#475569';
+                } else if (p === 'oro') {
+                    labelEl.style.backgroundColor = '#B45309';
+                } else {
+                    labelEl.style.backgroundColor = '#0F172A';
+                }
+                labelEl.style.color = '#ffffff';
+            }
+            const inputDestino = document.getElementById('input_plan_destino');
+            if (inputDestino) {
+                inputDestino.value = planLabel;
+            }
             // Limpiar el campo de clave al reabrir
             const inputCodigo = document.getElementById('codigo_activacion');
             if (inputCodigo) inputCodigo.value = '';
@@ -326,8 +350,21 @@ echo view('template/super_footer', ['pagina_actual' => 'admin_planes']);
                 }
             }
 
-            // ── 3. Actualizar variable de sesión cliente ───────────────────────
+            // Actualizar variable de sesión cliente y badge del modal
             planActivoActual = nuevoPlan;
+            const badgeActual = document.getElementById('badge_plan_actual');
+            if (badgeActual) {
+                const nombreCapitalizado = nuevoPlan.charAt(0).toUpperCase() + nuevoPlan.slice(1);
+                badgeActual.textContent = 'Plan ' + nombreCapitalizado;
+                if (nuevoPlan === 'bronce') {
+                    badgeActual.style.backgroundColor = '#CD7F32';
+                } else if (nuevoPlan === 'plata') {
+                    badgeActual.style.backgroundColor = '#475569';
+                } else if (nuevoPlan === 'oro') {
+                    badgeActual.style.backgroundColor = '#B45309';
+                }
+                badgeActual.style.color = '#ffffff';
+            }
         }
 
         // ────────────────────────────────────────────────────────────────────────

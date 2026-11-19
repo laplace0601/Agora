@@ -109,8 +109,9 @@ class LicenciaController extends BaseController
 
             $isDev = (ENVIRONMENT === 'development');
 
-            // ── 1. Recibir y sanear el código enviado por POST ─────────────────
+            // ── 1. Recibir y sanear los datos enviados por POST ─────────────────
             $codigoActivacion = trim((string) ($this->request->getPost('codigo_activacion') ?? ''));
+            $planDestino      = trim((string) ($this->request->getPost('plan_destino') ?? ''));
 
             // ── 2. Mapa de planes: clave del .env con fallback seguro → datos del plan ──
             $mapaPlanes = [
@@ -146,16 +147,55 @@ class LicenciaController extends BaseController
                 return $this->responder('error', 'No se encontró la configuración de marca.', 404, [], 'super/planes');
             }
 
-            // ── 4. Buscar el plan cuya llave coincide (flujo unificado) ────────
+            // ── 4. Validación de la clave según el plan seleccionado ───────────
             $planEncontrado = null;
+            $planDestinoNormalizado = ucfirst(strtolower($planDestino));
 
-            foreach ($mapaPlanes as $nombrePlan => $datosPlan) {
-                if ($codigoActivacion !== '' && $codigoActivacion === $datosPlan['key']) {
+            if (!empty($planDestinoNormalizado) && isset($mapaPlanes[$planDestinoNormalizado])) {
+                // Validación estricta: la clave debe ser del plan seleccionado específicamente
+                if ($codigoActivacion !== '' && $codigoActivacion === $mapaPlanes[$planDestinoNormalizado]['key']) {
                     $planEncontrado = [
-                        'nivel'  => $nombrePlan,
-                        'limite' => $datosPlan['limite'],
+                        'nivel'  => $planDestinoNormalizado,
+                        'limite' => $mapaPlanes[$planDestinoNormalizado]['limite'],
                     ];
-                    break;
+                } else {
+                    // Verificar si la clave ingresada pertenece a otro plan
+                    $otroPlan = null;
+                    foreach ($mapaPlanes as $pNombre => $pDatos) {
+                        if ($codigoActivacion !== '' && $codigoActivacion === $pDatos['key']) {
+                            $otroPlan = $pNombre;
+                            break;
+                        }
+                    }
+
+                    if ($otroPlan) {
+                        return $this->responder(
+                            'error',
+                            "La clave ingresada corresponde al Plan {$otroPlan}, pero estás intentando activar el Plan {$planDestinoNormalizado}. Debes ingresar la clave correcta de este plan.",
+                            422,
+                            [],
+                            'super/planes'
+                        );
+                    }
+
+                    return $this->responder(
+                        'error',
+                        "Clave de activación incorrecta para el Plan {$planDestinoNormalizado}.",
+                        400,
+                        [],
+                        'super/planes'
+                    );
+                }
+            } else {
+                // Flujo de compatibilidad si no se envió plan_destino
+                foreach ($mapaPlanes as $nombrePlan => $datosPlan) {
+                    if ($codigoActivacion !== '' && $codigoActivacion === $datosPlan['key']) {
+                        $planEncontrado = [
+                            'nivel'  => $nombrePlan,
+                            'limite' => $datosPlan['limite'],
+                        ];
+                        break;
+                    }
                 }
             }
 

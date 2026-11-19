@@ -26,3 +26,25 @@
 }
 .border-success-custom { border-color: #198754 !important; }
 .border-light-custom { border-color: rgba(0, 0, 0, 0.06) !important; }
+
+/* Botones de selección de plan */
+.btn-outline-agora-admin {
+    border: 2px solid #0F172A !important;
+    color: #0F172A !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-outline-agora-admin:hover {
+    background-color: #0F172A !important;
+    color: #ffffff !important;
+}
+
+/* Modal y Badges de cambio de plan */
+.modal-header-custom {
+    background: linear-gradient(135deg, #0F172A 0%, #1e293b 100%) !important;
+}
+
+.text-bg-agora {
+    background-color: #0F172A !important;
+    color: #ffffff !important;
+}
