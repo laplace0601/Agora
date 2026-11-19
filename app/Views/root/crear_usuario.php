@@ -62,7 +62,7 @@ echo view('template/super_header', ['pagina_actual' => 'super_crear_usuario']);
                         <div class="col-md-6 form-floating"><input type="text" class="form-control" name="cedula" placeholder="Cédula" required><label class="ms-2">Cédula de Identidad *</label></div>
                         <div class="col-md-6 form-floating"><input type="tel" class="form-control" name="telefono" placeholder="Teléfono" required><label class="ms-2">Número Telefónico *</label></div>
                         <div class="col-md-6 form-floating"><input type="email" class="form-control" name="correo" placeholder="Correo" required><label class="ms-2">Correo Electrónico *</label></div>
-                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="residente-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña Temporal * (mín. 8 caracteres)</label></div>
+                        <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave" id="residente-clave" placeholder="Contraseña" required minlength="8"><label class="ms-2">Contraseña * (mín. 8 caracteres)</label></div>
                         <div class="col-md-6 form-floating"><input type="password" class="form-control" name="clave_confirm" id="residente-clave-confirm" placeholder="Confirmar Contraseña" required minlength="8"><label class="ms-2">Confirmar Contraseña *</label></div>
 
                         <div class="col-md-6 form-floating">
