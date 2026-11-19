@@ -1,0 +1,4 @@
+para poder descargar los pdf de los recibos de pago primero se tiene que descargar 
+la carpeta composer ahi se encuentra la libreria necesario 
+solo debes usar este comando en el terminal en la carpeta de proyecto
+composer install
