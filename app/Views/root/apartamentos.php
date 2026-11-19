@@ -88,10 +88,15 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
     </div>
 
     <!-- Gestión de Apartamentos -->
-    <div class="row mt-5 mb-4 align-items-center">
-        <div class="col-md-8">
-            <h2 class="fw-bold h4 text-dark"><i class="bi bi-door-open-fill me-2 text-primary"></i>Gestión de Apartamentos</h2>
-            <p class="text-secondary small">Listado de todos los apartamentos registrados y sus datos.</p>
+    <div class="row mt-5 mb-4 align-items-center justify-content-between">
+        <div class="col-md-7">
+            <h2 class="fw-bold h4 text-dark mb-1"><i class="bi bi-door-open-fill me-2 text-primary"></i>Gestión de Apartamentos</h2>
+            <p class="text-secondary small mb-0">Listado de todos los apartamentos registrados y sus datos.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end align-items-center gap-2">
+            <button type="button" id="btn-delete-batch" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-2 d-none shadow-sm fw-semibold">
+                <i class="bi bi-trash-fill me-1"></i> Eliminar seleccionados (<span id="count-selected">0</span>)
+            </button>
         </div>
     </div>
 
@@ -101,19 +106,24 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                 <table class="table table-hover align-middle mb-0" id="tabla-apartamentos">
                     <thead class="table-light">
                         <tr>
-
+                            <th scope="col" style="width: 42px;" class="text-center">
+                                <input type="checkbox" class="form-check-input" id="check-all-aptos" title="Seleccionar todos">
+                            </th>
                             <th scope="col" class="text-secondary">Condominio</th>
                             <th scope="col" class="text-secondary">Número/Identificador</th>
                             <th scope="col" class="text-secondary">Residente</th>
                             <th scope="col" class="text-secondary">Metros Cuadrados</th>
                             <th scope="col" class="text-secondary">Alícuota</th>
+                            <th scope="col" class="text-secondary text-end pe-3">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-apartamentos">
                         <?php if (!empty($apartamentos)): ?>
                             <?php foreach ($apartamentos as $apto): ?>
                                 <tr>
-
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input check-apto-item" value="<?= $apto['id'] ?>">
+                                    </td>
                                     <td class="fw-medium"><?= htmlspecialchars($apto['nombre_condominio']) ?></td>
                                     <td><span class="badge bg-secondary rounded-pill"><?= htmlspecialchars($apto['nro_apartamento'] ?? '') ?></span></td>
                                     <td>
@@ -125,11 +135,20 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                                     </td>
                                     <td><?= number_format((float)($apto['metros_cuadrados'] ?? 0), 2) ?> m²</td>
                                     <td><span class="badge bg-info rounded-pill"><?= number_format((float)($apto['alicuota'] ?? 0), 4) ?>%</span></td>
+                                    <td class="text-end pe-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-apto rounded-pill px-2.5 py-1"
+                                            data-id="<?= $apto['id'] ?>"
+                                            data-numero="<?= htmlspecialchars($apto['nro_apartamento'] ?? '') ?>"
+                                            data-condo="<?= htmlspecialchars($apto['nombre_condominio'] ?? '') ?>"
+                                            title="Eliminar este apartamento">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No hay apartamentos registrados.</td>
+                                <td colspan="7" class="text-center py-4 text-muted">No hay apartamentos registrados.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -330,6 +349,115 @@ echo view('template/super_header', ['pagina_actual' => $pagina_actual]);
                 });
             });
         });
+
+        // ── Eliminar apartamento individual ──────────────────────────────────
+        document.querySelectorAll('.btn-delete-apto').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const numero = this.getAttribute('data-numero');
+                const condo = this.getAttribute('data-condo');
+
+                Swal.fire({
+                    title: `¿Eliminar apartamento ${numero}?`,
+                    html: `<p class="text-secondary small mb-2">Condominio: <strong>${condo}</strong></p>
+                           <p class="text-danger small fw-semibold mb-0">Esta acción liberará 1 cupo en el límite de tu plan.</p>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="bi bi-trash-fill me-1"></i> Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.showLoading();
+                        const f = document.createElement('form');
+                        f.method = 'POST';
+                        f.action = `<?= base_url('super/apartamentos/delete/') ?>${id}`;
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden';
+                        csrf.name = '<?= csrf_token() ?>';
+                        csrf.value = '<?= csrf_hash() ?>';
+                        f.appendChild(csrf);
+                        document.body.appendChild(f);
+                        f.submit();
+                    }
+                });
+            });
+        });
+
+        // ── Selección masiva y eliminación en lote ────────────────────────────
+        const checkAll = document.getElementById('check-all-aptos');
+        const checkItems = document.querySelectorAll('.check-apto-item');
+        const btnDeleteBatch = document.getElementById('btn-delete-batch');
+        const countSpan = document.getElementById('count-selected');
+
+        function actualizarSeleccionBatch() {
+            const seleccionados = document.querySelectorAll('.check-apto-item:checked');
+            const total = seleccionados.length;
+            if (countSpan) countSpan.textContent = total;
+            if (btnDeleteBatch) {
+                if (total > 0) {
+                    btnDeleteBatch.classList.remove('d-none');
+                } else {
+                    btnDeleteBatch.classList.add('d-none');
+                }
+            }
+            if (checkAll) {
+                checkAll.checked = checkItems.length > 0 && total === checkItems.length;
+            }
+        }
+
+        if (checkAll) {
+            checkAll.addEventListener('change', function() {
+                checkItems.forEach(cb => cb.checked = checkAll.checked);
+                actualizarSeleccionBatch();
+            });
+        }
+
+        checkItems.forEach(cb => {
+            cb.addEventListener('change', actualizarSeleccionBatch);
+        });
+
+        if (btnDeleteBatch) {
+            btnDeleteBatch.addEventListener('click', function() {
+                const seleccionados = Array.from(document.querySelectorAll('.check-apto-item:checked')).map(cb => cb.value);
+                if (seleccionados.length === 0) return;
+
+                Swal.fire({
+                    title: `¿Eliminar ${seleccionados.length} apartamento(s)?`,
+                    html: `<p class="text-danger small fw-semibold mb-0">Se eliminarán los ${seleccionados.length} apartamentos seleccionados y se liberarán los cupos correspondientes en tu plan.</p>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: `<i class="bi bi-trash-fill me-1"></i> Sí, eliminar ${seleccionados.length}`,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.showLoading();
+                        const f = document.createElement('form');
+                        f.method = 'POST';
+                        f.action = `<?= base_url('super/apartamentos/delete-batch') ?>`;
+                        const csrf = document.createElement('input');
+                        csrf.type = 'hidden';
+                        csrf.name = '<?= csrf_token() ?>';
+                        csrf.value = '<?= csrf_hash() ?>';
+                        f.appendChild(csrf);
+
+                        seleccionados.forEach(id => {
+                            const inp = document.createElement('input');
+                            inp.type = 'hidden';
+                            inp.name = 'ids[]';
+                            inp.value = id;
+                            f.appendChild(inp);
+                        });
+
+                        document.body.appendChild(f);
+                        f.submit();
+                    }
+                });
+            });
+        }
     });
 </script>
 

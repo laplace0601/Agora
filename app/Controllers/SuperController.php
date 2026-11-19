@@ -182,6 +182,93 @@ class SuperController extends BaseController
     }
 
     /**
+     * POST /super/apartamentos/delete/(:num)
+     * Elimina un apartamento individual y limpia sus relaciones.
+     */
+    public function deleteApartamento($id = null)
+    {
+        if (! $id) {
+            return $this->responder('error', 'ID de apartamento requerido.', 400, [], 'super/apartamentos');
+        }
+
+        try {
+            $apartamentoModel = new \App\Models\ApartamentoModel();
+            $apto = $apartamentoModel->find($id);
+
+            if (! $apto) {
+                return $this->responder('error', 'El apartamento no existe o ya fue eliminado.', 404, [], 'super/apartamentos');
+            }
+
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            // Limpieza preventiva de tablas dependientes
+            $db->table('recibos_mensuales')->where('apartamento_id', $id)->delete();
+            $db->table('solvencias')->where('apartamento_id', $id)->delete();
+            $db->table('habitantes')->where('apartamento_id', $id)->delete();
+            $db->table('reservas_areas_comunes')->where('apartamento_id', $id)->delete();
+
+            $apartamentoModel->delete($id);
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return $this->responder('error', 'No se pudo eliminar el apartamento por una restricción de integridad.', 500, [], 'super/apartamentos');
+            }
+
+            $nro = $apto['nro_apartamento'] ?? "#{$id}";
+            return $this->responder('success', "Apartamento {$nro} eliminado exitosamente.", 200, [], 'super/apartamentos');
+
+        } catch (\Throwable $e) {
+            log_message('error', '[SuperController::deleteApartamento] ' . $e->getMessage());
+            return $this->responder('error', 'Error al eliminar el apartamento: ' . $e->getMessage(), 500, [], 'super/apartamentos');
+        }
+    }
+
+    /**
+     * POST /super/apartamentos/delete-batch
+     * Elimina múltiples apartamentos seleccionados en lote.
+     */
+    public function deleteApartamentosBatch()
+    {
+        $ids = $this->request->getPost('ids');
+        if (! is_array($ids) || empty($ids)) {
+            return $this->responder('error', 'No se seleccionó ningún apartamento para eliminar.', 400, [], 'super/apartamentos');
+        }
+
+        $ids = array_filter(array_map('intval', $ids), fn($v) => $v > 0);
+        if (empty($ids)) {
+            return $this->responder('error', 'Selección de apartamentos no válida.', 400, [], 'super/apartamentos');
+        }
+
+        try {
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            $db->table('recibos_mensuales')->whereIn('apartamento_id', $ids)->delete();
+            $db->table('solvencias')->whereIn('apartamento_id', $ids)->delete();
+            $db->table('habitantes')->whereIn('apartamento_id', $ids)->delete();
+            $db->table('reservas_areas_comunes')->whereIn('apartamento_id', $ids)->delete();
+
+            $apartamentoModel = new \App\Models\ApartamentoModel();
+            $apartamentoModel->whereIn('id', $ids)->delete();
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return $this->responder('error', 'No se pudieron eliminar los apartamentos seleccionados.', 500, [], 'super/apartamentos');
+            }
+
+            $total = count($ids);
+            return $this->responder('success', "Se eliminaron {$total} apartamento(s) exitosamente.", 200, [], 'super/apartamentos');
+
+        } catch (\Throwable $e) {
+            log_message('error', '[SuperController::deleteApartamentosBatch] ' . $e->getMessage());
+            return $this->responder('error', 'Error al eliminar apartamentos: ' . $e->getMessage(), 500, [], 'super/apartamentos');
+        }
+    }
+
+    /**
      * POST /super/apartamentos/registrar-apartamento
      */
     public function registrarApartamento()
@@ -249,13 +336,17 @@ class SuperController extends BaseController
 
         if ($limitePlan > 0 && ($totalGlobal + $cantidad) > $limitePlan) {
             $disponibles = max(0, $limitePlan - $totalGlobal);
-            return $responderError(
-                "Tu plan \u00abNivel: {$nivelPlan}\u00bb permite un m\u00e1ximo de {$limitePlan} apartamentos en total. "
-                    . "Ya tienes {$totalGlobal} registrados e intentas crear {$cantidad} m\u00e1s. "
-                    . "Puedes agregar como m\u00e1ximo {$disponibles} apartamento(s).",
-                422,
-                'plan_limit'
-            );
+            if ($disponibles <= 0) {
+                $mensajeLimite = "Has alcanzado el límite máximo de tu Plan {$nivelPlan} ({$limitePlan} de {$limitePlan} apartamentos registrados). "
+                    . "Ya no dispones de cupos libres para crear más unidades. "
+                    . "Para ampliar la capacidad de tu sistema, puedes mejorar tu suscripción en la sección «Mi Plan».";
+            } else {
+                $mensajeLimite = "Cupo insuficiente en tu Plan {$nivelPlan}: este plan permite hasta {$limitePlan} apartamentos en total. "
+                    . "Actualmente tienes {$totalGlobal} registrados y solo dispones de cupo para {$disponibles} más (intentaste registrar {$cantidad}). "
+                    . "Por favor reduce la cantidad a {$disponibles} o actualiza tu suscripción en la sección «Mi Plan».";
+            }
+
+            return $responderError($mensajeLimite, 422, 'plan_limit');
         }
         // ──────────────────────────────────────────────────────────────────────
 

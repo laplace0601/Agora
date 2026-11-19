@@ -44,6 +44,10 @@ $routes->group('super', ['filter' => 'auth:root'], function ($routes) {
     $routes->get('apartamentos/condominios/delete/(:num)',  'SuperController::apartamentos');
     $routes->post('apartamentos/registrar-apartamento',    'SuperController::registrarApartamento');
     $routes->get('apartamentos/registrar-apartamento',     'SuperController::apartamentos');
+    $routes->post('apartamentos/delete/(:num)',            'SuperController::deleteApartamento/$1');
+    $routes->get('apartamentos/delete/(:num)',             'SuperController::apartamentos');
+    $routes->post('apartamentos/delete-batch',              'SuperController::deleteApartamentosBatch');
+    $routes->get('apartamentos/delete-batch',               'SuperController::apartamentos');
 
     // Gestión de usuarios
     $routes->get('crear-usuario', 'UsuarioController::crearUsuario');
