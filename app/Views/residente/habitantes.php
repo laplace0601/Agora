@@ -19,6 +19,13 @@ echo view('template/residente_header', ['pagina_actual' => $pagina_actual, 'apar
         </div>
     <?php endif; ?>
 
+    <!-- Botón Volver al Dashboard -->
+    <div class="mb-4">
+        <a href="<?= base_url('residente/dashboard') ?>" class="text-decoration-none text-secondary small d-inline-flex align-items-center">
+            <i class="bi bi-arrow-left me-2"></i> Volver al Dashboard
+        </a>
+    </div>
+
     <header class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 border-bottom pb-4">
         <div>
             <h1 class="fw-bold h3 text-dark mb-1"><i class="bi bi-people-fill me-2"></i>Censo de Mi Departamento</h1>

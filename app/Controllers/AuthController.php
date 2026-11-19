@@ -34,7 +34,7 @@ class AuthController extends BaseController
         $clave  = $this->request->getPost('clave');
 
         if (empty($correo) || empty($clave)) {
-            return redirect()->back()->with('error', 'El correo y la contraseña son requeridos.');
+            return redirect()->to(base_url('login'))->with('error', 'El correo y la contraseña son requeridos.');
         }
 
         $modelo  = new UsuarioModel();
@@ -43,7 +43,7 @@ class AuthController extends BaseController
 
         if (! $usuario) {
             // No revelamos si es el correo o la contraseña lo incorrecto (seguridad)
-            return redirect()->back()->with('error', 'Credenciales incorrectas o cuenta inactiva.');
+            return redirect()->to(base_url('login'))->with('error', 'Credenciales incorrectas o cuenta inactiva.');
         }
 
         $rol = $usuario['rol'] ?? '';

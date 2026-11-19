@@ -1,5 +1,22 @@
 <?php
 
+// ---------------------------------------------------------------
+// Detección Forzada de HTTPS detrás de Reverse Proxy (InfinityFree / Cloudflare)
+// Si el proxy externo terminó la conexión SSL, aseguramos que PHP reconozca HTTPS
+// para evitar que el navegador genere advertencias de "información no segura" y mixed-content.
+// ---------------------------------------------------------------
+if (
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+    (isset($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on') ||
+    (isset($_SERVER['HTTP_CF_VISITOR']) && strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false) ||
+    (isset($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) === 'on') ||
+    (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) ||
+    (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'infinityfreeapp.com'))
+) {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = '443';
+}
+
 use CodeIgniter\Boot;
 use Config\Paths;
 

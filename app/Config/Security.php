@@ -15,7 +15,7 @@ class Security extends BaseConfig
      *
      * @var string 'cookie' or 'session'
      */
-    public string $csrfProtection = 'cookie';
+    public string $csrfProtection = 'session';
 
     /**
      * --------------------------------------------------------------------------
@@ -84,5 +84,5 @@ class Security extends BaseConfig
      * En true redirige al usuario con un mensaje de error y token renovado,
      * en lugar de arrojar una SecurityException::forDisallowedAction() 403.
      */
-    public bool $redirect = true;
+    public bool $redirect = false;
 }

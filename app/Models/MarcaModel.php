@@ -12,6 +12,7 @@ class MarcaModel extends Model
     protected $returnType       = 'array';
 
     protected $allowedFields = [
+        'id',
         'nombre_empresa',
         'logo_url',
         'login_bg_url',

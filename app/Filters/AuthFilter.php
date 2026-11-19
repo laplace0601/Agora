@@ -11,14 +11,14 @@ class AuthFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to(site_url('auth/login'))->with('error', 'Debe iniciar sesión para acceder a esta área.');
+            return redirect()->to(base_url('login'))->with('error', 'Debe iniciar sesión para acceder a esta área.');
         }
 
-        // Validación de inactividad
+        // Validación de inactividad (2 horas = 7200 segundos)
         $sessionStartTime = session()->get('session_start_time');
-        if ($sessionStartTime && (time() - $sessionStartTime > 600)) {
+        if ($sessionStartTime && (time() - $sessionStartTime > 7200)) {
             session()->destroy();
-            return redirect()->to(site_url('auth/login'))->with('error', 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo.');
+            return redirect()->to(base_url('login'))->with('error', 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo.');
         }
 
         // Renovar el tiempo de inicio de sesión para contar inactividad
@@ -27,7 +27,7 @@ class AuthFilter implements FilterInterface
         if ($arguments && !empty($arguments)) {
             $rol = session()->get('rol');
             if (!in_array($rol, $arguments)) {
-                return redirect()->to(site_url('auth/login'))->with('error', 'No tiene permisos para acceder a esta área.');
+                return redirect()->to(base_url('login'))->with('error', 'No tiene permisos para acceder a esta área.');
             }
         }
     }

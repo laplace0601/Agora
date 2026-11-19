@@ -453,7 +453,8 @@ class FinanzasController extends BaseController
             ->first();
 
         if (! $recibo) {
-            return redirect()->back()->with('error', 'El recibo solicitado no existe.');
+            $urlFallback = ($rol === 'residente') ? 'residente/finanzas' : 'admin/finanzas/pagos';
+            return redirect()->to(base_url($urlFallback))->with('error', 'El recibo solicitado no existe.');
         }
 
         if ($rol === 'residente') {
@@ -462,14 +463,15 @@ class FinanzasController extends BaseController
             $idsApartamentos       = array_column($apartamentosResidente, 'id');
 
             if (! in_array($recibo['apartamento_id'], $idsApartamentos)) {
-                return redirect()->back()->with('error', 'Acceso denegado: este recibo no pertenece a tu apartamento.');
+                return redirect()->to(base_url('residente/finanzas'))->with('error', 'Acceso denegado: este recibo no pertenece a tu apartamento.');
             }
         } elseif (! in_array($rol, ['admin', 'root'], true)) {
-            return redirect()->back()->with('error', 'No tienes permisos para consultar este recibo.');
+            return redirect()->to(base_url('login'))->with('error', 'No tienes permisos para consultar este recibo.');
         }
 
         if (($recibo['estado_pago'] ?? '') !== 'Pagado') {
-            return redirect()->back()->with('error', 'El recibo aún no se encuentra marcado como Pagado.');
+            $urlFallback = ($rol === 'residente') ? 'residente/finanzas' : 'admin/finanzas/pagos';
+            return redirect()->to(base_url($urlFallback))->with('error', 'El recibo aún no se encuentra marcado como Pagado.');
         }
 
         $pagoModel = new PagoModel();

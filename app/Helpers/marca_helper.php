@@ -77,7 +77,7 @@ if (! function_exists('logoEmpresa')) {
         if (!empty($logo)) {
             $path = FCPATH . ltrim($logo, '/\\');
             if (is_file($path)) {
-                return base_url($logo) . '?v=' . filemtime($path);
+                return base_url($logo) . '?v=' . (@filemtime($path) ?: time());
             }
         }
         return null;
@@ -107,7 +107,7 @@ if (! function_exists('loginBgEmpresa')) {
         if (!empty($bg)) {
             $path = FCPATH . ltrim($bg, '/\\');
             if (is_file($path)) {
-                return base_url($bg) . '?v=' . filemtime($path);
+                return base_url($bg) . '?v=' . (@filemtime($path) ?: time());
             }
         }
 

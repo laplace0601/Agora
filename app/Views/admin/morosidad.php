@@ -34,7 +34,7 @@
                 <div class="col-auto">
                     <label class="form-label small text-secondary fw-medium">Año</label>
                     <select name="anio" class="form-select form-select-sm">
-                        <?php for ($y = ($anio_actual ?? date('Y')); $y >= 2020; $y--): ?>
+                        <?php for ($y = 2100; $y >= 2020; $y--): ?>
                             <option value="<?= $y ?>" <?= ($filtro_anio ?? '') == $y ? 'selected' : '' ?>><?= $y ?></option>
                         <?php endfor; ?>
                     </select>

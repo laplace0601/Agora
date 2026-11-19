@@ -7,11 +7,6 @@ Options -Indexes
     RewriteEngine On
     RewriteBase /public/
 
-    # Redireccionar trailing slashes a URLs limpias sin slash final
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
-
     # Servir archivos o carpetas físicos existentes directamente (css, js, imágenes)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d

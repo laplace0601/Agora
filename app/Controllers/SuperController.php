@@ -341,72 +341,106 @@ class SuperController extends BaseController
 
     public function guardarMarcaBlanca()
     {
-        $marcaModel = new \App\Models\MarcaModel();
-        $currentMarca = $marcaModel->find(1) ?? [];
-
-        $data = [
-            'nombre_empresa'    => $this->request->getPost('nombre_empresa'),
-            'correo_contacto'   => $this->request->getPost('correo_contacto'),
-            'telefono_contacto' => $this->request->getPost('telefono_contacto'),
-            'cedula_pago'       => $this->request->getPost('cedula_pago'),
-            'telefono_pago'     => $this->request->getPost('telefono_pago'),
-            'banco_pago'        => $this->request->getPost('banco_pago'),
-        ];
-
-        // Mantener color primario solo si fue enviado
-        $colorPrimario = $this->request->getPost('color_primario');
-        if ($colorPrimario !== null && trim($colorPrimario) !== '') {
-            $data['color_primario'] = trim($colorPrimario);
-        }
-
-        // 1. Manejo de Logotipo (Eliminar o Subir con FileUploadTrait)
-        if ($this->request->getPost('eliminar_logo') == '1') {
-            $this->eliminarArchivoSeguro($currentMarca['logo_url'] ?? null);
-            $data['logo_url'] = null;
-        } else {
-            $subidaLogo = $this->subirImagenSegura(
-                $this->request->getFile('logo_condominio'),
-                'branding',
-                $currentMarca['logo_url'] ?? null,
-                2,
-                ['jpg', 'jpeg', 'png', 'webp', 'svg', 'jfif']
-            );
-
-            if (is_array($subidaLogo) && isset($subidaLogo['error'])) {
-                return redirect()->to(base_url('super/marca-blanca'))
-                    ->with('error', $subidaLogo['error']);
-            }
-
-            if ($subidaLogo !== null) {
-                $data['logo_url'] = $subidaLogo;
-            }
-        }
-
-        // 2. Manejo de Fondo del Login (Eliminar o Subir con FileUploadTrait)
-        if ($this->request->getPost('eliminar_login_bg') == '1') {
-            $this->eliminarArchivoSeguro($currentMarca['login_bg_url'] ?? null);
-            $data['login_bg_url'] = null;
-        } else {
-            $subidaBg = $this->subirImagenSegura(
-                $this->request->getFile('login_bg'),
-                'branding',
-                $currentMarca['login_bg_url'] ?? null,
-                5,
-                ['jpg', 'jpeg', 'png', 'webp', 'jfif'],
-                'login_bg_'
-            );
-
-            if (is_array($subidaBg) && isset($subidaBg['error'])) {
-                return redirect()->to(base_url('super/marca-blanca'))
-                    ->with('error', $subidaBg['error']);
-            }
-
-            if ($subidaBg !== null) {
-                $data['login_bg_url'] = $subidaBg;
-            }
-        }
-
         try {
+            $marcaModel = new \App\Models\MarcaModel();
+
+            // 1. Detección y creación defensiva de columnas faltantes en MySQL (InfinityFree / entornos compartidos)
+            try {
+                $db = \Config\Database::connect();
+                $columnasExistentes = $db->getFieldNames('configuracion_marca');
+
+                if (! in_array('login_bg_url', $columnasExistentes, true)) {
+                    $db->query("ALTER TABLE configuracion_marca ADD COLUMN login_bg_url VARCHAR(255) NULL AFTER logo_url");
+                }
+                if (! in_array('telefono_contacto', $columnasExistentes, true)) {
+                    $db->query("ALTER TABLE configuracion_marca ADD COLUMN telefono_contacto VARCHAR(50) NULL AFTER correo_contacto");
+                }
+                if (! in_array('cedula_pago', $columnasExistentes, true)) {
+                    $db->query("ALTER TABLE configuracion_marca ADD COLUMN cedula_pago VARCHAR(20) NULL");
+                }
+                if (! in_array('telefono_pago', $columnasExistentes, true)) {
+                    $db->query("ALTER TABLE configuracion_marca ADD COLUMN telefono_pago VARCHAR(30) NULL");
+                }
+                if (! in_array('banco_pago', $columnasExistentes, true)) {
+                    $db->query("ALTER TABLE configuracion_marca ADD COLUMN banco_pago VARCHAR(100) NULL");
+                }
+            } catch (\Throwable $t) {
+                log_message('warning', '[MarcaBlanca] No se pudieron verificar/crear columnas: ' . $t->getMessage());
+            }
+
+            $currentMarca = $marcaModel->find(1) ?? [];
+
+            $data = [
+                'nombre_empresa'    => trim((string) $this->request->getPost('nombre_empresa')),
+                'correo_contacto'   => trim((string) $this->request->getPost('correo_contacto')),
+                'telefono_contacto' => trim((string) $this->request->getPost('telefono_contacto')),
+                'cedula_pago'       => trim((string) $this->request->getPost('cedula_pago')),
+                'telefono_pago'     => trim((string) $this->request->getPost('telefono_pago')),
+                'banco_pago'        => trim((string) $this->request->getPost('banco_pago')),
+            ];
+
+            // Mantener color primario solo si fue enviado
+            $colorPrimario = $this->request->getPost('color_primario');
+            if ($colorPrimario !== null && trim($colorPrimario) !== '') {
+                $data['color_primario'] = trim($colorPrimario);
+            }
+
+            // 2. Manejo de Logotipo (Eliminar o Subir con FileUploadTrait)
+            if ($this->request->getPost('eliminar_logo') == '1') {
+                $this->eliminarArchivoSeguro($currentMarca['logo_url'] ?? null);
+                $data['logo_url'] = null;
+            } else {
+                $subidaLogo = $this->subirImagenSegura(
+                    $this->request->getFile('logo_condominio'),
+                    'branding',
+                    $currentMarca['logo_url'] ?? null,
+                    2,
+                    ['jpg', 'jpeg', 'png', 'webp', 'svg', 'jfif']
+                );
+
+                if (is_array($subidaLogo) && isset($subidaLogo['error'])) {
+                    return redirect()->to(base_url('super/marca-blanca'))
+                        ->with('error', $subidaLogo['error']);
+                }
+
+                if ($subidaLogo !== null) {
+                    $data['logo_url'] = $subidaLogo;
+                }
+            }
+
+            // 3. Manejo de Fondo del Login (Eliminar o Subir con FileUploadTrait)
+            if ($this->request->getPost('eliminar_login_bg') == '1') {
+                $this->eliminarArchivoSeguro($currentMarca['login_bg_url'] ?? null);
+                $data['login_bg_url'] = null;
+            } else {
+                $subidaBg = $this->subirImagenSegura(
+                    $this->request->getFile('login_bg'),
+                    'branding',
+                    $currentMarca['login_bg_url'] ?? null,
+                    5,
+                    ['jpg', 'jpeg', 'png', 'webp', 'jfif'],
+                    'login_bg_'
+                );
+
+                if (is_array($subidaBg) && isset($subidaBg['error'])) {
+                    return redirect()->to(base_url('super/marca-blanca'))
+                        ->with('error', $subidaBg['error']);
+                }
+
+                if ($subidaBg !== null) {
+                    $data['login_bg_url'] = $subidaBg;
+                }
+            }
+
+            // 4. Filtrar campos contra columnas reales de la tabla para prevenir excepciones SQL
+            try {
+                $columnasValidas = $marcaModel->db->getFieldNames('configuracion_marca');
+                $data = array_intersect_key($data, array_flip($columnasValidas));
+            } catch (\Throwable $t) {
+                // Si la introspección falla, continuar con $data
+            }
+
+            // 5. Guardar o actualizar registro maestro (ID = 1)
             $existe = $marcaModel->find(1);
             if ($existe) {
                 $marcaModel->skipValidation(true)->update(1, $data);
@@ -415,13 +449,14 @@ class SuperController extends BaseController
                 $marcaModel->skipValidation(true)->insert($data);
             }
 
-            log_message('info', '[Auditoría] Usuario ID ' . (session()->get('usuario_id') ?? session()->get('id_usuario')) . ' actualizó la configuración de marca blanca.');
+            log_message('info', '[Auditoría] Usuario ID ' . (session()->get('usuario_id') ?? 'root') . ' actualizó la configuración de marca blanca.');
             return redirect()->to(base_url('super/marca-blanca'))
                 ->with('success', 'Identidad de marca actualizada correctamente.');
-        } catch (\Exception $e) {
-            log_message('error', '[MarcaBlanca] Error al guardar: ' . $e->getMessage());
+
+        } catch (\Throwable $e) {
+            log_message('error', '[MarcaBlanca] Error al guardar: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine());
             return redirect()->to(base_url('super/marca-blanca'))
-                ->with('error', 'Ocurrió un error al guardar la configuración de marca: ' . $e->getMessage());
+                ->with('error', 'Ocurrió un error al guardar la configuración: ' . $e->getMessage());
         }
     }
 

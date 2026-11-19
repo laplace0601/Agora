@@ -63,18 +63,23 @@ trait FileUploadTrait
         // Eliminar archivo previo si se especificó y existe
         $this->eliminarArchivoSeguro($archivoAnterior);
 
-        // Asegurar que el directorio de destino exista
+        // Asegurar que el directorio de destino exista con permisos adecuados
         $carpetaLimpia = trim(str_replace(['..', '\\'], ['', '/'], $carpetaDestino), '/');
         $rutaCompleta  = FCPATH . 'uploads/' . $carpetaLimpia . '/';
 
         if (! is_dir($rutaCompleta)) {
-            mkdir($rutaCompleta, 0775, true);
+            @mkdir($rutaCompleta, 0777, true);
         }
 
-        $nuevoNombre = $prefijo . $archivo->getRandomName();
-        $archivo->move($rutaCompleta, $nuevoNombre);
+        try {
+            $nuevoNombre = $prefijo . $archivo->getRandomName();
+            $archivo->move($rutaCompleta, $nuevoNombre);
 
-        return 'uploads/' . $carpetaLimpia . '/' . $nuevoNombre;
+            return 'uploads/' . $carpetaLimpia . '/' . $nuevoNombre;
+        } catch (\Throwable $e) {
+            log_message('error', '[FileUploadTrait] Error al mover archivo: ' . $e->getMessage());
+            return ['error' => 'No se pudo guardar el archivo en el servidor: ' . $e->getMessage()];
+        }
     }
 
     /**
@@ -87,12 +92,16 @@ trait FileUploadTrait
             return false;
         }
 
-        // Restringir estrictamente al directorio uploads/
-        if (str_contains($rutaRelativa, 'uploads/')) {
-            $archivoFisico = FCPATH . ltrim($rutaRelativa, '/\\');
-            if (is_file($archivoFisico)) {
-                return @unlink($archivoFisico);
+        try {
+            // Restringir estrictamente al directorio uploads/
+            if (str_contains($rutaRelativa, 'uploads/')) {
+                $archivoFisico = FCPATH . ltrim($rutaRelativa, '/\\');
+                if (is_file($archivoFisico)) {
+                    return @unlink($archivoFisico);
+                }
             }
+        } catch (\Throwable $e) {
+            log_message('warning', '[FileUploadTrait] No se pudo eliminar archivo: ' . $e->getMessage());
         }
 
         return false;

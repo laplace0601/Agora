@@ -73,7 +73,7 @@ echo view('template/admin_header', ['pagina_actual' => $pagina_actual]);
 
                                 <div class="form-floating mb-3">
                                     <input type="number" class="form-control" id="anio" name="anio"
-                                        min="2024" max="2035"
+                                        min="2020" max="2100"
                                         value="<?= $anio_actual ?? date('Y') ?>" required>
                                     <label for="anio">Año *</label>
                                 </div>

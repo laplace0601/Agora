@@ -54,7 +54,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                             <div class="mb-3 p-3 bg-light rounded-3 border">
                                 <label class="form-label text-secondary small fw-bold text-uppercase d-block mb-2">Logotipo Actual Guardado</label>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="<?= base_url($currentLogo) . '?v=' . filemtime(FCPATH . ltrim($currentLogo, '/\\')) ?>" alt="Logo actual" style="max-height: 70px; max-width: 160px; object-fit: contain;" class="rounded bg-white p-2 border">
+                                    <img src="<?= base_url($currentLogo) . '?v=' . (@filemtime(FCPATH . ltrim($currentLogo, '/\\')) ?: time()) ?>" alt="Logo actual" style="max-height: 70px; max-width: 160px; object-fit: contain;" class="rounded bg-white p-2 border">
                                     <div>
                                         <p class="small text-muted mb-2">Logotipo activo en cabeceras y reportes.</p>
                                         <div class="form-check">
@@ -106,7 +106,7 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                             <div class="mb-3 p-3 bg-light rounded-3 border">
                                 <label class="form-label text-secondary small fw-bold text-uppercase d-block mb-2">Fondo Actual Guardado</label>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="<?= base_url($currentBg) . '?v=' . filemtime(FCPATH . ltrim($currentBg, '/\\')) ?>" alt="Fondo login actual" style="max-height: 100px; max-width: 180px; object-fit: cover;" class="rounded shadow-sm border">
+                                    <img src="<?= base_url($currentBg) . '?v=' . (@filemtime(FCPATH . ltrim($currentBg, '/\\')) ?: time()) ?>" alt="Fondo login actual" style="max-height: 100px; max-width: 180px; object-fit: cover;" class="rounded shadow-sm border">
                                     <div>
                                         <p class="small text-muted mb-2">Esta es la imagen que se muestra actualmente en la pantalla de inicio de sesión.</p>
                                         <div class="form-check">
@@ -196,8 +196,9 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success text-white w-100 py-2 rounded-pill fw-semibold shadow-sm mt-2" style="background-color: #198754; border-color: #198754;">
-                            <i class="bi bi-check-circle me-1"></i> Aplicar Identidad de Marca
+                        <button type="submit" id="btnGuardarMarca" class="btn btn-success text-white w-100 py-2.5 rounded-pill fw-semibold shadow-sm mt-3" style="background-color: #198754; border-color: #198754;">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" id="spinnerMarca" role="status" aria-hidden="true"></span>
+                            <i class="bi bi-check-circle me-1" id="iconoMarca"></i> <span id="textoMarca">Aplicar Identidad de Marca</span>
                         </button>
                     </form>
                 </div>
@@ -205,6 +206,24 @@ echo view('template/super_header', ['pagina_actual' => 'admin_marca_blanca']);
         </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formMarca = document.querySelector('form[action*="marca-blanca/guardar"]');
+    if (formMarca) {
+        formMarca.addEventListener('submit', function() {
+            const btn = document.getElementById('btnGuardarMarca');
+            const spinner = document.getElementById('spinnerMarca');
+            const icono = document.getElementById('iconoMarca');
+            const texto = document.getElementById('textoMarca');
+            if (btn) btn.disabled = true;
+            if (spinner) spinner.classList.remove('d-none');
+            if (icono) icono.classList.add('d-none');
+            if (texto) texto.textContent = 'Guardando cambios...';
+        });
+    }
+});
+</script>
 
 <?php
 echo view('template/super_footer', ['pagina_actual' => 'admin_marca_blanca']);
